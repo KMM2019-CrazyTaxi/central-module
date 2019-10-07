@@ -17,13 +17,13 @@ OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
 project: $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) -o project
+	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
 
 clean:
-	rm -f project 
+	rm -f project.out
 	find $(OBJSDIR)/ -name '*.o' -delete
 	find $(DEPDIR)/ -name '*.h.gch' -delete
 	rm -r project.dSYM
