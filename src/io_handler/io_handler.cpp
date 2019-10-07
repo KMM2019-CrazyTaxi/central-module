@@ -17,10 +17,6 @@ int io_thread_main(io_data& data) {
 
         data.distance = update_distance();
         data.acceleration = update_acceleration();
-
-        std::cout << "IO execution" << std::endl;
-        std::cout << "d(IO): " << data.distance << std::endl;
-        std::cout << "a(IO): " << data.acceleration << std::endl;
         
         std::this_thread::sleep_for(std::chrono::milliseconds(210));
     }
@@ -33,7 +29,8 @@ static float update_distance() {
 #ifdef WIRING_PI
     // pi implementation
 #else
-    return (float)std::rand()/(float)(RAND_MAX/1);
+    #define MAX_DISTANCE 10
+    return (float) std::rand() / (float) ( RAND_MAX / MAX_DISTANCE);
 #endif
 
 }
@@ -43,7 +40,8 @@ static float update_acceleration() {
 #ifdef WIRING_PI
     // pi implementation
 #else
-    return (float)std::rand()/(float)(RAND_MAX/10);
+    #define MAX_ACCELERATION 10
+    return (float) std::rand() / (float) ( RAND_MAX / MAX_ACCELERATION );
 #endif
 }
 
