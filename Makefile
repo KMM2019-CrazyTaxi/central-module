@@ -27,3 +27,9 @@ clean:
 	find $(OBJSDIR)/ -name '*.o' -delete
 	find $(DEPDIR)/ -name '*.h.gch' -delete
 	rm -r project.dSYM
+
+run:
+	@echo "------------------------------ Compiling project... ------------------------------"		
+	make
+	@echo "------------------------------ Running project... --------------------------------"
+	./project.out
