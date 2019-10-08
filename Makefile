@@ -4,9 +4,11 @@ CCXFLAGS = -std=c++17
 SRCDIR  = ./src
 OBJSDIR = ./build
 DEPDIR	= ./include
+GPUDIR = ./QPULib/Lib
 
 # Find all subdirectories
 INCLUDES = $(shell find $(SRCDIR) -type d | sed s/^/-I/)
+INCLUDES += $(shell find $(GPUDIR) -type d | sed s/^/-I/)
 
 # Get all headers and sources from source directory
 HEADERS = $(shell find $(SRCDIR) -type f -name '*.h')
