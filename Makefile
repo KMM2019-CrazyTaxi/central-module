@@ -1,5 +1,5 @@
 CCX=clang++
-CCXFLAGS = -std=c++17
+CCXFLAGS = -std=c++17 -pthread
 
 SRCDIR  = ./src
 OBJSDIR = ./build
