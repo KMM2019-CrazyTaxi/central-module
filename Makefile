@@ -18,14 +18,18 @@ SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
-project: $(OBJECTS)
+project: $(OBJSDIR) $(OBJECTS)
 	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
 
+$(OBJSDIR):
+	mkdir build
+
 clean:
 	rm -f project.out
+	rm -rf $(OBJSDIR)
 	find $(OBJSDIR)/ -name '*.o' -delete
 	find $(DEPDIR)/ -name '*.h.gch' -delete
 	rm -r project.dSYM
