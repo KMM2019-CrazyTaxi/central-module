@@ -1,0 +1,3 @@
+[submodule "include/raspicam"]
+	path = include/raspicam
+	url = https://github.com/KMM2019-CrazyTaxi/raspicam.git
