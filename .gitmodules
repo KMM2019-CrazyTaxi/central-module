@@ -1,6 +1,1 @@
-[submodule "QPULib"]
-	path = QPULib
-	url = https://github.com/KMM2019-CrazyTaxi/QPULib
-[submodule "include/QPULib"]
-	path = include/QPULib
-	url = https://github.com/KMM2019-CrazyTaxi/QPULib.git
+
