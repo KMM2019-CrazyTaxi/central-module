@@ -18,10 +18,10 @@ SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
-QPULIB = -l./include/QPULib/qpulib.a
+QPULIB = ./include/QPULib/qpulib.a
 
 project: $(OBJSDIR) $(QPULIB) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(QPULIB) $(OBJECTS_NO_PATH) -o project.out
+	$(CCX) $(CCXFLAGS) -l$(QPULIB) $(OBJECTS_NO_PATH) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
