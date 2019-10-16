@@ -33,12 +33,12 @@ $(OBJSDIR):
 	mkdir build
 
 clean:
+	cd ./include/QPULib && make clean
 	rm -f project.out
 	rm -rf $(OBJSDIR)
 	find $(OBJSDIR)/ -name '*.o' -delete
 	find $(DEPDIR)/ -name '*.h.gch' -delete
 	rm -r project.dSYM
-	cd ./include/QPULib && make clean
 
 run:
 	@echo "------------------------------ Compiling project... ------------------------------"		
