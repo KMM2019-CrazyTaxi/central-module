@@ -1,5 +1,5 @@
 CCX=clang++
-CCXFLAGS = -std=c++17 -pthread
+CCXFLAGS = -std=c++17 -pthread -DQPU_MODE
 
 SRCDIR  = ./src
 OBJSDIR = ./build
@@ -21,7 +21,7 @@ OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 QPULIB = ./include/QPULib/qpulib.a
 
 project: $(OBJSDIR) $(QPULIB) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) -o project.out -l $(QPULIB)
+	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
