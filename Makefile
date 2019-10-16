@@ -21,7 +21,7 @@ OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 QPULIB = ./include/QPULib/qpulib.a
 
 project: $(OBJSDIR) $(QPULIB) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) -l$(QPULIB) $(OBJECTS_NO_PATH) -o project.out
+	$(CCX) $(CCXFLAGS) $(QPULIB) $(OBJECTS_NO_PATH) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
