@@ -18,11 +18,16 @@ SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
-project: $(OBJSDIR) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) -o project.out
+QPULIB = -linclude/QPULib/qpulib.a
+
+$(MAIN): $(OBJSDIR) $(OBJECTS) $(QPULIB)
+	$(CCX) $(CCXFLAGS) $(QPULIB) $(OBJECTS_NO_PATH) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
+
+$(QPULIB):
+	cd ./include/QPULib && make
 
 $(OBJSDIR):
 	mkdir build
@@ -33,6 +38,7 @@ clean:
 	find $(OBJSDIR)/ -name '*.o' -delete
 	find $(DEPDIR)/ -name '*.h.gch' -delete
 	rm -r project.dSYM
+	cd ./include/QPULib && make clean
 
 run:
 	@echo "------------------------------ Compiling project... ------------------------------"		
