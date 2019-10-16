@@ -4,7 +4,7 @@ CCXFLAGS = -std=c++17 -pthread
 SRCDIR  = ./src
 OBJSDIR = ./build
 DEPDIR	= ./include
-GPUDIR = ./QPULib/Lib
+GPUDIR = ./include/QPULib/Lib
 
 # Find all subdirectories
 INCLUDES = $(shell find $(SRCDIR) -type d | sed s/^/-I/)
