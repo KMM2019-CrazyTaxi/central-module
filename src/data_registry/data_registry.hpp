@@ -5,6 +5,8 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "registry_entries.hpp"
+
 /**
  * A single entry in the data_registry
  */
