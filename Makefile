@@ -1,12 +1,14 @@
 CCX=clang++
-CCXFLAGS = -std=c++17
+CCXFLAGS = -std=c++17 -pthread -DQPU_MODE
 
 SRCDIR  = ./src
 OBJSDIR = ./build
 DEPDIR	= ./include
+GPUDIR = ./include/QPULib/Lib
 
 # Find all subdirectories
 INCLUDES = $(shell find $(SRCDIR) -type d | sed s/^/-I/)
+INCLUDES += $(shell find $(GPUDIR) -type d | sed s/^/-I/)
 
 # Get all headers and sources from source directory
 HEADERS = $(shell find $(SRCDIR) -type f -name '*.h')
@@ -16,14 +18,24 @@ SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
-project: $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) -o project.out
+QPULIB = ./include/QPULib/qpulib.a
+
+project: $(OBJSDIR) $(QPULIB) $(OBJECTS)
+	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
 
+$(QPULIB):
+	cd ./include/QPULib && make
+
+$(OBJSDIR):
+	mkdir build
+
 clean:
+	cd ./include/QPULib && make clean
 	rm -f project.out
+	rm -rf $(OBJSDIR)
 	find $(OBJSDIR)/ -name '*.o' -delete
 	find $(DEPDIR)/ -name '*.h.gch' -delete
 	rm -r project.dSYM
