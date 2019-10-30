@@ -2,7 +2,6 @@
 #include <thread>
 #include <functional>
 
-#include "io_handler.hpp"
 #include "data_registry.hpp"
 #include "registry_entries.hpp"
 
