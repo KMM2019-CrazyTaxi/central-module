@@ -79,9 +79,6 @@ private:
      * This dynamic memory is where the data is stored.
      */
     ~data_registry();
-
-    // Lock used to make sure access to unordered_map is synchronised
-    std::mutex global_lock;
     
     // Map that maps the ids to the entries 
     std::unordered_map<std::string, registry_entry> registry;
