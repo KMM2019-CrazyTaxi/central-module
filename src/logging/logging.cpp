@@ -26,7 +26,9 @@ static system_clock::time_point latest_flush = system_clock::now();
 void logging_thread_main(const std::unordered_map<std::thread::id, std::string>& name_map, const std::atomic_bool& running) {
 
     thread_name_map = name_map;
-    std::ofstream output_file(LOG_FILE_PATH);
+    std::ofstream output_file(LOG_FILE_PATH, std::ios::app);
+
+    output_file << "\n\n\n";
 
     while (running || queue_size > 0) {
         
