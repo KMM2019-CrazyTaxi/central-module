@@ -18,6 +18,9 @@ static std::atomic_int queue_size = 0;
 // Map that maps thread ids to a string representation
 static std::unordered_map<std::thread::id, std::string> thread_name_map;
 
+// The time point of the latest flush to the log file
+static std::chrono::system_clock::time_point latest_flush = std::chrono::system_clock::now();
+
 void logging_thread_main(const std::unordered_map<std::thread::id, std::string>& name_map, const std::atomic_bool& running) {
 
     thread_name_map = name_map;
@@ -25,6 +28,14 @@ void logging_thread_main(const std::unordered_map<std::thread::id, std::string>&
 
     while (running || queue_size > 0) {
         print_message(output_file);
+
+        auto now = std::chrono::system_clock::now();
+
+        // Make sure to flush to disk at least every second
+        if (now - latest_flush >= std::chrono::seconds(1)) {
+            output_file.flush();
+            latest_flush = now;
+        }
     }
 
     output_file.close();
