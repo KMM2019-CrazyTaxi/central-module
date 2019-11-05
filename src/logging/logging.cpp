@@ -9,6 +9,8 @@
 #include "logging.hpp"
 #include "message_queue.hpp"
 
+using std::chrono::system_clock;
+
 // The message queue used
 static message_queue messages;
 
@@ -19,7 +21,7 @@ static std::atomic_int queue_size = 0;
 static std::unordered_map<std::thread::id, std::string> thread_name_map;
 
 // The time point of the latest flush to the log file
-static std::chrono::system_clock::time_point latest_flush = std::chrono::system_clock::now();
+static system_clock::time_point latest_flush = system_clock::now();
 
 void logging_thread_main(const std::unordered_map<std::thread::id, std::string>& name_map, const std::atomic_bool& running) {
 
@@ -27,9 +29,10 @@ void logging_thread_main(const std::unordered_map<std::thread::id, std::string>&
     std::ofstream output_file(LOG_FILE_PATH);
 
     while (running || queue_size > 0) {
+        
         print_message(output_file);
 
-        auto now = std::chrono::system_clock::now();
+        auto now = system_clock::now();
 
         // Make sure to flush to disk at least every second
         if (now - latest_flush >= std::chrono::seconds(1)) {
@@ -47,7 +50,7 @@ void queue_message(std::string&& message) {
 
     new_entry.message = std::move(message);
     new_entry.thread_id = std::this_thread::get_id();
-    new_entry.time_of_arrival = std::chrono::system_clock::now();
+    new_entry.time_of_arrival = system_clock::now();
 
     // Acquire lock
     std::unique_lock lock(messages.queue_lock);
@@ -69,7 +72,7 @@ void print_message(std::ofstream& file) {
 
     std::stringstream string_builder;
 
-    std::time_t t = std::chrono::system_clock::to_time_t(entry.time_of_arrival);
+    std::time_t t = system_clock::to_time_t(entry.time_of_arrival);
 
     char buffer[32];
     sprintf(buffer, "%.24s", std::ctime(&t));
