@@ -15,7 +15,7 @@
 void logging_thread_main(const std::unordered_map<std::thread::id, std::string>& name_map, const std::atomic_bool& running);
 
 /**
- * Queues the message to be printed by the io thread.
+ * Queues the message to be printed by the logging thread.
  * 
  * @param message The message to be printed the standard output and the log file
  *                NOTE: This function is potentially destructive for the message,
