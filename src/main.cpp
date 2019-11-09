@@ -26,12 +26,7 @@ int main() {
 
     std::thread logging_thread(logging_thread_main, std::ref(thread_name_map), std::ref(running));
 
-    queue_message("Message 1");
-    queue_message("Message 2");
-    queue_message("Message 3");
-    queue_message("Message 4");
-
-    running = false;
+    // running = false;
 
     io_thread.join();
     ir_thread.join();
