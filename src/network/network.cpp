@@ -102,14 +102,14 @@ void network_thread_main(const std::atomic_bool& running) {
         while (connection) {
             
             valread = read(new_socket, buffer, NETWORK_BUFFER_SIZE);
-
+            std::vector<packet> packets;
             if (valread > 0) {
 
                 msg << "Read " << valread << " bytes from " << std::string(inet_ntoa(address.sin_addr));
                 queue_message(msg.str());
                 msg.str("");
 
-                std::vector<packet> packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
+                packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
                 msg << "Parsed " << packets.size() << " packets";
                 queue_message(msg.str());
                 msg.str("");
@@ -117,6 +117,17 @@ void network_thread_main(const std::atomic_bool& running) {
             }
 
             const char* hello = "Hello from server";
+
+            memset(buffer, 0, NETWORK_BUFFER_SIZE);
+            buffer[0] = (uint8_t) packets.size();
+
+            uint8_t* local_buffer = (uint8_t*) buffer + 1;
+
+            for (const auto& packet : packets) {
+                packet::write(packet, local_buffer);
+                local_buffer += PACKET_HEADER_SIZE + packet.size();
+            }
+
 
             int send_error = send(new_socket, buffer, valread, MSG_NOSIGNAL);
 
