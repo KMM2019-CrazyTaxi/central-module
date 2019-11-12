@@ -162,12 +162,11 @@ std::vector<packet> parse_packets(uint8_t* buffer, uint32_t buffer_size) {
 
 packet parse_packet(uint8_t* buffer, uint32_t buffer_size) {
 
-    int buffer_index = 0;
-    uint32_t type = (uint32_t) buffer[buffer_index++];
-    uint32_t id   = (uint32_t) concat_bytes(buffer[buffer_index++], buffer[buffer_index++]);
-    uint32_t size = (uint32_t) concat_bytes(buffer[buffer_index++], buffer[buffer_index++]);
+    uint32_t type = (uint32_t) buffer[0];
+    uint32_t id   = (uint32_t) concat_bytes(buffer[2], buffer[1]);
+    uint32_t size = (uint32_t) concat_bytes(buffer[4], buffer[3]);
 
-    packet p = packet(id, type, size, buffer+buffer_index);
+    packet p = packet(id, type, size, buffer + PACKET_HEADER_SIZE);
 
     return p;
 }
