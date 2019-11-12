@@ -125,7 +125,7 @@ void network_thread_main(const std::atomic_bool& running) {
 
             for (const auto& packet : packets) {
                 packet::write(packet, local_buffer);
-                local_buffer += PACKET_HEADER_SIZE + packet.size();
+                local_buffer += PACKET_HEADER_SIZE + packet.get_size();
             }
 
 
@@ -150,7 +150,7 @@ std::vector<packet> parse_packets(uint8_t* buffer, uint32_t buffer_size) {
         
         packet p = parse_packet(buffer + buffer_index, buffer_size);
         // Increase the buffer index with 5 (packet header) and packet size
-        buffer_index += PACKET_HEADER_SIZE + p.size();
+        buffer_index += PACKET_HEADER_SIZE + p.get_size();
         
         packets.push_back(p);
     }
