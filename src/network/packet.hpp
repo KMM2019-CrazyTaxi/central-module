@@ -46,17 +46,17 @@ public:
     /**
      * @return The unique identifier of the packet
      */
-    uint32_t id() const;
+    uint32_t get_id() const;
 
     /**
      * @return The size of the data contained in the packet
      */
-    uint32_t size() const;
+    uint32_t get_size() const;
 
     /**
      * @return The type of the packet
      */
-    uint32_t type() const;
+    uint32_t get_type() const;
 
     /**
      * Indexes over the data

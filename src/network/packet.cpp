@@ -42,6 +42,18 @@ packet::~packet() {
     delete[] data;
 }
 
+uint32_t packet::get_id() const {
+    return id;
+}
+
+uint32_t packet::get_size() const {
+    return size;
+}
+
+uint32_t packet::get_type() const {
+    return type;
+}
+
 void packet::write(const packet& p, uint8_t* buffer) {
 
     buffer[0] = (uint8_t) p.type;
