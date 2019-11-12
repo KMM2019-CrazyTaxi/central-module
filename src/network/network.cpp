@@ -13,6 +13,8 @@
 #include "logging.hpp"
 #include "defs.hpp"
 
+uint16_t concat_bytes(uint8_t hi, uint8_t lo);
+
 int create_socket(int max_tries) {
 
     queue_message("Creating socket file descriptor...");
