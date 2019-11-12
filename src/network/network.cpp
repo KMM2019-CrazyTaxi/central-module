@@ -109,19 +109,16 @@ void network_thread_main(const std::atomic_bool& running) {
                 queue_message(msg.str());
                 msg.str("");
 
-                msg << "[ " 
-                    << std::string(inet_ntoa(address.sin_addr))
-                    << " ]: "
-                    << std::string(buffer);
-
+                std::vector<packet> packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
+                msg << "Parsed " << packets.size() << " packets";
                 queue_message(msg.str());
                 msg.str("");
-                buffer[0] = '\0';
+                
             }
 
             const char* hello = "Hello from server";
 
-            int send_error = send(new_socket, hello, strlen(hello), MSG_NOSIGNAL);
+            int send_error = send(new_socket, buffer, valread, MSG_NOSIGNAL);
 
             if (send_error == -1) {
                 connection = false;
@@ -129,4 +126,39 @@ void network_thread_main(const std::atomic_bool& running) {
             }
         }
     }
+}
+
+std::vector<packet> parse_packets(uint8_t* buffer, uint32_t buffer_size) {
+
+    uint32_t buffer_index = 0;
+
+    int packet_count = (int) buffer[buffer_index++];
+    std::vector<packet> packets;
+
+    for (int i = 0; i < packet_count; i++) {
+        
+        packet p = parse_packet(buffer + buffer_index, buffer_size);
+        // Increase the buffer index with 5 (packet header) and packet size
+        buffer_index += PACKET_HEADER_SIZE + p.size();
+        
+        packets.push_back(p);
+    }
+
+    return packets;
+}
+
+packet parse_packet(uint8_t* buffer, uint32_t buffer_size) {
+
+    int buffer_index = 0;
+    uint32_t type = (uint32_t) buffer[buffer_index++];
+    uint32_t id   = (uint32_t) concat_bytes(buffer[buffer_index++], buffer[buffer_index++]);
+    uint32_t size = (uint32_t) concat_bytes(buffer[buffer_index++], buffer[buffer_index++]);
+
+    packet p = packet(id, type, size, buffer+buffer_index);
+
+    return p;
+}
+
+uint16_t concat_bytes(uint8_t hi, uint8_t lo) {
+    return (hi << 8) + lo;
 }
