@@ -97,6 +97,7 @@ void io_thread_main(const std::atomic_bool& running) {
 
     // Set up SPI busses
     #ifdef __WIRING_PI_H__ 
+        queue_message("Setting up SPI channels.");
         wiringPiSPISetup(SPI_SENSOR_CHANNEL, SPI_FREQUENCY);
         wiringPiSPISetup(SPI_CONTROL_CHANNEL, SPI_FREQUENCY);
     #endif
