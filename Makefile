@@ -17,7 +17,7 @@ INCLUDES = $(shell find $(SRCDIR) -type d | sed s/^/-I/)
 INCLUDES += $(shell find $(GPUDIR) -type d | sed s/^/-I/)
 
 # Get all headers and sources from source directory
-HEADERS = $(shell find $(SRCDIR) -type f -name '*.h')
+HEADERS = $(shell find $(SRCDIR) -type f -name '*.hpp')
 SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 
 # Generate all objects and matching objects without directory path
