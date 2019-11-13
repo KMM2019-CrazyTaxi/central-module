@@ -9,13 +9,13 @@ GPUDIR = ./include/QPULib/Lib
 QPULIB :=
 
 ifeq ($(QPU), 1)
-	CXX_FLAGS += -DQPU_MODE
+	CCXFLAGS += -DQPU_MODE
 	QPULIB := ./include/QPULib/qpulib.a
 endif
 
 ifeq ($(WIRING), 1)
-	LDFLAGS += -l wiringPi
-	CXXFLAGS += -D WIRING_PI
+	LDFLAGS += -lwiringPi
+	CCXFLAGS += -DWIRING_PI=1
 endif
 
 # Find all subdirectories
@@ -31,7 +31,7 @@ OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
 project: $(OBJSDIR) $(QPULIB) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) -lwiringPi -o project.out
+	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) $(LDFLAGS) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
