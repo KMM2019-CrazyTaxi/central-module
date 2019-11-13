@@ -64,6 +64,8 @@ void acquire_sensor_data() {
 void send_control_data() {
 
     memset(control_buffer, 0, MSG_BUFFER_SIZE);
+
+    queue_message("Sending control data");
     
     control_change_data data;
 

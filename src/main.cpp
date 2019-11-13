@@ -28,7 +28,7 @@ int main() {
     queue_message("Message 3");
     queue_message("Message 4");
 
-    running = false;
+    // running = false;
 
     io_thread.join();
     ir_thread.join();

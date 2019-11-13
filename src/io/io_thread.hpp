@@ -4,7 +4,7 @@
 #include <atomic>
 
 // The number of milliseconds waited between each io update
-#define IO_UPDATE_MS 20
+#define IO_UPDATE_MS 500
 
 // The frequency on which the SPI bus runs (Hz)
 #define SPI_FREQUENCY 500_000
