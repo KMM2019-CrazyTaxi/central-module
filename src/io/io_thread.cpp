@@ -11,12 +11,16 @@
 
 #include <string.h>
 
-#define SPI_SENSOR_CHANNEL 0
-#define SPI_CONTROL_CHANNEL 1
+#define SPI_CONTROL 0
+#define SPI_SENSOR  1
+#define SPI_CHANNEL 0
 
 #define SENSOR_MSG_SIZE 13
 #define CONTROL_MSG_SIZE 6
 #define MSG_BUFFER_SIZE 16
+
+#define SPI_CONTROL_SS_PIN 0 // Physical pin 11
+#define SPI_SENSOR_SS_PIN  1 // Physical pin 12
 
 #define SPI_START_BYTE 0xAA
 
@@ -26,13 +30,19 @@ int control_failures = 0;
 char control_buffer[MSG_BUFFER_SIZE];
 char sensor_buffer[MSG_BUFFER_SIZE];
 
+void activate_slave(int slave);
+void deactivate_slave(int slave);
+void set_slave(int slave, int val);
+
 void acquire_sensor_data() {
 
     memset(sensor_buffer, 0, MSG_BUFFER_SIZE);
     control_buffer[0] = SPI_START_BYTE;
 
-    #ifdef __WIRING_PI_H__ 
-        wiringPiSPIDataRW(SPI_SENSOR_CHANNEL, (unsigned char*) sensor_buffer, SENSOR_MSG_SIZE);
+    #ifdef __WIRING_PI_H__
+        activate_slave(SPI_SENSOR);
+        wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) sensor_buffer, SENSOR_MSG_SIZE);
+        deactivate_slave(SPI_SENSOR);
     #else
         return;
     #endif
@@ -83,7 +93,9 @@ void send_control_data() {
     control_buffer[CONTROL_MSG_SIZE - 1] = checkbyte;
 
     #ifdef __WIRING_PI_H__ 
-        wiringPiSPIDataRW(SPI_CONTROL_CHANNEL, (unsigned char*) control_buffer, SENSOR_MSG_SIZE);
+        activate_slave(SPI_CONTROL);
+        wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) control_buffer, SENSOR_MSG_SIZE);
+        deactivate_slave(SPI_CONTROL);
     #else
         return;
     #endif
@@ -98,8 +110,10 @@ void io_thread_main(const std::atomic_bool& running) {
     // Set up SPI busses
     #ifdef __WIRING_PI_H__ 
         queue_message("Setting up SPI channels.");
-        wiringPiSPISetup(SPI_SENSOR_CHANNEL, SPI_FREQUENCY);
-        wiringPiSPISetup(SPI_CONTROL_CHANNEL, SPI_FREQUENCY);
+        wiringPiSetup();
+        wiringPiSPISetup(0, SPI_FREQUENCY);
+        pinMode(SPI_CONTROL_SS_PIN, OUTPUT);
+        pinMode(SPI_SENSOR_SS_PIN, OUTPUT);
     #endif
 
     while (running) {
@@ -119,6 +133,33 @@ char calc_checkbyte(char* buffer, int size) {
     }
 
     return acc;
+}
+
+void set_slave(int slave, int val);
+
+void activate_slave(int slave) {
+    set_slave(slave, 0);
+}
+
+void deactivate_slave(int slave) {
+    set_slave(slave, 1);
+}
+
+void set_slave(int slave, int val) {
+    int pin;
+
+    switch (slave) {
+        case SPI_CONTROL:
+            pin = SPI_CONTROL_SS_PIN;
+            break;
+        case SPI_SENSOR:
+            pin = SPI_SENSOR_SS_PIN;
+            break;
+    }
+
+    #ifdef __WIRING_PI_H__ 
+        digitalWrite(pin, val);
+    #endif
 }
 
 bool test_checkbyte(char* buffer, int size, char checkbyte) {
