@@ -25,7 +25,7 @@ OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
 project: $(OBJSDIR) $(QPULIB) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) -o project.out
+	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) -lwiringPi -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
