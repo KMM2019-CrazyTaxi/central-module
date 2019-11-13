@@ -1,6 +1,7 @@
 #ifndef CM_IO_THREAD_H
 #define CM_IO_THREAD_H
 
+#include <atomic>
 
 // The number of milliseconds waited between each io update
 #define IO_UPDATE_MS 20
@@ -11,7 +12,7 @@
 /**
  * Main function ran by the io thread
  */
-void io_thread_main();
+void io_thread_main(const std::atomic_bool& running);
 
 /**
  * Acquires sensor data from the sensor module and updates the registry
