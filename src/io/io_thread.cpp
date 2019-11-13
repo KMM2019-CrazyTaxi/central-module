@@ -4,7 +4,7 @@
 #include "data_registry.hpp"
 #include "registry_entries.hpp"
 
-#ifdef __WIRING_PI_H__
+#ifdef WIRING_PI
     #include <wiringPi.h>
     #include <wiringPiSPI.h>
 #endif

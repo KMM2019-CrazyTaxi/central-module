@@ -1,5 +1,6 @@
 CCX=clang++
 CCXFLAGS = -std=c++17 -pthread 
+LDFLAGS :=
 
 SRCDIR  = ./src
 OBJSDIR = ./build
@@ -10,6 +11,11 @@ QPULIB :=
 ifeq ($(QPU), 1)
 	CXX_FLAGS += -DQPU_MODE
 	QPULIB := ./include/QPULib/qpulib.a
+endif
+
+ifeq ($(WIRING), 1)
+	LDFLAGS += -l wiringPi
+	CXXFLAGS += -D WIRING_PI
 endif
 
 # Find all subdirectories
