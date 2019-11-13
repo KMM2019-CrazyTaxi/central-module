@@ -49,13 +49,17 @@ void acquire_sensor_data() {
 
     // Check startbyte
     if (sensor_buffer[0] != SPI_START_BYTE) {
-        queue_message("Error: Sensor data start byte validation failed. Dropping acquired data.");
+        #ifdef __WIRING_PI_H__
+            queue_message("Error: Sensor data start byte validation failed. Dropping acquired data.");
+        #endif
         return;
     }
 
     // Test for checkbyte, if the checkbyte is wrong, drop the data and log an error.
     if (!test_checkbyte(sensor_buffer, SENSOR_MSG_SIZE - 1, sensor_buffer[SENSOR_MSG_SIZE - 1])) {
-        queue_message("Error: Sensor data check byte validation failed. Dropping acquired data.");
+        #ifdef __WIRING_PI_H__
+            queue_message("Error: Sensor data check byte validation failed. Dropping acquired data.");
+        #endif
         return;
     }
 
@@ -74,8 +78,6 @@ void acquire_sensor_data() {
 void send_control_data() {
 
     memset(control_buffer, 0, MSG_BUFFER_SIZE);
-
-    queue_message("Sending control data");
     
     control_change_data data;
 
@@ -101,7 +103,9 @@ void send_control_data() {
     #endif
 
     if (control_buffer[CONTROL_MSG_SIZE - 1] != checkbyte) {
-        queue_message("Error: Control data check byte validation failed.");
+        #ifdef __WIRING_PI_H__
+            queue_message("Error: Control data check byte validation failed.");
+        #endif
     }
 }
 
