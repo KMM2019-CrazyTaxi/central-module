@@ -42,6 +42,9 @@ $(QPULIB):
 $(OBJSDIR):
 	mkdir build
 
+all:
+	make WIRING=1 QPU=1
+
 clean:
 	cd ./include/QPULib && make clean
 	rm -f project.out
