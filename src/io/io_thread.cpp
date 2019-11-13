@@ -74,8 +74,8 @@ void send_control_data() {
     data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
 
     control_buffer[0] = SPI_START_BYTE;
-    control_buffer[1] = data.speed_delta;
-    control_buffer[2] = data.angle_delta;
+    control_buffer[1] = 1;// data.speed_delta;
+    control_buffer[2] = 2; // data.angle_delta;
 
     char checkbyte = calc_checkbyte(control_buffer, CONTROL_MSG_SIZE - 1);
     control_buffer[CONTROL_MSG_SIZE - 1] = checkbyte;
