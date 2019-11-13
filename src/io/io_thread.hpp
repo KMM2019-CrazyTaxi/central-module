@@ -7,7 +7,7 @@
 #define IO_UPDATE_MS 500
 
 // The frequency on which the SPI bus runs (Hz)
-#define SPI_FREQUENCY 500_000
+#define SPI_FREQUENCY 500000
 
 /**
  * Main function ran by the io thread

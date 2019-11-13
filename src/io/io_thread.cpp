@@ -32,7 +32,7 @@ void acquire_sensor_data() {
     control_buffer[0] = SPI_START_BYTE;
 
     #ifdef __WIRING_PI_H__ 
-        wiringPiSPIDataRW(SPI_SENSOR_CHANNEL, sensor_buffer, SENSOR_MSG_SIZE);
+        wiringPiSPIDataRW(SPI_SENSOR_CHANNEL, (unsigned char*) sensor_buffer, SENSOR_MSG_SIZE);
     #else
         return;
     #endif
@@ -83,7 +83,7 @@ void send_control_data() {
     control_buffer[CONTROL_MSG_SIZE - 1] = checkbyte;
 
     #ifdef __WIRING_PI_H__ 
-        wiringPiSPIDataRW(SPI_CONTROL_CHANNEL, control_buffer, SENSOR_MSG_SIZE);
+        wiringPiSPIDataRW(SPI_CONTROL_CHANNEL, (unsigned char*) control_buffer, SENSOR_MSG_SIZE);
     #else
         return;
     #endif
