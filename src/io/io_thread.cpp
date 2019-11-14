@@ -23,7 +23,7 @@
 int sensor_failures = 0;
 int control_failures = 0;
 
-char sensor_buffer[MSG_BUFFER_SIZE];
+unsigned char sensor_buffer[MSG_BUFFER_SIZE];
 
 void activate_slave(int slave);
 void deactivate_slave(int slave);
@@ -141,7 +141,7 @@ void send_control_data() {
         #ifdef __WIRING_PI_H__ 
             queue_message("Transmitted " + print_buffer((uint8_t*) ans_buffer, SPI_CONTROL_FINISH_MSG_SIZE));
             activate_slave(SPI_CONTROL);
-            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) ans_buffer,SPI_CONTROL_FINISH_MSG_SIZE1);
+            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) ans_buffer,SPI_CONTROL_FINISH_MSG_SIZE);
             deactivate_slave(SPI_CONTROL);
             queue_message("Received " + print_buffer((uint8_t*) ans_buffer, SPI_CONTROL_FINISH_MSG_SIZE));
         #endif
@@ -208,7 +208,7 @@ void set_slave(int slave, int val) {
     #endif
 }
 
-bool test_checkbyte(char* buffer, int size, char checkbyte) {
+bool test_checkbyte(unsigned char* buffer, int size, char checkbyte) {
 
     char true_checkbyte = calc_checkbyte(buffer, size);
     return true_checkbyte == checkbyte;
