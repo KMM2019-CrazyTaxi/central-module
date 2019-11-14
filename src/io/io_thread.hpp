@@ -38,7 +38,7 @@ char calc_checkbyte(unsigned char* buffer, int size);
  * @param checkbyte the expected hash of the data
  * @return whether the given checkbyte matches the hash
  */
-bool test_checkbyte(char* buffer, int size, char checkbyte);
+bool test_checkbyte(unsigned char* buffer, int size, char checkbyte);
 
 /**
  * Concatenates two bytes into a short
