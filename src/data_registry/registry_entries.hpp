@@ -11,8 +11,8 @@ struct sensor_data {
 };
 
 struct control_change_data {
-    char speed_delta;
-    char angle_delta;
+    char speed;
+    char angle;
 };
 
 #endif
