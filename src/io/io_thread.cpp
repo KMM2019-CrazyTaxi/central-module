@@ -97,11 +97,11 @@ void send_control_data() {
         start_buffer[0] = SPI_START;
 
         #ifdef __WIRING_PI_H__ 
-            queue_message("Transmitted " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_MSG_INIT_SIZE));
+            queue_message("Transmitted " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_INIT_MSG_SIZE));
             activate_slave(SPI_CONTROL);
-            wiringPiSPIDataRW(SPI_CHANNEL, start_buffer, SPI_CONTROL_MSG_INIT_SIZE);
+            wiringPiSPIDataRW(SPI_CHANNEL, start_buffer, SPI_CONTROL_INIT_MSG_SIZE);
             deactivate_slave(SPI_CONTROL);
-            queue_message("Received " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_MSG_INIT_SIZE));
+            queue_message("Received " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_INIT_MSG_SIZE));
 
         if (start_buffer[0] != SPI_ACK) {
             queue_message("Failed initialising communication with steering module. Retrying in 1 ms");
@@ -118,11 +118,11 @@ void send_control_data() {
         char checkbyte = calc_checkbyte(msg_buffer, CONTROL_MSG_SIZE - 1);
 
         #ifdef __WIRING_PI_H__ 
-            queue_message("Transmitted " + print_buffer((uint8_t*) msg_buffer, 4));
+            queue_message("Transmitted " + print_buffer((uint8_t*) msg_buffer, SPI_CONTROL_DATA_MSG_SIZE));
             activate_slave(SPI_CONTROL);
-            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) msg_buffer, CONTROL_MSG_SIZE);
+            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) msg_buffer, SPI_CONTROL_DATA_MSG_SIZE);
             deactivate_slave(SPI_CONTROL);
-            queue_message("Received " + print_buffer((uint8_t*) msg_buffer, 4));
+            queue_message("Received " + print_buffer((uint8_t*) msg_buffer, SPI_CONTROL_DATA_MSG_SIZE));
         #endif
 
         unsigned char answer = SPI_FINISHED;
@@ -139,10 +139,11 @@ void send_control_data() {
 
         // Write answer
         #ifdef __WIRING_PI_H__ 
-            queue_message("Transmitted " + print_buffer((uint8_t*) ans_buffer, 1));
+            queue_message("Transmitted " + print_buffer((uint8_t*) ans_buffer, SPI_CONTROL_FINISH_MSG_SIZE));
             activate_slave(SPI_CONTROL);
-            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) ans_buffer, 1);
+            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) ans_buffer,SPI_CONTROL_FINISH_MSG_SIZE1);
             deactivate_slave(SPI_CONTROL);
+            queue_message("Received " + print_buffer((uint8_t*) ans_buffer, SPI_CONTROL_FINISH_MSG_SIZE));
         #endif
 
         if (answer == SPI_FINISHED) break;
