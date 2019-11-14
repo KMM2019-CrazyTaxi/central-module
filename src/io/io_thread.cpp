@@ -112,9 +112,9 @@ void send_control_data() {
 
         #endif
 
-        msg_buffer[0] = 1; // data.speed_delta;
-        msg_buffer[1] = 2; // data.angle_delta;
-        msg_buffer[2] = SPI_NAN; // NaN
+        msg_buffer[0] = data.speed;
+        msg_buffer[1] = data.angle;
+        msg_buffer[2] = SPI_NAN;
 
         char checkbyte = calc_checkbyte(msg_buffer, CONTROL_MSG_SIZE - 1);
 
