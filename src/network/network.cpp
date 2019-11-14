@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 
+#include "net_message_handler.hpp"
 #include "network.hpp"
 #include "logging.hpp"
 #include "defs.hpp"
@@ -118,7 +119,8 @@ void network_thread_main(const std::atomic_bool& running) {
                 msg << "Parsed " << packets.size() << " packets";
                 queue_message(msg.str());
                 msg.str("");
-                
+
+                handle_packets(packets);
             }
 
             const char* hello = "Hello from server";
