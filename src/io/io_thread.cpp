@@ -102,16 +102,13 @@ void send_control_data() {
 
         char checkbyte = calc_checkbyte(msg_buffer, CONTROL_MSG_SIZE - 1);
 
-        queue_message("Transmitted " + print_buffer((uint8_t*) msg_buffer, 4));
-
-
         #ifdef __WIRING_PI_H__ 
+            queue_message("Transmitted " + print_buffer((uint8_t*) msg_buffer, 4));
             activate_slave(SPI_CONTROL);
             wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) msg_buffer, CONTROL_MSG_SIZE);
             deactivate_slave(SPI_CONTROL);
+            queue_message("Received " + print_buffer((uint8_t*) msg_buffer, 4));
         #endif
-
-        queue_message("Received " + print_buffer((uint8_t*) msg_buffer, 4));
 
         unsigned char answer = SPI_FINISHED;
 
@@ -121,13 +118,15 @@ void send_control_data() {
                 answer = SPI_RESTART;
             #endif
         }
-
-        queue_message("Transmitted " + print_buffer((uint8_t*) &answer, 1));
         
+
+        ans_buffer[0] = answer;
+
         // Write answer
         #ifdef __WIRING_PI_H__ 
+            queue_message("Transmitted " + print_buffer((uint8_t*) ans_buffer, 1));
             activate_slave(SPI_CONTROL);
-            wiringPiSPIDataRW(SPI_CHANNEL, &answer, 1);
+            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) ans_buffer, 1);
             deactivate_slave(SPI_CONTROL);
         #endif
 
