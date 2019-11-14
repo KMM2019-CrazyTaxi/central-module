@@ -74,7 +74,6 @@ std::string print_buffer(uint8_t* buffer, int size) {
     for (int i = 0; i < size; i++) {
         s << std::hex << (int) buffer[i] << " ";
     }
-    s << std::endl;
     return s.str();
 }
 
