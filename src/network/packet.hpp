@@ -61,7 +61,7 @@ public:
     /**
      * Indexes over the data
      */
-    // uint8_t operator[](uint32_t index) const;
+    uint8_t operator[](uint32_t index) const;
 
     /**
      * Writes the given packet to the given buffer

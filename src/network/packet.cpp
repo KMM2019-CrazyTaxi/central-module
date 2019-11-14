@@ -54,6 +54,10 @@ uint32_t packet::get_type() const {
     return type;
 }
 
+uint8_t packet::operator[](uint32_t index) const {
+    return data[index];
+}
+
 void packet::write(const packet& p, uint8_t* buffer) {
 
     buffer[0] = (uint8_t) p.type;
