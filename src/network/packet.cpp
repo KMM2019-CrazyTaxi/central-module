@@ -4,6 +4,13 @@
 #include <algorithm>
 #include <stdint.h>
 
+packet::packet() {
+    id = 0;
+    type = 0;
+    size = 0;
+    data = nullptr;
+}
+
 packet::packet(uint32_t _id, uint32_t _type, uint32_t _size, uint8_t* buffer) {
 
     id   = _id;
@@ -39,7 +46,7 @@ packet& packet::operator=(packet&& other) {
 }
 
 packet::~packet() {
-    delete[] data;
+    if (data) delete[] data;
 }
 
 uint32_t packet::get_id() const {

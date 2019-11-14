@@ -114,7 +114,7 @@ void network_thread_main(const std::atomic_bool& running) {
 
                 queue_message(print_buffer((uint8_t*) buffer, valread));
 
-                // packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
+                packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
                 msg << "Parsed " << packets.size() << " packets";
                 queue_message(msg.str());
                 msg.str("");
