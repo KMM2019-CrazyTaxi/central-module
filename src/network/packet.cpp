@@ -26,7 +26,8 @@ packet::packet(const packet& other) {
     id   = other.id;
     type = other.type;
     size = other.size;
-
+    data = new uint8_t[size]();
+    
     std::copy(other.data, other.data + other.size, data);
 }
 
