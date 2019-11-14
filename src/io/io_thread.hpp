@@ -2,6 +2,7 @@
 #define CM_IO_THREAD_H
 
 #include <atomic>
+#include <string>
 
 // The number of milliseconds waited between each io update
 #define IO_UPDATE_MS 20
