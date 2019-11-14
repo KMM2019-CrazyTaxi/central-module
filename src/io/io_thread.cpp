@@ -18,7 +18,7 @@
 #define CONTROL_MSG_SIZE 4
 #define MSG_BUFFER_SIZE 16
 
-#define CONTROL_MSG_CHECKBYTE 3
+#define CONTROL_MSG_CHECKBYTE 2
 
 int sensor_failures = 0;
 int control_failures = 0;
