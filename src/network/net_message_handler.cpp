@@ -16,7 +16,7 @@ void handle_packet(const packet& p) {
     data_registry& registry = data_registry::get_instance();
 
     switch(p.get_type()) {
-        case SEND_MAX_SPEED:
+        case SEND_MAX_SPEED: {
 
             uint8_t speed = p[0];
 
@@ -27,8 +27,9 @@ void handle_packet(const packet& p) {
 
             registry.release_data(CONTROL_CHANGE_DATA_ID);
             break;
+        }
         
-        case REQUEST_TURN:
+        case REQUEST_TURN: {
             uint8_t angle = p[0];
 
             control_change_data* registry_entry = 
@@ -38,6 +39,7 @@ void handle_packet(const packet& p) {
 
             registry.release_data(CONTROL_CHANGE_DATA_ID);
             break;
+        }
         default:
             break;
     }
