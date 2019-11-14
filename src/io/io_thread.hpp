@@ -28,7 +28,7 @@ void send_control_data();
  * @param size the number of bytes from buffer to hash
  * @return the checkbyte of the data
  */
-char calc_checkbyte(char* buffer, int size);
+char calc_checkbyte(unsigned char* buffer, int size);
 
 /**
  * Checks whether the given checkbyte matches the buffer
