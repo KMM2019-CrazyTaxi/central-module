@@ -9,6 +9,10 @@ data_registry::data_registry() {
     registry[SENSOR_DATA_ID].id = SENSOR_DATA_ID;
     registry[SENSOR_DATA_ID].data = (void*) sd;
 
+    control_change_data* ccd = new control_change_data();
+    registry[CONTROL_CHANGE_DATA_ID].id = CONTROL_CHANGE_DATA_ID;
+    registry[CONTROL_CHANGE_DATA_ID].data = (void*) ccd;
+
 }
 
 data_registry::~data_registry() {

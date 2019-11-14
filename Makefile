@@ -1,5 +1,6 @@
 CCX=clang++
 CCXFLAGS = -std=c++17 -pthread 
+LDFLAGS :=
 
 SRCDIR  = ./src
 OBJSDIR = ./build
@@ -8,8 +9,13 @@ GPUDIR = ./include/QPULib/Lib
 QPULIB :=
 
 ifeq ($(QPU), 1)
-	CXX_FLAGS += -DQPU_MODE
+	CCXFLAGS += -DQPU_MODE
 	QPULIB := ./include/QPULib/qpulib.a
+endif
+
+ifeq ($(WIRING), 1)
+	LDFLAGS += -lwiringPi
+	CCXFLAGS += -DWIRING_PI=1
 endif
 
 # Find all subdirectories
@@ -25,7 +31,7 @@ OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
 project: $(OBJSDIR) $(QPULIB) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) -o project.out
+	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) $(LDFLAGS) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
@@ -35,6 +41,9 @@ $(QPULIB):
 
 $(OBJSDIR):
 	mkdir build
+
+all:
+	make WIRING=1 QPU=1
 
 clean:
 	cd ./include/QPULib && make clean
