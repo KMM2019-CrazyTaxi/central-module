@@ -12,6 +12,7 @@
 #include "network.hpp"
 #include "logging.hpp"
 #include "defs.hpp"
+#include "io_thread.hpp"
 
 uint16_t concat_bytes(uint8_t hi, uint8_t lo);
 
@@ -111,7 +112,9 @@ void network_thread_main(const std::atomic_bool& running) {
                 queue_message(msg.str());
                 msg.str("");
 
-                packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
+                queue_message(print_buffer((uint8_t*) buffer, valread));
+
+                // packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
                 msg << "Parsed " << packets.size() << " packets";
                 queue_message(msg.str());
                 msg.str("");

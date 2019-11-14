@@ -40,6 +40,8 @@ char calc_checkbyte(unsigned char* buffer, int size);
  */
 bool test_checkbyte(unsigned char* buffer, int size, char checkbyte);
 
+std::string print_buffer(uint8_t* buffer, int size);
+
 /**
  * Concatenates two bytes into a short
  */
