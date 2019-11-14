@@ -14,8 +14,6 @@ int main() {
     
     std::atomic_bool running = true;
 
-    std::atomic_bool running = true;
-
     std::thread io_thread(io_thread_main, std::ref(running));
     std::thread ir_thread(image_recognition_main);
     std::thread net_thread(network_thread_main, std::ref(running));
