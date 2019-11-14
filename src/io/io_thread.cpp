@@ -92,7 +92,7 @@ void send_control_data() {
     data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
 
     int fails = 0;
-    while (fails < SPI_FAIL_COUNT) {
+    while (fails <= SPI_FAIL_COUNT) {
 
         start_buffer[0] = SPI_START;
 
@@ -148,6 +148,11 @@ void send_control_data() {
 
         if (answer == SPI_FINISHED) break;
 
+        fails++;
+    }
+
+    if (fails == SPI_FAIL_COUNT) {
+        queue_message("Failed communication with steering module 5 times, skipping.");
     }
 }
 
