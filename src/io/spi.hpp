@@ -7,6 +7,7 @@
 #define SPI_FINISHED    0x66
 #define SPI_RESTART     0x99
 
+#define SPI_FREQ    1000000 / 32
 #define SPI_CONTROL 0
 #define SPI_SENSOR  1
 #define SPI_CHANNEL 0

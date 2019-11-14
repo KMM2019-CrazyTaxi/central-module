@@ -10,6 +10,7 @@
 #endif
 
 #include <string.h>
+#include <sstream>
 
 #include "spi.hpp"
 
@@ -31,7 +32,6 @@ void set_slave(int slave, int val);
 void acquire_sensor_data() {
 
     memset(sensor_buffer, 0, MSG_BUFFER_SIZE);
-    control_buffer[0] = SPI_START;
 
     #ifdef __WIRING_PI_H__
         activate_slave(SPI_SENSOR);
@@ -69,6 +69,15 @@ void acquire_sensor_data() {
     return;
 }
 
+std::string print_buffer(uint8_t* buffer, int size) {
+    std::stringstream s;
+    for (int i = 0; i < size; i++) {
+        s << std::hex << (int) buffer[i] << " ";
+    }
+    s << std::endl;
+    return s.str();
+}
+
 void send_control_data() {
 
     char msg_buffer[MSG_BUFFER_SIZE];
@@ -93,11 +102,16 @@ void send_control_data() {
 
         char checkbyte = calc_checkbyte(msg_buffer, CONTROL_MSG_SIZE - 1);
 
+        queue_message("Transmitted " + print_buffer((uint8_t*) msg_buffer, 4));
+
+
         #ifdef __WIRING_PI_H__ 
             activate_slave(SPI_CONTROL);
             wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) msg_buffer, CONTROL_MSG_SIZE);
             deactivate_slave(SPI_CONTROL);
         #endif
+
+        queue_message("Received " + print_buffer((uint8_t*) msg_buffer, 4));
 
         unsigned char answer = SPI_FINISHED;
 
@@ -108,6 +122,8 @@ void send_control_data() {
             #endif
         }
 
+        queue_message("Transmitted " + print_buffer((uint8_t*) &answer, 1));
+        
         // Write answer
         #ifdef __WIRING_PI_H__ 
             activate_slave(SPI_CONTROL);
@@ -126,14 +142,14 @@ void io_thread_main(const std::atomic_bool& running) {
     #ifdef __WIRING_PI_H__ 
         queue_message("Setting up SPI channels.");
         wiringPiSetup();
-        wiringPiSPISetup(0, SPI_FREQUENCY);
+        wiringPiSPISetup(0, SPI_FREQ);
         pinMode(SPI_CONTROL_SS_PIN, OUTPUT);
         pinMode(SPI_SENSOR_SS_PIN, OUTPUT);
     #endif
 
     while (running) {
 
-        acquire_sensor_data();
+        // acquire_sensor_data();
         send_control_data();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(IO_UPDATE_MS));
