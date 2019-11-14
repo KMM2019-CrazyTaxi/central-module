@@ -104,8 +104,9 @@ void send_control_data() {
             // queue_message("Received " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_INIT_MSG_SIZE));
 
         if (start_buffer[0] != SPI_ACK) {
-            // queue_message("Failed initialising communication with steering module. Retrying in 1 ms");
+            queue_message("Failed initialising communication with steering module. Retrying in 1 ms");
             std::this_thread::sleep_for(std::chrono::milliseconds(SPI_FAILED_WAIT_MS));
+            fails++;
             continue;
         }
 
