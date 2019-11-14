@@ -79,25 +79,41 @@ std::string print_buffer(uint8_t* buffer, int size) {
 
 void send_control_data() {
 
-    char msg_buffer[MSG_BUFFER_SIZE];
-    char ans_buffer[1];
+    unsigned char start_buffer[SPI_CONTROL_INIT_MSG_SIZE];
+    unsigned char msg_buffer[SPI_CONTROL_DATA_MSG_SIZE];
+    unsigned char ans_buffer[SPI_CONTROL_FINISH_MSG_SIZE];
+
+    control_change_data data;
+
+    control_change_data* registry_entry = 
+        (control_change_data*) data_registry::get_instance().acquire_data(CONTROL_CHANGE_DATA_ID);
+    
+    data = *registry_entry;
+    data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
 
     int fails = 0;
     while (fails < SPI_FAIL_COUNT) {
-        memset(msg_buffer, 0, MSG_BUFFER_SIZE);
-        
-        control_change_data data;
 
-        control_change_data* registry_entry = 
-            (control_change_data*) data_registry::get_instance().acquire_data(CONTROL_CHANGE_DATA_ID);
-        
-        data = *registry_entry;
-        data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
+        start_buffer[0] = SPI_START;
 
-        msg_buffer[0] = SPI_START;
-        msg_buffer[1] = 1; // data.speed_delta;
-        msg_buffer[2] = 2; // data.angle_delta;
-        msg_buffer[3] = SPI_NAN; // NaN
+        #ifdef __WIRING_PI_H__ 
+            queue_message("Transmitted " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_MSG_INIT_SIZE));
+            activate_slave(SPI_CONTROL);
+            wiringPiSPIDataRW(SPI_CHANNEL, start_buffer, SPI_CONTROL_MSG_INIT_SIZE);
+            deactivate_slave(SPI_CONTROL);
+            queue_message("Received " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_MSG_INIT_SIZE));
+
+        if (start_buffer[0] != SPI_ACK) {
+            queue_message("Failed initialising communication with steering module. Retrying in 1 ms");
+            std::this_thread::sleep_for(std::chrono::milliseconds(SPI_FAILED_WAIT_MS));
+            continue;
+        }
+
+        #endif
+
+        msg_buffer[0] = 1; // data.speed_delta;
+        msg_buffer[1] = 2; // data.angle_delta;
+        msg_buffer[2] = SPI_NAN; // NaN
 
         char checkbyte = calc_checkbyte(msg_buffer, CONTROL_MSG_SIZE - 1);
 
@@ -154,7 +170,7 @@ void io_thread_main(const std::atomic_bool& running) {
     }
 }
 
-char calc_checkbyte(char* buffer, int size) {
+char calc_checkbyte(unsigned char* buffer, int size) {
     
     char acc = buffer[0];
     for (int i = 1; i < size; i++) {
