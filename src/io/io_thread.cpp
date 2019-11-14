@@ -11,23 +11,17 @@
 
 #include <string.h>
 
-#define SPI_CONTROL 0
-#define SPI_SENSOR  1
-#define SPI_CHANNEL 0
+#include "spi.hpp"
 
 #define SENSOR_MSG_SIZE 13
-#define CONTROL_MSG_SIZE 6
+#define CONTROL_MSG_SIZE 4
 #define MSG_BUFFER_SIZE 16
 
-#define SPI_CONTROL_SS_PIN 0 // Physical pin 11
-#define SPI_SENSOR_SS_PIN  1 // Physical pin 12
-
-#define SPI_START_BYTE 0xAA
+#define CONTROL_MSG_CHECKBYTE 3
 
 int sensor_failures = 0;
 int control_failures = 0;
 
-char control_buffer[MSG_BUFFER_SIZE];
 char sensor_buffer[MSG_BUFFER_SIZE];
 
 void activate_slave(int slave);
@@ -37,7 +31,7 @@ void set_slave(int slave, int val);
 void acquire_sensor_data() {
 
     memset(sensor_buffer, 0, MSG_BUFFER_SIZE);
-    control_buffer[0] = SPI_START_BYTE;
+    control_buffer[0] = SPI_START;
 
     #ifdef __WIRING_PI_H__
         activate_slave(SPI_SENSOR);
@@ -48,7 +42,7 @@ void acquire_sensor_data() {
     #endif
 
     // Check startbyte
-    if (sensor_buffer[0] != SPI_START_BYTE) {
+    if (sensor_buffer[0] != SPI_START) {
         #ifdef __WIRING_PI_H__
             queue_message("Error: Sensor data start byte validation failed. Dropping acquired data.");
         #endif
@@ -77,35 +71,52 @@ void acquire_sensor_data() {
 
 void send_control_data() {
 
-    memset(control_buffer, 0, MSG_BUFFER_SIZE);
-    
-    control_change_data data;
+    char msg_buffer[MSG_BUFFER_SIZE];
+    char ans_buffer[1];
 
-    control_change_data* registry_entry = 
-        (control_change_data*) data_registry::get_instance().acquire_data(CONTROL_CHANGE_DATA_ID);
-    
-    data = *registry_entry;
-    data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
+    int fails = 0;
+    while (fails < SPI_FAIL_COUNT) {
+        memset(msg_buffer, 0, MSG_BUFFER_SIZE);
+        
+        control_change_data data;
 
-    control_buffer[0] = SPI_START_BYTE;
-    control_buffer[1] = 1;// data.speed_delta;
-    control_buffer[2] = 2; // data.angle_delta;
+        control_change_data* registry_entry = 
+            (control_change_data*) data_registry::get_instance().acquire_data(CONTROL_CHANGE_DATA_ID);
+        
+        data = *registry_entry;
+        data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
 
-    char checkbyte = calc_checkbyte(control_buffer, CONTROL_MSG_SIZE - 1);
-    control_buffer[CONTROL_MSG_SIZE - 1] = checkbyte;
+        msg_buffer[0] = SPI_START;
+        msg_buffer[1] = 1; // data.speed_delta;
+        msg_buffer[2] = 2; // data.angle_delta;
+        msg_buffer[3] = SPI_NAN; // NaN
 
-    #ifdef __WIRING_PI_H__ 
-        activate_slave(SPI_CONTROL);
-        wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) control_buffer, SENSOR_MSG_SIZE);
-        deactivate_slave(SPI_CONTROL);
-    #else
-        return;
-    #endif
+        char checkbyte = calc_checkbyte(msg_buffer, CONTROL_MSG_SIZE - 1);
 
-    if (control_buffer[CONTROL_MSG_SIZE - 1] != checkbyte) {
-        #ifdef __WIRING_PI_H__
-            queue_message("Error: Control data check byte validation failed.");
+        #ifdef __WIRING_PI_H__ 
+            activate_slave(SPI_CONTROL);
+            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) msg_buffer, CONTROL_MSG_SIZE);
+            deactivate_slave(SPI_CONTROL);
         #endif
+
+        unsigned char answer = SPI_FINISHED;
+
+        if (msg_buffer[CONTROL_MSG_CHECKBYTE] != checkbyte) {
+            #ifdef __WIRING_PI_H__
+                queue_message("Error: Control data check byte validation failed.");
+                answer = SPI_RESTART;
+            #endif
+        }
+
+        // Write answer
+        #ifdef __WIRING_PI_H__ 
+            activate_slave(SPI_CONTROL);
+            wiringPiSPIDataRW(SPI_CHANNEL, &answer, 1);
+            deactivate_slave(SPI_CONTROL);
+        #endif
+
+        if (answer == SPI_FINISHED) break;
+
     }
 }
 
