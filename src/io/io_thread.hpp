@@ -4,7 +4,7 @@
 #include <atomic>
 
 // The number of milliseconds waited between each io update
-#define IO_UPDATE_MS 1000
+#define IO_UPDATE_MS 20
 
 /**
  * Main function ran by the io thread
