@@ -62,6 +62,6 @@ packet handle_packet(const packet& p) {
             return packet(p.get_id(), CURRENT_TEMPERATURE, sizeof(float), (uint8_t*) &systemp);
         }
         default:
-            break;
+            return packet(p.get_id(), REMOTE_MODULE_COMMUNICATION_ERROR, 0, nullptr);
     }
 }
