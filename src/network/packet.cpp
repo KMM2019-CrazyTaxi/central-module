@@ -9,9 +9,11 @@ packet::packet(uint32_t _id, uint32_t _type, uint32_t _size, uint8_t* buffer) {
     id   = _id;
     type = _type;
     size = _size;
-    data = new uint8_t[_size]();
 
-    std::copy(buffer, buffer+size, data);
+    if (size) data = new uint8_t[_size]();
+    else      data = nullptr;
+
+    if (size) std::copy(buffer, buffer+size, data);
 }
 
 packet::packet(const packet& other) {
@@ -19,9 +21,10 @@ packet::packet(const packet& other) {
     id   = other.id;
     type = other.type;
     size = other.size;
-    data = new uint8_t[size]();
+    if (size) data = new uint8_t[size]();
+    else      data = nullptr;
 
-    std::copy(other.data, other.data + other.size, data);
+    if (size) std::copy(other.data, other.data + other.size, data);
 }
 
 packet& packet::operator=(const packet& other) {
