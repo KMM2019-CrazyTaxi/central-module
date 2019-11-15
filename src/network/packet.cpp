@@ -58,6 +58,10 @@ uint32_t packet::get_type() const {
     return type;
 }
 
+const uint8_t* packet::get_data() const {
+    return data;
+}
+
 uint8_t packet::operator[](uint32_t index) const {
     return data[index];
 }
