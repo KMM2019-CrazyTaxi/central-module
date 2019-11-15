@@ -3,18 +3,24 @@
 #include "data_registry.hpp"
 #include "packet_ids.hpp"
 
-void handle_packets(const std::vector<packet>& packets) {
+#include <stdio.h>
+
+std::vector<packet> handle_packets(const std::vector<packet>& packets) {
+
+    std::vector<packet> result;
 
     for (const packet& p : packets) {
-        handle_packet(p);
+        result.push_back(handle_packet(p));
     }
 
+    return result;
 }
 
-void handle_packet(const packet& p) {
+packet handle_packet(const packet& p) {
 
     data_registry& registry = data_registry::get_instance();
 
+    
     switch(p.get_type()) {
         case SEND_MAX_SPEED: {
 
@@ -26,7 +32,8 @@ void handle_packet(const packet& p) {
             registry_entry->speed = speed;
 
             registry.release_data(CONTROL_CHANGE_DATA_ID);
-            break;
+
+            return packet(p.get_id(), MAX_SPEED_ACKNOWLEDGEMENT, 0, nullptr);
         }
         
         case REQUEST_TURN: {
@@ -38,7 +45,21 @@ void handle_packet(const packet& p) {
             registry_entry->angle = angle;
 
             registry.release_data(CONTROL_CHANGE_DATA_ID);
-            break;
+
+            return packet(p.get_id(), TURN_ACKNOWLEDGEMENT, 0, nullptr);
+        }
+
+        case REQUEST_TEMPERATURE: {
+            float systemp, millideg;
+            FILE *thermal;
+            int n;
+
+            thermal = fopen("/sys/class/thermal/thermal_zone0/temp","r");
+            n = fscanf(thermal,"%f",&millideg);
+            fclose(thermal);
+            systemp = millideg / 1000;
+
+            return packet(p.get_id(), CURRENT_TEMPERATURE, sizeof(float), (uint8_t*) &systemp);
         }
         default:
             break;

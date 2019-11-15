@@ -6,8 +6,16 @@
 #include "packet.hpp"
 
 
-void handle_packets(const std::vector<packet>& packets);
+/**
+ * 
+ */
+std::vector<packet> handle_packets(const std::vector<packet>& packets);
 
-void handle_packet(const packet& p);
+/**
+ * 
+ */
+packet handle_packet(const packet& p);
+
+
 
 #endif
