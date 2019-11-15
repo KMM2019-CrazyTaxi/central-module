@@ -4,6 +4,7 @@
 #include "packet_ids.hpp"
 
 #include <stdio.h>
+#include <string.h>
 
 std::vector<packet> handle_packets(const std::vector<packet>& packets) {
 
@@ -60,6 +61,15 @@ packet handle_packet(const packet& p) {
             systemp = millideg / 1000;
 
             return packet(p.get_id(), CURRENT_TEMPERATURE, sizeof(float), (uint8_t*) &systemp);
+        }
+        
+        case SEND_CURRENT_DATE_TIME: {
+            char buffer[32];
+            memset(buffer, 0, sizeof(buffer));
+            sprintf(buffer, "date -s '%s'", (const char*) p.get_data());
+            system(buffer);
+
+            return packet(p.get_id(), ACK_CURRENT_DATE_TIME, 0, nullptr);
         }
         default:
             return packet(p.get_id(), REMOTE_MODULE_COMMUNICATION_ERROR, 0, nullptr);
