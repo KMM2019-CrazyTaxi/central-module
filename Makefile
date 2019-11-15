@@ -1,27 +1,37 @@
 CCX=clang++
-CCXFLAGS = -std=c++17 -pthread -DQPU_MODE
+CCXFLAGS = -std=c++17 -pthread 
+LDFLAGS :=
 
 SRCDIR  = ./src
 OBJSDIR = ./build
 DEPDIR	= ./include
 GPUDIR = ./include/QPULib/Lib
+QPULIB :=
+
+ifeq ($(QPU), 1)
+	CCXFLAGS += -DQPU_MODE
+	QPULIB := ./include/QPULib/qpulib.a
+endif
+
+ifeq ($(WIRING), 1)
+	LDFLAGS += -lwiringPi
+	CCXFLAGS += -DWIRING_PI=1
+endif
 
 # Find all subdirectories
 INCLUDES = $(shell find $(SRCDIR) -type d | sed s/^/-I/)
 INCLUDES += $(shell find $(GPUDIR) -type d | sed s/^/-I/)
 
 # Get all headers and sources from source directory
-HEADERS = $(shell find $(SRCDIR) -type f -name '*.h')
+HEADERS = $(shell find $(SRCDIR) -type f -name '*.hpp')
 SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 
 # Generate all objects and matching objects without directory path
 OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
-QPULIB = ./include/QPULib/qpulib.a
-
 project: $(OBJSDIR) $(QPULIB) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) -o project.out
+	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(QPULIB) $(LDFLAGS) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
@@ -31,6 +41,9 @@ $(QPULIB):
 
 $(OBJSDIR):
 	mkdir build
+
+all:
+	make WIRING=1 QPU=1
 
 clean:
 	cd ./include/QPULib && make clean
