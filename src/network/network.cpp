@@ -138,8 +138,11 @@ void network_thread_main(const std::atomic_bool& running) {
                 local_buffer += PACKET_HEADER_SIZE + packet.get_size();
             }
 
+            uint32_t answer_size = (uint32_t) (local_buffer - (uint8_t*) buffer);
 
-            int send_error = send(new_socket, buffer, valread, MSG_NOSIGNAL);
+            queue_message(print_buffer((uint8_t*) buffer, answer_size));
+
+            int send_error = send(new_socket, buffer, answer_size, MSG_NOSIGNAL);
 
             if (send_error == -1) {
                 connection = false;
