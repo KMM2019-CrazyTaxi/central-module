@@ -13,7 +13,7 @@
 struct registry_entry {
 
     // Id associated with the entry (necessary?)
-    std::string id;
+    int id;
 
     // Lock associated with the entry
     std::mutex lock;
@@ -56,14 +56,14 @@ public:
      * NOTE: This function locks the mutex associated with the data,
      * make sure the release it with release_data(id)
      */
-    void* acquire_data(const std::string& id);
+    void* acquire_data(int id);
 
     /**
      * Releases the mutex of the data associated with the given id
      * 
      * @param id ID of the data to be released
      */
-    void release_data(const std::string& id);
+    void release_data(int id);
 
 private:
 
@@ -81,7 +81,7 @@ private:
     ~data_registry();
     
     // Map that maps the ids to the entries 
-    std::unordered_map<std::string, registry_entry> registry;
+    std::unordered_map<int, registry_entry> registry;
 
 };
 
