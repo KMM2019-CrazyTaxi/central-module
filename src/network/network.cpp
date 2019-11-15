@@ -133,24 +133,20 @@ void network_thread_main(const std::atomic_bool& running) {
 
             uint8_t* local_buffer = (uint8_t*) buffer + 1;
 
-            if (!answer_packets.empty()) {
+            for (const auto& packet : answer_packets) {
+                packet::write(packet, local_buffer);
+                local_buffer += PACKET_HEADER_SIZE + packet.get_size();
+            }
 
-                for (const auto& packet : answer_packets) {
-                    packet::write(packet, local_buffer);
-                    local_buffer += PACKET_HEADER_SIZE + packet.get_size();
-                }
+            uint32_t answer_size = (uint32_t) (local_buffer - (uint8_t*) buffer);
 
-                uint32_t answer_size = (uint32_t) (local_buffer - (uint8_t*) buffer);
+            queue_message(print_buffer((uint8_t*) buffer, answer_size));
 
-                queue_message(print_buffer((uint8_t*) buffer, answer_size));
+            int send_error = send(new_socket, buffer, answer_size, MSG_NOSIGNAL);
 
-                int send_error = send(new_socket, buffer, answer_size, MSG_NOSIGNAL);
-
-                if (send_error == -1) {
-                    connection = false;
-                    queue_message("Connection broken.");
-                }
-
+            if (send_error == -1) {
+                connection = false;
+                queue_message("Connection broken.");
             }
 
             if (!running) {
