@@ -23,6 +23,14 @@ packet handle_packet(const packet& p) {
 
     
     switch(p.get_type()) {
+        case REQUEST_SENSOR_DATA: {
+
+            sensor_data data = *(sensor_data*) registry.acquire_data(SENSOR_DATA_ID);
+            registry.release_data(SENSOR_DATA_ID);
+
+            return packet(p.get_id(), CURRENT_SENSOR_DATA, sizeof(data), (uint8_t*) &data);
+        }
+
         case SEND_MAX_SPEED: {
 
             uint8_t speed = p[0];
