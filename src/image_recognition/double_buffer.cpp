@@ -4,26 +4,19 @@
 #include <algorithm>
 #include <mutex>
 
-#ifdef SHARED_ENABLED
-
 double_buffer::double_buffer(uint32_t size) /*: buffer_1(size), buffer_2(size) */ {
 
-    buffer_1 = SharedArray<uint8_t>(size);
-    buffer_2 = SharedArray<uint8_t>(size);
-    read_buffer = &buffer_1;
-    write_buffer = &buffer_2;
+    #ifdef SHARED_ENABLED
+        buffer_1 = SharedArray<uint8_t>(size);
+        buffer_2 = SharedArray<uint8_t>(size);
+        read_buffer = &buffer_1;
+        write_buffer = &buffer_2;
+    #else
+        read_buffer = new uint8_t[size]();
+        write_buffer = new uint8_t[size]();
+    #endif
 
 }
-
-#else
-
-double_buffer::double_buffer(uint32_t size) {
-
-    read_buffer = new uint8_t[size]();
-    write_buffer = new uint8_t[size]();
-}
-
-#endif
 
 
 double_buffer::~double_buffer() {
@@ -40,7 +33,34 @@ double_buffer::~double_buffer() {
 
 }
 
-uint8_t double_buffer::read(uint32_t index) {
+void double_buffer::resize(uint32_t new_size) {
+
+    write_lock.lock();
+
+    #ifdef SHARED_ENABLED
+        read_buffer = nullptr;
+        write_buffer = nullptr;
+        buffer_1.dealloc();
+        buffer_2.dealloc();
+    #else
+        delete[] read_buffer;
+        delete[] write_buffer;
+    #endif
+
+    #ifdef SHARED_ENABLED
+        buffer_1 = SharedArray<uint8_t>(new_size);
+        buffer_2 = SharedArray<uint8_t>(new_size);
+        read_buffer = &buffer_1;
+        write_buffer = &buffer_2;
+    #else
+        read_buffer = new uint8_t[new_size]();
+        write_buffer = new uint8_t[new_size]();
+    #endif
+
+    write_lock.unlock();
+}
+
+uint8_t double_buffer::read(uint32_t index) const {
 
     #ifdef SHARED_ENABLED
         return (*read_buffer)[index];
@@ -60,7 +80,7 @@ void double_buffer::write(uint32_t index, uint8_t value) {
 
 }
 
-const uint8_t* double_buffer::get_read_buffer() {
+const uint8_t* double_buffer::get_read_buffer() const {
 
     #ifdef SHARED_ENABLED
         return read_buffer->getPointer();

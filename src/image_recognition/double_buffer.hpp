@@ -34,11 +34,18 @@ public:
     ~double_buffer();
 
     /**
+     * Resizes the double buffer to the new size
+     * 
+     * @param new_size The new size of the double buffer
+     */
+    void resize(uint32_t new_size);
+
+    /**
      * Reads a byte from the read-only buffer
      * 
      * @param index The index to read from
      */
-    uint8_t read(uint32_t index);
+    uint8_t read(uint32_t index) const;
 
     /**
      * Writes a byte to the write-only buffer
@@ -51,7 +58,7 @@ public:
     /**
      * @return Constant pointer to the read-only buffer
      */
-    const uint8_t* get_read_buffer();
+    const uint8_t* get_read_buffer() const;
 
     /**
      * @return Pointer to the write-only buffer
