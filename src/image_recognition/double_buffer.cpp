@@ -6,8 +6,10 @@
 
 #ifdef SHARED_ENABLED
 
-double_buffer::double_buffer(uint32_t size) : buffer_1(size), buffer_2(size) {
+double_buffer::double_buffer(uint32_t size) /*: buffer_1(size), buffer_2(size) */ {
 
+    buffer_1 = SharedArray<uint8_t>(size);
+    buffer_2 = SharedArray<uint8_t>(size);
     read_buffer = &buffer_1;
     write_buffer = &buffer_2;
 
