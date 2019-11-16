@@ -35,13 +35,15 @@ void take_time() {
 }
 
 int main() {
+
+    uint8_t* image = new uint8_t[SIZE_RGB];
+    uint8_t* gray = new uint8_t[SIZE_GRAY];
+    uint8_t* blur = new uint8_t[SIZE_GRAY];
+    uint8_t* edge = new uint8_t[SIZE_GRAY];
+    uint8_t* marked = new uint8_t[SIZE_RGB];
+    
     for (int file{}; file < 8; ++file) {
 	ifstream input{ FILE_NAMES[file] + ".ppm", ios::binary };
-	uint8_t* image = new uint8_t[SIZE_RGB];
-	uint8_t* gray = new uint8_t[SIZE_GRAY];
-	uint8_t* blur = new uint8_t[SIZE_GRAY];
-	uint8_t* edge = new uint8_t[SIZE_GRAY];
-	uint8_t* marked = new uint8_t[SIZE_RGB];
 
 	vector<int> left, right;
 
@@ -64,6 +66,8 @@ int main() {
 	cout << "Max edge: ";
 	take_time();
 	cout << endl;
+
+	mark_edges(edge, marked, left, right, WIDTH, HEIGHT);
 	
 	ofstream output{ FILE_NAMES[file] + "_gray.ppm", ios::binary };
 	write_image(gray, output, WIDTH, HEIGHT, 1);
@@ -80,11 +84,12 @@ int main() {
 	output.open( FILE_NAMES[file] + "_marked.ppm", ios::binary);
 	write_image(marked, output, WIDTH, HEIGHT, 3);
 	output.close();
-
-	delete image;
-	delete gray;
-	delete blur;
-	delete edge;
     }
+    
+    delete image;
+    delete gray;
+    delete blur;
+    delete edge;
+    delete marked;
     return 0;
 }
