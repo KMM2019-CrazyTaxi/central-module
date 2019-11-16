@@ -29,3 +29,6 @@ central_module_log
 *.exe
 *.out
 *.app
+
+# Emacs backup files
+*~
