@@ -3,6 +3,7 @@
 #include <string>
 #include <cstring>
 #include <string>
+#include <chrono>
 
 #include "image_util.hpp"
 
@@ -17,6 +18,22 @@ const uint32_t SIZE_GRAY{ WIDTH * HEIGHT };
 const string FILE_NAMES[8] {"1", "2", "3", "4",
 	"5", "6", "7", "8"};
 
+std::chrono::high_resolution_clock::time_point t1, t2;
+
+void start_time() {
+    t1 = std::chrono::high_resolution_clock::now();
+}
+
+void take_time() {
+    using clock_t = std::chrono::high_resolution_clock;
+    using time_t = clock_t::time_point;
+
+    t2 = clock_t::now();
+    auto elapsed_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
+    t1 = t2;
+    cout << elapsed_time * 1000;
+}
+
 int main() {
     for (int file{}; file < 8; ++file) {
 	ifstream input{ FILE_NAMES[file] + ".ppm", ios::binary };
@@ -30,13 +47,24 @@ int main() {
 
 	read_image(image, input);
 	memcpy(marked, image, SIZE_RGB);
-    
-	rgb2gray(image, gray, WIDTH, HEIGHT);
-//    gauss(gray, blur, WIDTH, HEIGHT);
-	sobel(gray, edge, WIDTH, HEIGHT);
-	get_max_edge(edge, left, right, WIDTH, HEIGHT);
-	mark_edges(edge, marked, left, right, WIDTH, HEIGHT);
 
+	start_time();
+	rgb2gray(image, gray, WIDTH, HEIGHT);
+	cout << "To gray: ";
+	take_time();
+	cout << endl;
+//    gauss(gray, blur, WIDTH, HEIGHT);
+	
+	sobel(gray, edge, WIDTH, HEIGHT);
+	cout << "Sobel: ";
+	take_time();
+	cout << endl;
+	
+	get_max_edge(edge, left, right, WIDTH, HEIGHT);
+	cout << "Max edge: ";
+	take_time();
+	cout << endl;
+	
 	ofstream output{ FILE_NAMES[file] + "_gray.ppm", ios::binary };
 	write_image(gray, output, WIDTH, HEIGHT, 1);
 	output.close();
