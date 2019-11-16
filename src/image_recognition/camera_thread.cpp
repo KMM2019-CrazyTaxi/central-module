@@ -15,7 +15,10 @@ void camera_thread_main(const std::atomic_bool& running, double_buffer& image_bu
     #ifdef _RaspiCam_H_
         raspicam::RaspiCam camera;
 
-        // image_buffer = double_buffer(camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB));
+        camera.setWidth(IMAGE_WIDTH);
+        camera.setHeight(IMAGE_HEIGHT);
+
+        image_buffer.resize(camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB));
 
         if (!camera.open()) queue_message("Failed to open camera.");
 
