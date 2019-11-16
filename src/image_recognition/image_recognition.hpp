@@ -3,9 +3,11 @@
 
 #include <atomic>
 
+#include "double_buffer.hpp"
+
 /**
  * Main function ran by the image recognition thread
  */
-void image_recognition_main(const std::atomic_bool& running);
+void image_recognition_main(const std::atomic_bool& running, double_buffer& image_buffer);
 
 #endif

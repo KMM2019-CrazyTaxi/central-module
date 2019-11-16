@@ -5,9 +5,13 @@
 #include <chrono>
 
 #include "logging.hpp"
+#include "double_buffer.hpp"
 
-void image_recognition_main(const std::atomic_bool& running) {
-    
+void image_recognition_main(const std::atomic_bool& running, double_buffer& image_buffer) {
+
+    // Swap the buffers to notify camera thread to grab image
+    image_buffer.swap_buffers();
+
     // Main loop
     while (running) {
 
