@@ -98,6 +98,14 @@ uint8_t* double_buffer::get_write_buffer() {
     #endif
 }
 
+void double_buffer::lock_write_buffer() {
+    write_lock.lock();
+}
+
+void double_buffer::unlock_write_buffer() {
+    write_lock.unlock();
+}
+
 void double_buffer::swap_buffers() {
 
     write_lock.lock();

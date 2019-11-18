@@ -66,6 +66,16 @@ public:
     uint8_t* get_write_buffer();
 
     /**
+     * Locks the mutex associated with the write_buffer
+     */
+    void lock_write_buffer();
+
+    /**
+     * Unlocks the mutex associated with the write_buffer
+     */
+    void unlock_write_buffer();
+
+    /**
      * Swaps the read and write buffers
      */
     void swap_buffers();

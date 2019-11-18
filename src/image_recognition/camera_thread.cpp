@@ -25,6 +25,8 @@ void camera_thread_main(const std::atomic_bool& running, double_buffer& image_bu
         std::this_thread::sleep_for(std::chrono::seconds(3));
     #endif
 
+    image_buffer.lock_write_buffer();
+
     while (running) {
 
         // Waits until the most recent captured image starts being processed
@@ -40,5 +42,7 @@ void camera_thread_main(const std::atomic_bool& running, double_buffer& image_bu
 
         #endif
     }
+
+    image_buffer.unlock_write_buffer();
 
 }
