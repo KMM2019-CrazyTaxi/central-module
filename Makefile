@@ -14,8 +14,18 @@ ifeq ($(QPU), 1)
 endif
 
 ifeq ($(WIRING), 1)
-	LDFLAGS += -lwiringPi
 	CCXFLAGS += -DWIRING_PI=1
+	LDFLAGS  += -lwiringPi
+endif
+
+ifeq ($(CAM), 1) 
+	CCXFLAGS += -DRASPICAM=1
+	LDFLAGS  += -lraspicam
+endif
+
+ifeq ($(OPENCV), 1)
+	CCXFLAGS += -DOPENCV=1
+	LDFLAGS  += -lopencv_core -lopencv_imgcodecs 
 endif
 
 # Find all subdirectories
@@ -43,7 +53,7 @@ $(OBJSDIR):
 	mkdir build
 
 all:
-	make WIRING=1 QPU=1
+	make WIRING=1 QPU=1 CAM=1 OPENCV=1
 
 clean:
 	cd ./include/QPULib && make clean
