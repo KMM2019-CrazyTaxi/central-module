@@ -18,7 +18,7 @@ int main() {
     std::atomic_bool running = true;
 
     // Create image buffer for image processing
-    double_buffer image_buffer(IMAGE_SIZE);
+    double_buffer image_buffer(1024);
 
     // Create IO thread for communication with steering and sensor modules
     std::thread io_thread(io_thread_main, std::ref(running));
