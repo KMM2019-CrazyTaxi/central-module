@@ -3,7 +3,7 @@
 
 using namespace std;
 
-void rgb2gray(uint8_t* image, uint8_t* gray, const uint32_t width, const uint32_t height)
+void rgb2gray(const uint8_t* image, uint8_t* gray, const uint32_t width, const uint32_t height)
 {
     for (uint32_t pixel{}; pixel < width*height; ++pixel) {
 	uint32_t sum{};
@@ -22,14 +22,14 @@ void read_image(uint8_t* image, istream& input) {
 
     input >> format >> width >> height >> scale;
     if (format == "P5") {
-	size = width * height;
+        size = width * height;
     } else {
 	size = width * height * 3;
     }
     input.read((char*) image, size);
 }
 
-void write_image(uint8_t* image, ostream& output,
+void write_image(const uint8_t* image, ostream& output,
 		 const uint32_t width, const uint32_t height, const uint32_t colours) {
     uint32_t size = width * height * colours;
     string format{};
