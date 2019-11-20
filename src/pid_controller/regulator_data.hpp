@@ -24,53 +24,17 @@ struct pid_decision_in{
   regulator_param_data params;
 };
 
+struct pid_system_out{
+  uint8_t angle;
+  uint8_t speed;
+};
+
 struct pid_decision_data{
   telemetrics_data metrics;
   regulator_param_data params;
+  pid_system_out out;
   System sys;
   Turn turn;
-};
-
-struct pid_turning_in{
-  telemetrics_data metrics;
-  pid_params params;
-  Turn turn;
-};
-
-struct pid_turning_out{
-  uint8_t angle;
-  uint8_t speed;
-};
-
-struct pid_parking_in{
-  telemetrics_data metrics;
-  pid_params params;
-};
-
-struct pid_parking_out{
-  uint8_t angle;
-  uint8_t speed;
-};
-
-struct pid_stopping_in{
-  telemetrics_data metrics;
-  pid_params params;
-};
-
-struct pid_stopping_out{
-  uint8_t angle;
-  uint8_t speed;
-};
-
-struct pid_line_in{
-  uint8_t angle;
-  uint8_t speed;
-  pid_params params;
-};
-
-struct pid_line_out{
-  uint8_t angle;
-  uint8_t speed;
 };
 
 #endif

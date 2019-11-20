@@ -3,6 +3,6 @@
 
 #include "regulator_data.hpp"
 
-pid_turning_out pid_turning(pid_turning_in in);
+pid_system_out pid_turning(pid_decision_data in);
 
 #endif

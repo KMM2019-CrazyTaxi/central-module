@@ -3,6 +3,6 @@
 
 #include "regulator_data.hpp"
 
-pid_parking_out pid_parking(pid_parking_in in);
+pid_system_out pid_parking(pid_decision_data in);
 
 #endif

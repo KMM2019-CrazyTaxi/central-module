@@ -1,8 +1,8 @@
 #include "stopping.hpp"
 #include "logging.hpp"
 
-pid_stopping_out pid_stopping(pid_stopping_in in) {
+pid_system_out pid_stopping(pid_decision_data in) {
   // TODO: Implement behaviour
-  pid_stopping_out out;
+  pid_system_out out;
   return out;
 }

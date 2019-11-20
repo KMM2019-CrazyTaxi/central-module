@@ -1,8 +1,8 @@
 #include "parking.hpp"
 #include "logging.hpp"
 
-pid_parking_out pid_parking(pid_parking_in in) {
+pid_system_out pid_parking(pid_decision_data in) {
   // TODO: Implement behaviour
-  pid_parking_out out;
+  pid_system_out out;
   return out;
 }

@@ -1,8 +1,8 @@
 #include "line.hpp"
 #include "logging.hpp"
 
-pid_line_out pid_line(pid_line_in in){
+pid_system_out pid_line(pid_system_out in){
   // TODO: Implement proper behaviour
-  pid_line_out out;
+  pid_system_out out;
   return out;
 }
