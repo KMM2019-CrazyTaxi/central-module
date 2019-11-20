@@ -30,7 +30,6 @@ int main() {
     std::thread logging_thread(logging_thread_main, std::ref(thread_name_map), std::ref(running));
 
     // running = false;
-
     io_thread.join();
     ir_thread.join();
     net_thread.join();

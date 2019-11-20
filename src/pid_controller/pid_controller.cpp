@@ -68,3 +68,4 @@ void set_output(regulator_out_data output){
     data_registry::get_instance().release_data(REGULATOR_OUT_DATA_ID);
     
 }
+

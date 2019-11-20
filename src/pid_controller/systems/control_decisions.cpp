@@ -1,17 +1,17 @@
 #include "control_decisions.hpp"
 #include "logging.hpp"
 
-pid_decision_data decide(pid_decision_in);
-regulator_out_data regulate(pid_decision_data);
+pid_decision_data decide(const pid_decision_in &);
+regulator_out_data regulate(const pid_decision_data &);
 
 
-regulator_out_data pid_decision(pid_decision_in in) {
+regulator_out_data pid_decision(const pid_decision_in &in) {
   pid_decision_data data = decide(in);
   regulator_out_data out = regulate(data);
   return out;
 }
 
-pid_decision_data decide(pid_decision_in in) {
+pid_decision_data decide(const pid_decision_in &in) {
   // TODO: Implement decision making
   pid_decision_data data =
     {
@@ -21,7 +21,7 @@ pid_decision_data decide(pid_decision_in in) {
   return data;
 }
 
-regulator_out_data regulate(pid_decision_data dec) {
+regulator_out_data regulate(const pid_decision_data &dec) {
 
   pid_system_out line_in;
 

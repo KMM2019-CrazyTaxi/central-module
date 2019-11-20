@@ -7,6 +7,6 @@
 #include "stopping.hpp"
 #include "line.hpp"
 
-regulator_out_data pid_decision(pid_decision_in in);
+regulator_out_data pid_decision(const pid_decision_in &in);
 
 #endif
