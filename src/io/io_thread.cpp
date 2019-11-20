@@ -23,50 +23,69 @@
 int sensor_failures = 0;
 int control_failures = 0;
 
-unsigned char sensor_buffer[MSG_BUFFER_SIZE];
-
 void activate_slave(int slave);
 void deactivate_slave(int slave);
 void set_slave(int slave, int val);
 
+void spi_write(int slave, unsigned char* buffer, int size);
+
 void acquire_sensor_data() {
+    
+    unsigned char start_buffer[SPI_SENSOR_INIT_MSG_SIZE];
+    unsigned char msg_buffer[SPI_SENSOR_DATA_MSG_SIZE];
+    unsigned char ans_buffer[SPI_SENSOR_FINISH_MSG_SIZE];
 
-    memset(sensor_buffer, 0, MSG_BUFFER_SIZE);
+    int fails = 0;
+    while (fails <= SPI_FAIL_COUNT) {
 
-    #ifdef __WIRING_PI_H__
-        activate_slave(SPI_SENSOR);
-        wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) sensor_buffer, SENSOR_MSG_SIZE);
-        deactivate_slave(SPI_SENSOR);
-    #else
-        return;
-    #endif
-
-    // Check startbyte
-    if (sensor_buffer[0] != SPI_START) {
+        start_buffer[0] = SPI_START;
+        
         #ifdef __WIRING_PI_H__
-            queue_message("Error: Sensor data start byte validation failed. Dropping acquired data.");
+            spi_write(SPI_SENSOR, start_buffer, SPI_SENSOR_INIT_MSG_SIZE);
+        #else
+            return;
         #endif
+
+        // Check startbyte
+        if (start_buffer[0] != SPI_ACK) {
+                queue_message("Failed initialising communication with steering module. Retrying in 1 ms");
+                fails++;
+                continue;
+        }
+
+        // Read the sensor data
+        spi_write(SPI_SENSOR, msg_buffer, SPI_SENSOR_DATA_MSG_SIZE);
+
+        unsigned char answer = SPI_FINISHED;
+
+        // Test for checkbyte, if the checkbyte is wrong, drop the data and log an error.
+        if (!test_checkbyte(msg_buffer, SPI_SENSOR_DATA_MSG_SIZE - 1, msg_buffer[SPI_SENSOR_DATA_MSG_SIZE - 1])) {
+            queue_message("Error: Sensor data check byte validation failed. Retrying communication.");
+            answer = SPI_RESTART;
+            fails++;
+        }
+
+        // Write answer
+        ans_buffer[0] = answer;
+        spi_write(SPI_SENSOR, ans_buffer, SPI_SENSOR_FINISH_MSG_SIZE);
+
+        if (answer == SPI_RESTART) continue;
+
+        // Otherwise read the data
+        short status = concat_bytes(msg_buffer[1], msg_buffer[2]);
+        short acc_x  = concat_bytes(msg_buffer[3], msg_buffer[4]);
+        short acc_y  = concat_bytes(msg_buffer[5], msg_buffer[6]);
+        short acc_z  = concat_bytes(msg_buffer[7], msg_buffer[8]);
+
+        char distance = msg_buffer[9];
+        char speed    = msg_buffer[10];
+
         return;
     }
 
-    // Test for checkbyte, if the checkbyte is wrong, drop the data and log an error.
-    if (!test_checkbyte(sensor_buffer, SENSOR_MSG_SIZE - 1, sensor_buffer[SENSOR_MSG_SIZE - 1])) {
-        #ifdef __WIRING_PI_H__
-            queue_message("Error: Sensor data check byte validation failed. Dropping acquired data.");
-        #endif
-        return;
+    if (fails == SPI_FAIL_COUNT) {
+        queue_message("Failed communication with steering module 5 times, skipping.");
     }
-
-    // Otherwise read the data
-    short status = concat_bytes(sensor_buffer[1], sensor_buffer[2]);
-    short acc_x  = concat_bytes(sensor_buffer[3], sensor_buffer[4]);
-    short acc_y  = concat_bytes(sensor_buffer[5], sensor_buffer[6]);
-    short acc_z  = concat_bytes(sensor_buffer[7], sensor_buffer[8]);
-
-    char distance = sensor_buffer[9];
-    char speed    = sensor_buffer[10];
-
-    return;
 }
 
 std::string print_buffer(uint8_t* buffer, int size) {
@@ -175,6 +194,15 @@ void io_thread_main(const std::atomic_bool& running) {
 
         std::this_thread::sleep_for(std::chrono::milliseconds(IO_UPDATE_MS));
     }
+}
+
+void spi_write(int slave, unsigned char* buffer, int size) {
+
+    #ifdef __WIRING_PI_H__
+        activate_slave(slave);
+        wiringPiSPIDataRW(SPI_CHANNEL, buffer, size);
+        deactivate_slave(slave);
+    #endif
 }
 
 char calc_checkbyte(unsigned char* buffer, int size) {
