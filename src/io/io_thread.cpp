@@ -14,11 +14,7 @@
 
 #include "spi.hpp"
 
-#define SENSOR_MSG_SIZE 13
-#define CONTROL_MSG_SIZE 4
 #define MSG_BUFFER_SIZE 16
-
-#define CONTROL_MSG_CHECKBYTE 2
 
 int sensor_failures = 0;
 int control_failures = 0;
@@ -39,15 +35,17 @@ void acquire_sensor_data() {
     while (fails <= SPI_FAIL_COUNT) {
 
         start_buffer[0] = SPI_START;
-        
-        #ifdef __WIRING_PI_H__
-            spi_write(SPI_SENSOR, start_buffer, SPI_SENSOR_INIT_MSG_SIZE);
-        #else
-            return;
+        start_buffer[1] = 0x00;
+
+        // If wiring pi library is not present, return
+        #ifndef __WIRING_PI_H__
+            return;    
         #endif
 
-        // Check startbyte
-        if (start_buffer[0] != SPI_ACK) {
+        spi_write(SPI_SENSOR, start_buffer, SPI_SENSOR_INIT_MSG_SIZE);
+
+        // Check answer byte
+        if (start_buffer[1] != SPI_ACK) {
                 queue_message("Failed initialising communication with steering module. Retrying in 1 ms");
                 fails++;
                 continue;
@@ -115,12 +113,12 @@ void send_control_data() {
 
         start_buffer[0] = SPI_START;
 
-        #ifdef __WIRING_PI_H__ 
-            // queue_message("Transmitted " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_INIT_MSG_SIZE));
-            activate_slave(SPI_CONTROL);
-            wiringPiSPIDataRW(SPI_CHANNEL, start_buffer, SPI_CONTROL_INIT_MSG_SIZE);
-            deactivate_slave(SPI_CONTROL);
-            // queue_message("Received " + print_buffer((uint8_t*) start_buffer, SPI_CONTROL_INIT_MSG_SIZE));
+        // If wiring pi library is not present, return
+        #ifndef __WIRING_PI_H__ 
+            return;
+        #endif
+
+        spi_write(SPI_CONTROL, start_buffer, SPI_CONTROL_INIT_MSG_SIZE);
 
         if (start_buffer[0] != SPI_ACK) {
             queue_message("Failed initialising communication with steering module. Retrying in 1 ms");
@@ -129,42 +127,26 @@ void send_control_data() {
             continue;
         }
 
-        #endif
-
         msg_buffer[0] = data.speed;
         msg_buffer[1] = data.angle;
         msg_buffer[2] = SPI_NAN;
 
-        char checkbyte = calc_checkbyte(msg_buffer, CONTROL_MSG_SIZE - 1);
+        char checkbyte = calc_checkbyte(msg_buffer, SPI_CONTROL_DATA_MSG_SIZE - 1);
 
-        #ifdef __WIRING_PI_H__ 
-            // queue_message("Transmitted " + print_buffer((uint8_t*) msg_buffer, SPI_CONTROL_DATA_MSG_SIZE));
-            activate_slave(SPI_CONTROL);
-            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) msg_buffer, SPI_CONTROL_DATA_MSG_SIZE);
-            deactivate_slave(SPI_CONTROL);
-            // queue_message("Received " + print_buffer((uint8_t*) msg_buffer, SPI_CONTROL_DATA_MSG_SIZE));
-        #endif
+        // Write the data
+        spi_write(SPI_CONTROL, msg_buffer, SPI_CONTROL_DATA_MSG_SIZE);
 
         unsigned char answer = SPI_FINISHED;
 
-        if (msg_buffer[CONTROL_MSG_CHECKBYTE] != checkbyte) {
-            #ifdef __WIRING_PI_H__
+        if (msg_buffer[2] != checkbyte) {
                 queue_message("Error: Control data check byte validation failed.");
                 answer = SPI_RESTART;
-            #endif
-        }
-        
+        }  
 
         ans_buffer[0] = answer;
 
         // Write answer
-        #ifdef __WIRING_PI_H__ 
-            // queue_message("Transmitted " + print_buffer((uint8_t*) ans_buffer, SPI_CONTROL_FINISH_MSG_SIZE));
-            activate_slave(SPI_CONTROL);
-            wiringPiSPIDataRW(SPI_CHANNEL, (unsigned char*) ans_buffer,SPI_CONTROL_FINISH_MSG_SIZE);
-            deactivate_slave(SPI_CONTROL);
-            // queue_message("Received " + print_buffer((uint8_t*) ans_buffer, SPI_CONTROL_FINISH_MSG_SIZE));
-        #endif
+        spi_write(SPI_CONTROL, ans_buffer, SPI_CONTROL_FINISH_MSG_SIZE);
 
         if (answer == SPI_FINISHED) break;
 
@@ -185,6 +167,10 @@ void io_thread_main(const std::atomic_bool& running) {
         wiringPiSPISetup(SPI_CHANNEL, SPI_FREQ);
         pinMode(SPI_CONTROL_SS_PIN, OUTPUT);
         pinMode(SPI_SENSOR_SS_PIN, OUTPUT);
+
+        // Slave select is active low, so set pins to high
+        digitalWrite(SPI_CONTROL_SS_PIN, 1);
+        digitalWrite(SPI_SENSOR_SS_PIN, 1);
     #endif
 
     while (running) {
@@ -199,9 +185,11 @@ void io_thread_main(const std::atomic_bool& running) {
 void spi_write(int slave, unsigned char* buffer, int size) {
 
     #ifdef __WIRING_PI_H__
+        // queue_message("Transmitted " + print_buffer((uint8_t*) buffer, size));
         activate_slave(slave);
         wiringPiSPIDataRW(SPI_CHANNEL, buffer, size);
         deactivate_slave(slave);
+        // queue_message("Received " + print_buffer((uint8_t*) buffer, size));
     #endif
 }
 
