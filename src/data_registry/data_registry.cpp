@@ -14,24 +14,17 @@ data_registry::data_registry() {
     registry[CONTROL_CHANGE_DATA_ID].id = CONTROL_CHANGE_DATA_ID;
     registry[CONTROL_CHANGE_DATA_ID].data = (void*) ccd;
 
-    regulator_data* rd = new regulator_data();
-    // Set initial values
-    rd->speed_params =
-      {
-       .k = PID_K_SPEED_INITIAL,
-       .td = 0 // Unused
-      };
-    rd->turn_params =
-      {
-       .k = PID_K_TURN_INITIAL,
-       .td = PID_TD_TURN_INITIAL
-      };
-    registry[REGULATOR_DATA_ID].id = REGULATOR_DATA_ID;
-    registry[REGULATOR_DATA_ID].data = (void*) rd;
+    telemetrics_data* td = new telemetrics_data();
+    registry[TELEMETRICS_DATA_ID].id = TELEMETRICS_DATA_ID;
+    registry[TELEMETRICS_DATA_ID].data = (void*) td;
 
-    regulator_output* ro = new regulator_output();
-    registry[REGULATOR_OUTPUT_ID].id = REGULATOR_OUTPUT_ID;
-    registry[REGULATOR_OUTPUT_ID].data = (void*) ro;
+    regulator_out_data* rod = new regulator_out_data();
+    registry[REGULATOR_OUT_DATA_ID].id = REGULATOR_OUT_DATA_ID;
+    registry[REGULATOR_OUT_DATA_ID].data = (void*) rod;
+
+    regulator_param_data* rpd = new regulator_param_data();
+    registry[REGULATOR_PARAM_DATA_ID].id = REGULATOR_PARAM_DATA_ID;
+    registry[REGULATOR_PARAM_DATA_ID].data = (void*) rpd;
 
 }
 
