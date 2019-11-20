@@ -81,7 +81,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	queue_message("Final edge detection took " + std::to_string(to_ms(sobel_time, edge_time)) + " ms.");
 	queue_message("Marking test image took " + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
 
-	if (write_image_to_file) {
+	if (WRITE_IMAGE_TO_FILE) {
             std::ofstream output{ std::to_string(n_processed_images++) + "_processed.ppm", std::ios::binary };
             write_image(marked, output, WIDTH, HEIGHT, 3);
             output.close();
