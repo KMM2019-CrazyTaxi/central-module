@@ -41,6 +41,13 @@ char calc_checkbyte(unsigned char* buffer, int size);
  */
 bool test_checkbyte(unsigned char* buffer, int size, char checkbyte);
 
+/**
+ * Turns a buffer of bytes into a string of hex numbers with spaces between each byte.
+ * 
+ * @param buffer The buffer to translate
+ * @param size The number of bytes to read from the buffer
+ * @return A string of the bytes in hexadecimal
+ */
 std::string print_buffer(uint8_t* buffer, int size);
 
 /**
