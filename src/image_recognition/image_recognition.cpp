@@ -83,6 +83,10 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         rgb2gray(&qpu_image, &qpu_gray, WIDTH, HEIGHT);
         time_point gray_time{ hr_clock::now() };
 
+        for (int i{}; i < SIZE_GRAY; ++i) {
+            gray[i] = qpu_gray[i];
+        }
+
         auto sobel = compile(sobel_qpu);
         sobel.setNumQPUs(NUM_QPU);
         sobel(&qpu_gray, &qpu_edge, WIDTH, HEIGHT);
@@ -114,7 +118,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 
 	if (WRITE_IMAGE_TO_FILE) {
             std::ofstream output{ std::to_string(n_processed_images++) + "_processed.ppm", std::ios::binary };
-            write_image(marked, output, WIDTH, HEIGHT, 3);
+            write_image(gray, output, WIDTH, HEIGHT, 1);
             output.close();
 	}
     }
