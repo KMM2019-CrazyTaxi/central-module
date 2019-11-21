@@ -122,28 +122,23 @@ void rgb2gray_qpu(Ptr<Int> colour, Ptr<Int> gray, Int width, Int height) {
 #else
 
 void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height) {
-    int kernel[3] = {1, 0, -1};
-    for (int32_t h{0}; h < height; ++h) {
-	for (int32_t w{1}; w < width - 1; ++w) {
-	    int sum{};
-            for (int32_t j{}; j < 3; ++j) {
-                sum += kernel[j] * image[h * width + w + j - 1];
-            }
-	    result[h * width + w] = sum < 0 ? 0 : sum;
-	}
+    const int32_t size{ width * height };
+    for (int32_t pos{1}; pos < size - 1; ++pos) {
+        int32_t sum = image[pos - 1] - image[pos + 1];
+        result[pos] = sum < 0 ? 0 : sum;
     }
 }
 
 void rgb2gray(const uint8_t* image, uint8_t* gray, const int32_t width, const int32_t height)
 {
-    for (uint32_t pixel{}; pixel < width*height; ++pixel) {
-	uint32_t sum{};
-	for (uint32_t c{}; c < 3; ++c) {
-	    sum += *image * *image;
-	    ++image;
-	}
-	uint32_t val = sum / 442; // 442 is the length of a (255, 255, 255) rgb vector.
-	*(gray++) = val >= 128 ? 255 : val * 2;
+    const int32_t size{ width * height };
+    for (int32_t pos{}; pos < size; ++pos) {
+        uint32_t sum{};
+        for (uint32_t c{}; c < 3; ++c) {
+            sum += *image++;
+        }
+        sum >>= 1;
+        *(gray++) = sum >= 255 ? 255 : sum;
     }
 }
 
