@@ -26,6 +26,7 @@ const uint32_t COLORS{ 3 };
 const int SIZE_RGB{ WIDTH * HEIGHT * COLORS };
 const int SIZE_GRAY{ WIDTH * HEIGHT };
 const bool WRITE_IMAGE_TO_FILE{ true };
+const int NUM_QPU{ 4 };
 
 int to_ms(const time_point& time1, const time_point& time2) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1).count();
@@ -79,13 +80,13 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
             qpu_image[i] = marked[i];
         }
         auto rgb2gray = compile(rgb2gray_qpu);
-        rgb2gray.setNumQPUs(4);
-	rgb2gray(qpu_image, qpu_gray, WIDTH, HEIGHT);
+        rgb2gray.setNumQPUs(NUM_QPU);
+	rgb2gray(&qpu_image, &qpu_gray, WIDTH, HEIGHT);
 	time_point gray_time{ hr_clock::now() };
         
         auto sobel = compile(sobel_qpu);
-        sobel.setNumQPUs(4);
-        sobel(qpu_gray, qpu_edge, WIDTH, HEIGHT);
+        sobel.setNumQPUs(NUM_QPU);
+        sobel(&qpu_gray, &qpu_edge, WIDTH, HEIGHT);
         for (int i{}; i < SIZE_GRAY; ++i) {
             edge[i] = static_cast<uint8_t>(qpu_edge[i]);
         }
