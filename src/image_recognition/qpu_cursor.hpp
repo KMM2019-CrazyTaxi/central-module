@@ -26,8 +26,6 @@ public:
     // Shift the current vector right one element
     void shiftRight(Float& result);
 
-private:
-
     Ptr<Float> cursor;
     Float prev, current, next;
 
