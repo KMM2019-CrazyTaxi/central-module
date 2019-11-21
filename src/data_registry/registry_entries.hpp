@@ -9,6 +9,7 @@
 #define TELEMETRICS_DATA_ID "telemetrics_data"
 #define REGULATOR_OUT_DATA_ID "regulator_out_data"
 #define REGULATOR_PARAM_DATA_ID "regulator_param_data"
+#define REGULATOR_SAMPLE_DATA_ID "regulator_sample_data"
 
 struct sensor_data {
     float distance;
@@ -21,15 +22,14 @@ struct control_change_data {
 };
 
 struct telemetrics_data {
-  uint8_t curr_speed;
-  uint8_t curr_angle;
-  uint8_t dist_left;
-  uint8_t dist_right;
+  double curr_speed;
+  double dist_left;
+  double dist_right;
 };
 
 struct regulator_out_data {
-  uint8_t speed;
-  uint8_t angle;
+  double speed;
+  double angle;
 };
 
 /**
@@ -51,16 +51,27 @@ struct regulator_out_data {
  * - Increased impact from measurement error
  */
 struct pid_params{
-  float kp;
-  float td;
-  float ti;
+  double kp;
+  double ki;
+  double kd;
+  double alpha;
+  double beta;
 };
 
-struct regulator_param_data {
+struct regulator_param_data{
   pid_params turning;
   pid_params parking;
   pid_params stopping;
-  pid_params line;
+  pid_params line_angle;
+  pid_params line_speed;
+};
+
+/**
+ * Contains sample data for different pid sub-systems
+ */
+struct regulator_sample_data{
+  double line_angle_d;
+  double line_speed_d;
 };
 
 #endif

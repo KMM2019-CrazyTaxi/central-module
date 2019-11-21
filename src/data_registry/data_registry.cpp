@@ -26,6 +26,10 @@ data_registry::data_registry() {
     registry[REGULATOR_PARAM_DATA_ID].id = REGULATOR_PARAM_DATA_ID;
     registry[REGULATOR_PARAM_DATA_ID].data = (void*) rpd;
 
+    regulator_sample_data* rsd = new regulator_sample_data();
+    registry[REGULATOR_SAMPLE_DATA_ID].id = REGULATOR_SAMPLE_DATA_ID;
+    registry[REGULATOR_SAMPLE_DATA_ID].data = (void*) rsd;
+
 }
 
 data_registry::~data_registry() {

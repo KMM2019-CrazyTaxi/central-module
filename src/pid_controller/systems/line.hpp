@@ -3,6 +3,6 @@
 
 #include "regulator_data.hpp"
 
-pid_system_out pid_line(const pid_system_out &in);
+pid_system_out pid_line(pid_system_out &in);
 
 #endif

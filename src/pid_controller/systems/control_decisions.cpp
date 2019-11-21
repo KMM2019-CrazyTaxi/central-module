@@ -2,12 +2,12 @@
 #include "logging.hpp"
 
 pid_decision_data decide(const pid_decision_in &);
-regulator_out_data regulate(const pid_decision_data &);
+pid_decision_return regulate(const pid_decision_data &);
 
 
-regulator_out_data pid_decision(const pid_decision_in &in) {
+pid_decision_return pid_decision(const pid_decision_in &in) {
   pid_decision_data data = decide(in);
-  regulator_out_data out = regulate(data);
+  pid_decision_return out = regulate(data);
   return out;
 }
 
@@ -16,12 +16,16 @@ pid_decision_data decide(const pid_decision_in &in) {
   pid_decision_data data =
     {
      .sys = line,
-     .turn = left
+     .out.dt = in.dt,
+     .out.samples = in.samples,
+     .out.angle = 0,
+     .out.metrics.dist_left = 5,
+     .out.metrics.dist_right = 0
     };
   return data;
 }
 
-regulator_out_data regulate(const pid_decision_data &dec) {
+pid_decision_return regulate(const pid_decision_data &dec) {
 
   pid_system_out line_in;
 
@@ -75,10 +79,11 @@ regulator_out_data regulate(const pid_decision_data &dec) {
   }
 
   pid_system_out line_out = pid_line(line_in);
-  regulator_out_data out =
+  pid_decision_return out =
     {
      .angle = line_out.angle,
-     .speed = line_out.speed
+     .speed = line_out.speed,
+     .samples = line_out.samples
     };
 
   return out;

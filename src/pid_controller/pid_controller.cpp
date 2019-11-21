@@ -8,7 +8,9 @@
 
 telemetrics_data get_metrics();
 regulator_param_data get_params();
+regulator_sample_data get_samples();
 void set_output(regulator_out_data);
+void set_samples(regulator_sample_data);
 
 
 void pid_ctrl_thread_main(const std::atomic_bool& running){
@@ -18,19 +20,32 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     // Get all data for the regulator
     telemetrics_data metrics = get_metrics();
     regulator_param_data params = get_params();
+    
+    regulator_sample_data samples = get_samples();
+    double dt = 1; // Sample time
 
     pid_decision_in dec_in =
       {
        .metrics = metrics,
-       .params = params
+       .params = params,
+       .dt = dt,
+       .samples = samples
       };
 
     // Regulate
-    regulator_out_data reg_out;
-    reg_out = pid_decision(dec_in);
+    pid_decision_return regulate = pid_decision(dec_in);
+
+    samples = regulate.samples;
+    
+    regulator_out_data reg_out =
+      {
+       .angle = regulate.angle,
+       .speed = regulate.speed
+      };
 
     // Send output
     set_output(reg_out);
+    set_samples(samples);
       
     }
   
@@ -60,12 +75,33 @@ regulator_param_data get_params(){
     return params;
 }
 
+// Get params from global registry
+regulator_sample_data get_samples(){
+    regulator_sample_data samples;
+
+    regulator_sample_data *registry_entry =
+      (regulator_sample_data*) data_registry::get_instance().
+      acquire_data(REGULATOR_SAMPLE_DATA_ID);
+    samples = *registry_entry;
+    data_registry::get_instance().release_data(REGULATOR_SAMPLE_DATA_ID);
+    return samples;
+}
+
 void set_output(regulator_out_data output){
     regulator_out_data *registry_entry =
       (regulator_out_data*) data_registry::get_instance().
       acquire_data(REGULATOR_OUT_DATA_ID);
     *registry_entry = output;
     data_registry::get_instance().release_data(REGULATOR_OUT_DATA_ID);
+    
+}
+
+void set_samples(regulator_sample_data samples){
+    regulator_sample_data *registry_entry =
+      (regulator_sample_data*) data_registry::get_instance().
+      acquire_data(REGULATOR_SAMPLE_DATA_ID);
+    *registry_entry = samples;
+    data_registry::get_instance().release_data(REGULATOR_SAMPLE_DATA_ID);
     
 }
 

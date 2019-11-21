@@ -19,35 +19,41 @@
 enum System {decision, turning, parking, stopping, line};
 
 /**
- * Enumerates all of the available turning directions.
- */
-enum Turn {left, right};
-
-/**
  * Contains data which is sent to the regulator's decision maker.
  */
 struct pid_decision_in{
   telemetrics_data metrics;
   regulator_param_data params;
+  
+  double dt;
+  regulator_sample_data samples;
 };
 
 /**
  * Contains a sub-system's output data.
  */
 struct pid_system_out{
-  uint8_t angle;
-  uint8_t speed;
+  double angle;
+  double speed;
+  telemetrics_data metrics;
+  regulator_param_data params;
+
+  double dt;
+  regulator_sample_data samples;
+};
+
+struct pid_decision_return{
+  double angle;
+  double speed;
+  regulator_sample_data samples;
 };
 
 /**
  * Contains all output from the regulator's decision maker.
  */
 struct pid_decision_data{
-  telemetrics_data metrics;
-  regulator_param_data params;
   pid_system_out out;
   System sys;
-  Turn turn;
 };
 
 #endif
