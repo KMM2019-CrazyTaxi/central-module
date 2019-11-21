@@ -1,4 +1,12 @@
 #include "image_util.hpp"
+
+#ifdef QPU_MODE
+
+#include "QPULib.h"
+#include "qpu_cursor.hpp"
+
+#endif
+
 #include <vector>
 
 using namespace std;
@@ -62,7 +70,77 @@ void gauss(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
     }
 }
 
+#ifdef QPU_MODE
+
+void sobelx_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int pitch, Int width, Int height)
+{
+    Cursor row[3];
+    grid = grid + pitch*me() + index();
+
+    // Skip first row of output grid
+    gridOut = gridOut + pitch;
+
+    For (Int y = me(), y < height, y=y+numQPUs())
+        // Point p to the output row
+        Ptr<Float> p = gridOut + y*pitch;
+
+    // Initilaise three cursors for the three input rows
+    for (int i = 0; i < 3; i++) row[i].init(grid + i*pitch);
+    for (int i = 0; i < 3; i++) row[i].prime();
+
+    // Compute one output row
+    For (Int x = 0, x < width, x=x+16)
+
+        for (int i = 0; i < 3; i++) row[i].advance();
+
+    Float left[3], right[3];
+    for (int i = 0; i < 3; i++) {
+        row[i].shiftLeft(right[i]);
+        row[i].shiftRight(left[i]);
+    }
+
+    Float sum = left[0] + row[0].current + right[0] +
+        left[1] +                  right[1] +
+        left[2] + row[2].current + right[2];
+
+    store(row[1].current - K * (row[1].current - sum * 0.125), p);
+    p = p + 16;
+
+    End
+
+        // Cursors are finished for this row
+        for (int i = 0; i < 3; i++) row[i].finish();
+
+    // Move to the next input rows
+    grid = grid + pitch*numQPUs();
+    End
+        }
+
+#endif
+
 void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height) {
+
+#ifdef QPU_MODE
+
+    SharedArray<float> qpu_image(width * height), qpu_result(width * height);
+    for (int i{}; i < height; ++i) {
+        for (int j{}; j < width; ++j) {
+            qpu_image[i * width + j] = image[i * width + j];
+        }
+    }
+
+    auto qpu_routine = compile(sobelx_qpu);
+    qpu_routine.setNumQPUs(4);
+    qpu_routine(&qpu_image, &qpu_result);
+
+    for (int i{}; i < height; ++j) {
+        for (int j{}; j < width; ++j) {
+            result[i * width + j] = static_cast<uint8_t>(qpu_result[i * width + j]);
+        }
+    }
+
+#else
+
     int kernel[3][3] = {{1, 0, -1},
 			{2, 0, -2},
 			{1, 0, -1}};
@@ -77,6 +155,9 @@ void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
 	    result[h * width + w] = sum < 0 ? 0 : sum;
 	}
     }
+
+#endif
+
 }
 
 void get_max_edge(uint8_t* image, vector<int>& left, vector<int>& right,
