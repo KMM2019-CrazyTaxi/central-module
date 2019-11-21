@@ -6,6 +6,12 @@
 #include <vector>
 #include <fstream>
 
+#ifdef QPU_MODE
+
+#include "QPULib.h"
+
+#endif
+
 #include "logging.hpp"
 #include "double_buffer.hpp"
 #include "camera_thread.hpp"
@@ -31,8 +37,13 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     image_buffer.swap_buffers();
 
     // Buffers to save partially processed image.
+#ifdef QPU_MODE
+    SharedBuffer<float> qpu_image(SIZE_RGB);
+    SharedBuffer<float> qpu_gray(SIZE_GRAY);
+    SharedBuffer<float> qpu_edge(SIZE_GRAY);
+#else
     uint8_t* gray = new uint8_t[SIZE_GRAY];
-    uint8_t* blur = new uint8_t[SIZE_GRAY];
+#end
     uint8_t* edge = new uint8_t[SIZE_GRAY];
     uint8_t* marked = new uint8_t[SIZE_RGB];
 
@@ -49,7 +60,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         queue_message("IR Tick");
 
         // Sleep for 1 second
-        //std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	// Start time for benchmarking
 	time_point start_time{ hr_clock::now() };
@@ -60,12 +71,29 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	
 	// Request new image while processing this one.
 	image_buffer.swap_buffers();
-	
+
 	// Process image.
+#ifdef QPU_MODE
+
+        for (int i{}; i < SIZE_RGB; ++i) {
+            qpu_image[i] = marked[i];
+        }
+	rgb2gray(qpu_image, qpu_gray, WIDTH, HEIGHT);
+	time_point gray_time{ hr_clock::now() };
+	sobel(qpu_gray, qpu_edge, WIDTH, HEIGHT);
+        for (int i{}; i < SIZE_GRAY; ++i) {
+            edge[i] = static_cast<uint8_t>(qpu_edge[i]);
+        }
+	time_point sobel_time{ hr_clock::now() };
+
+#else
+
 	rgb2gray(marked, gray, WIDTH, HEIGHT);
 	time_point gray_time{ hr_clock::now() };
 	sobel(gray, edge, WIDTH, HEIGHT);
 	time_point sobel_time{ hr_clock::now() };
+
+#endif
 	get_max_edge(edge, left, right, WIDTH, HEIGHT);
 	left.clear();
 	right.clear();
