@@ -93,7 +93,7 @@ void sobel(SharedArray<float>& image, SharedArray<float>& result,
 }
 
 void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
-    Cursor red;
+    Cursor green;
     colour = colour + 3*width*me() + 3*index();
 
     For (Int y = me(), y < height, y=y+numQPUs())
@@ -101,26 +101,27 @@ void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
         Ptr<Float> p = gray + y*width;
 
     // Initilaise three cursors for the three input rows
-    red.init(colour);
-    red.print();
+    green.init(colour);
+    green.prime();
 
     // Compute one output row
     For (Int x = 0, x < width, x=x+16)
         // Advance three times to get to next red pixel.
-        for (int i = 0; i < 3; ++i)
-            red.advance();
+        green.advance();
+    green.advance();
 
-    Float green, blue;
-    row.shiftRight(green);
+    Float red, blue;
+    green.shiftLeft(red);
     green.shiftRight(blue);
 
-    Float val = (reg + green + blur) / 3.0;
+    Float val = (red + green.current + blue) / 3.0;
 
     store(val, p);
     p = p + 16;
+    green.advance();
 
     End
-        red.finish();
+        green.finish();
 
     // Move to the next input rows
     gray = gray + width*numQPUs();
@@ -129,7 +130,7 @@ void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
 
 void rgb2gray(SharedArray<float>& image, SharedArray<float>& result,
               const int32_t width, const int32_t height) {
-    auto qpu_routine = compile(rbg2gray_qpu);
+    auto qpu_routine = compile(rgb2gray_qpu);
     qpu_routine.setNumQPUs(4);
     qpu_routine(&image, &result, width, height);
 }
