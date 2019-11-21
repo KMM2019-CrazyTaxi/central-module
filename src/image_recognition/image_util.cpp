@@ -84,7 +84,7 @@ void sobel_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
         }
 
 void sobel(SharedArray<float>& image, SharedArray<float>& result, 
-           const int32_t width, const int32_t height) {
+           const uint32_t width, const uint32_t height) {
 
     auto qpu_routine = compile(sobel_qpu);
     qpu_routine.setNumQPUs(4);
@@ -114,7 +114,7 @@ void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
     green.shiftLeft(red);
     green.shiftRight(blue);
 
-    Float val = (red + green.current + blue) / 3.0;
+    Float val = red + green.current + blue;
 
     store(val, p);
     p = p + 16;
@@ -129,7 +129,7 @@ void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
 }
 
 void rgb2gray(SharedArray<float>& image, SharedArray<float>& result,
-              const int32_t width, const int32_t height) {
+              const uint32_t width, const uint32_t height) {
     auto qpu_routine = compile(rgb2gray_qpu);
     qpu_routine.setNumQPUs(4);
     qpu_routine(&image, &result, width, height);
