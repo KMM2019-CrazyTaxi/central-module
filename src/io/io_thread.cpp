@@ -46,7 +46,7 @@ void acquire_sensor_data() {
 
         // Check answer byte
         if (start_buffer[1] != SPI_ACK) {
-                queue_message("Failed initialising communication with steering module. Retrying in 1 ms");
+                queue_message("Failed initialising communication with sensor module. Retrying in 1 ms");
                 fails++;
                 continue;
         }
@@ -82,7 +82,7 @@ void acquire_sensor_data() {
     }
 
     if (fails == SPI_FAIL_COUNT) {
-        queue_message("Failed communication with steering module 5 times, skipping.");
+        queue_message("Failed communication with sensor module 5 times, skipping.");
     }
 }
 
