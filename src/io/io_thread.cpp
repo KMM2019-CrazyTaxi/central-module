@@ -61,7 +61,7 @@ void acquire_sensor_data() {
         unsigned char expected_checkbyte = calc_checkbyte(msg_buffer, SPI_SENSOR_DATA_MSG_SIZE - 1);
 
         // Test for checkbyte, if the checkbyte is wrong, drop the data and log an error.
-        if (!test_checkbyte(msg_buffer, SPI_SENSOR_DATA_MSG_SIZE - 1, checkbyte)) {
+        if (checkbyte != expected_checkbyte) {
             queue_message(
                 "Error: Sensor data check byte validation failed. Got " + 
                 std::to_string(checkbyte) + 
@@ -138,16 +138,24 @@ void send_control_data() {
         msg_buffer[1] = data.angle;
         msg_buffer[2] = SPI_NAN;
 
-        char checkbyte = calc_checkbyte(msg_buffer, SPI_CONTROL_DATA_MSG_SIZE - 1);
+        unsigned char expected_checkbyte = calc_checkbyte(msg_buffer, SPI_CONTROL_DATA_MSG_SIZE - 1);
 
         // Write the data
         spi_write(SPI_CONTROL, msg_buffer, SPI_CONTROL_DATA_MSG_SIZE);
 
         unsigned char answer = SPI_FINISHED;
 
-        if (msg_buffer[2] != checkbyte) {
-                queue_message("Error: Control data check byte validation failed.");
-                answer = SPI_RESTART;
+        unsigned char checkbyte = msg_buffer[2];
+
+        // Test for checkbyte, if the checkbyte is wrong, drop the data and log an error.
+        if (checkbyte != expected_checkbyte) {
+            queue_message(
+                "Error: Control data check byte validation failed. Got " + 
+                std::to_string(checkbyte) + 
+                " expected " +
+                std::to_string(expected_checkbyte) +
+                ". Retrying communication.");
+            answer = SPI_RESTART;
         }  
 
         ans_buffer[0] = answer;
