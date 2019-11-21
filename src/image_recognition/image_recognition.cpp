@@ -39,6 +39,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 
     // Buffers to save partially processed image.
 #ifdef QPU
+    SharedArray<float> qpu_image(SIZE_RGB);
     SharedArray<float> qpu_gray(SIZE_GRAY);
     SharedArray<float> qpu_edge(SIZE_GRAY);
 #endif
@@ -72,26 +73,29 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	image_buffer.swap_buffers();
 
 	// Process image.
-	rgb2gray(marked, gray, WIDTH, HEIGHT);
-	time_point gray_time{ hr_clock::now() };
-
 #ifdef QPU
-        for (int i{}; i < SIZE_GRAY; ++i) {
-            qpu_gray[i] = gray[i];
+        for (int i{}; i < SIZE_RGB; ++i) {
+            qpu_image[i] = marked[i];
         }
+
+        auto rgb2gray = compile(rgb2gray_qpu);
+        rgb2gray.setNumQPUs(NUM_QPU);
+        rgb2gray(&qpu_image, &qpu_gray, WIDTH, HEIGHT);
+        time_point gray_time{ hr_clock::now() };
+
         auto sobel = compile(sobel_qpu);
         sobel.setNumQPUs(NUM_QPU);
         sobel(&qpu_gray, &qpu_edge, WIDTH, HEIGHT);
 	time_point sobel_time{ hr_clock::now() };
+
         for (int i{}; i < SIZE_GRAY; ++i) {
             edge[i] = static_cast<uint8_t>(qpu_edge[i]);
         }
-        
 #else
-
+	rgb2gray(marked, gray, WIDTH, HEIGHT);
+	time_point gray_time{ hr_clock::now() };
 	sobel(gray, edge, WIDTH, HEIGHT);
 	time_point sobel_time{ hr_clock::now() };
-
 #endif
 	get_max_edge(edge, left, right, WIDTH, HEIGHT);
 	left.clear();
