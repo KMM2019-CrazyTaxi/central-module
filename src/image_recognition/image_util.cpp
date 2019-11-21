@@ -72,20 +72,20 @@ void gauss(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
 
 #ifdef QPU_MODE
 
-void sobelx_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int pitch, Int width, Int height)
+void sobelx_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
 {
     Cursor row[3];
-    grid = grid + pitch*me() + index();
+    grid = grid + width*me() + index();
 
     // Skip first row of output grid
     gridOut = gridOut + pitch;
 
     For (Int y = me(), y < height, y=y+numQPUs())
         // Point p to the output row
-        Ptr<Float> p = gridOut + y*pitch;
+        Ptr<Float> p = gridOut + y*width;
 
     // Initilaise three cursors for the three input rows
-    for (int i = 0; i < 3; i++) row[i].init(grid + i*pitch);
+    for (int i = 0; i < 3; i++) row[i].init(grid + i*width);
     for (int i = 0; i < 3; i++) row[i].prime();
 
     // Compute one output row
@@ -112,7 +112,7 @@ void sobelx_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int pitch, Int width, Int h
         for (int i = 0; i < 3; i++) row[i].finish();
 
     // Move to the next input rows
-    grid = grid + pitch*numQPUs();
+    grid = grid + width*numQPUs();
     End
         }
 
@@ -131,7 +131,7 @@ void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
 
     auto qpu_routine = compile(sobelx_qpu);
     qpu_routine.setNumQPUs(4);
-    qpu_routine(&qpu_image, &qpu_result);
+    qpu_routine(&qpu_image, &qpu_result, width, height);
 
     for (int i{}; i < height; ++i) {
         for (int j{}; j < width; ++j) {
