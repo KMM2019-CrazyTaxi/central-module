@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-#ifdef QPU_MODE
+#ifdef QPU
 
 #include "QPULib.h"
 
@@ -14,10 +14,10 @@ void read_image(uint8_t* image, std::istream& input);
 void write_image(const uint8_t* image, std::ostream& output,
 		 const uint32_t width, const uint32_t height, const uint32_t colours);
 
-#ifdef QPU_MODE
+#ifdef QPU
 
 //void rgb2gray_qpu(Ptr<Float> image, Ptr<Float> gray, Int width, Int height);
-void sobel_qpu(Ptr<Float> image, Ptr<Float> result, Int width, Int height);
+void sobel_qpu(Ptr<Int> image, Ptr<Int> result, Int width, Int height);
 
 #else
 
