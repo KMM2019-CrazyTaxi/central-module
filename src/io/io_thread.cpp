@@ -57,9 +57,11 @@ void acquire_sensor_data() {
 
         unsigned char answer = SPI_FINISHED;
 
+        unsigned char checkbyte = msg_buffer[SPI_SENSOR_DATA_MSG_SIZE - 1];
+
         // Test for checkbyte, if the checkbyte is wrong, drop the data and log an error.
-        if (!test_checkbyte(msg_buffer, SPI_SENSOR_DATA_MSG_SIZE - 1, msg_buffer[SPI_SENSOR_DATA_MSG_SIZE - 1])) {
-            queue_message("Error: Sensor data check byte validation failed. Retrying communication.");
+        if (!test_checkbyte(msg_buffer, SPI_SENSOR_DATA_MSG_SIZE - 1, checkbyte)) {
+            queue_message("Error: Sensor data check byte validation failed. Got " + std::to_string(checkbyte) + ". Retrying communication.");
             answer = SPI_RESTART;
             fails++;
         }
