@@ -78,9 +78,14 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         for (int i{}; i < SIZE_RGB; ++i) {
             qpu_image[i] = marked[i];
         }
+        auto rgb2gray = compile(rgb2gray_qpu);
+        rgb2gray.setNumQPUs(4);
 	rgb2gray(qpu_image, qpu_gray, WIDTH, HEIGHT);
 	time_point gray_time{ hr_clock::now() };
-	sobel(qpu_gray, qpu_edge, WIDTH, HEIGHT);
+        
+        auto sobel = compile(sobel_qpu);
+        sobel.setNumQPUs(4);
+        sobel(qpu_gray, qpu_edge, WIDTH, HEIGHT);
         for (int i{}; i < SIZE_GRAY; ++i) {
             edge[i] = static_cast<uint8_t>(qpu_edge[i]);
         }
