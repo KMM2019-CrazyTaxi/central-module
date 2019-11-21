@@ -175,14 +175,14 @@ void mark_edges(uint8_t* edge, uint8_t* marked,
 {
     for (int h{}; h < height; ++h) {
 	int w{ left[h] };
-	if (edge[h*width + w] > 64) {
+	if (edge[h*width + w] > 32) {
 	    marked[h*width*3 + w*3] = 255;
 	    marked[h*width*3 + w*3 + 1] = 0;
 	    marked[h*width*3 + w*3 + 2] = 0;
 	}
 
     	w = right[h];
-	if (edge[h*width + w] > 64) {
+	if (edge[h*width + w] > 32) {
 	    marked[h*width*3 + w*3] = 0;
 	    marked[h*width*3 + w*3 + 1] = 255;
 	    marked[h*width*3 + w*3 + 2] = 0;
