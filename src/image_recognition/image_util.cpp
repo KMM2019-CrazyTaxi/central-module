@@ -9,11 +9,9 @@
 
 #include <vector>
 
-using namespace std;
-
-void read_image(uint8_t* image, istream& input) {
+void read_image(uint8_t* image, std::istream& input) {
     uint32_t width, height, scale, size;
-    string format;
+    std::string format;
 
     input >> format >> width >> height >> scale;
     if (format == "P5") {
@@ -24,15 +22,22 @@ void read_image(uint8_t* image, istream& input) {
     input.read((char*) image, size);
 }
 
-void write_image(const uint8_t* image, ostream& output,
-		 const uint32_t width, const uint32_t height, const uint32_t colours) {
-    uint32_t size = width * height * colours;
-    string format{};
-    if (colours == 1) {
+void write_image(const uint8_t* image, std::ostream& output,
+		 const uint32_t width, const uint32_t height, const IMAGE_TYPE type) {
+    uint32_t size{};
+    std::string format{};
+
+    switch (type) {
+    case GRAY:
+        size = width * height;
 	format = "P5\n";
-    } else {
+        break;
+    case RGB:
+        size = width * height * 3;
 	format = "P6\n";
+        break;
     }
+
     output << format << width << " " << height << " 255\n";
     output.write((char*) image, size);
 }
@@ -121,18 +126,26 @@ void rgb2gray_qpu(Ptr<Int> colour, Ptr<Int> gray, Int width, Int height) {
 
 #else
 
-void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height) {
-    const int32_t size{ width * height };
-    for (int32_t pos{1}; pos < size - 1; ++pos) {
+void sobelx(const uint8_t* image, uint8_t* result, 
+            const uint32_t width, const uint32_t height) {
+    const uint32_t size{ width * height };
+    for (uint32_t pos{1}; pos < size - 1; ++pos) {
         int32_t sum = image[pos - 1] - image[pos + 1];
         result[pos] = sum < 0 ? 0 : sum;
     }
 }
 
-void rgb2gray(const uint8_t* image, uint8_t* gray, const int32_t width, const int32_t height)
+void rgb2gray(const uint8_t* image, uint8_t* gray, 
+              const uint32_t width, const uint32_t height)
 {
-    const int32_t size{ width * height };
-    for (int32_t pos{}; pos < size; ++pos) {
+    /*
+     * Approximates true rgb2gray conversion by summing colour channels and
+     * dividing by 2. This is much faster that true rgb2gray conversion using
+     * scalar products, and as an added bonus tends to smooth bright colours
+     * to an even white with few edges.
+     */
+    const uint32_t size{ width * height };
+    for (uint32_t pos{}; pos < size; ++pos) {
         uint32_t sum{};
         for (uint32_t c{}; c < 3; ++c) {
             sum += *image++;
@@ -144,68 +157,85 @@ void rgb2gray(const uint8_t* image, uint8_t* gray, const int32_t width, const in
 
 #endif
 
-void get_max_edge(uint8_t* image, vector<int>& left, vector<int>& right,
-		  const int32_t width, const int32_t height) {
-    for (int row{}; row < height; ++row) {
-	
-	uint8_t strongest_strength{ image[row * width + width / 2] };
-	int strongest_edge{ width / 2 };
-	for (int col{ width / 2 }; col >= 3; --col) {
-	    if (image[row * width + col] >= 1.5*strongest_strength) {
-		strongest_strength = image[row * width + col];
-		strongest_edge = col;
-	    }
-	}
-	left.push_back(strongest_edge);
-
-	strongest_strength = image[row * width + width / 2];
-	strongest_edge = width / 2;
-	for (int col{ width / 2 }; col < width - 3; ++col) {
-	    if (image[row * width + col] >= 1.5*strongest_strength) {
-		strongest_strength = image[row * width + col];
-		strongest_edge = col;
-	    }
-	}
-	right.push_back(strongest_edge);
-    }
-}
-
-void mark_edges(uint8_t* edge, uint8_t* marked,
-		vector<int>& left, vector<int>& right, const int32_t width, const int32_t height)
-{
-    for (int h{}; h < height; ++h) {
-	int w{ left[h] };
-	if (edge[h*width + w] > 32) {
-	    marked[h*width*3 + w*3] = 255;
-	    marked[h*width*3 + w*3 + 1] = 0;
-	    marked[h*width*3 + w*3 + 2] = 0;
-	}
-
-    	w = right[h];
-	if (edge[h*width + w] > 32) {
-	    marked[h*width*3 + w*3] = 0;
-	    marked[h*width*3 + w*3 + 1] = 255;
-	    marked[h*width*3 + w*3 + 2] = 0;
-	}
-    }
-}
-
-void gauss(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height)
+void gauss(const uint8_t* image, uint8_t* result,
+           const uint32_t width, const uint32_t height)
 {
     int kernel[5][5] = {{1, 4, 6, 4, 1},
 			{4, 16, 24, 1, 4},
 			{6, 24, 36, 24, 6},
 			{4, 16, 24, 16, 4},
 			{1, 4, 6, 4, 1}};
-    for (int32_t h{2}; h < height - 2; ++h) {
-	for (int32_t w{2}; w < width - 2; ++w) {
+    for (uint32_t h{2}; h < height - 2; ++h) {
+	for (uint32_t w{2}; w < width - 2; ++w) {
 	    uint32_t sum{};
-	    for (int32_t i{}; i < 5; ++i) {
-		for (int32_t j{}; j < 5; ++j) {
+	    for (uint32_t i{}; i < 5; ++i) {
+		for (uint32_t j{}; j < 5; ++j) {
 		    sum += kernel[i][j] * image[(h + i - 2) * width + w + j - 2];
 		}
 	    }
 	    result[h * width + w] = (sum >> 8);
+	}
+    }
+}
+
+void get_max_edge(const uint8_t* image, 
+                  std::vector<uint32_t>& left, std::vector<uint32_t>& right,
+		  const uint32_t width, const uint32_t height) {
+    for (int row{}; row < height; ++row) {
+        const uint32_t row_start{ row * width };
+        const uint32_t row_middle{ width >> 1 };
+
+	uint8_t strongest_strength{ image[row_start + row_middle] };
+	uint32_t strongest_edge_pixel{ row_middle };
+        double min_stronger_edge_strength{ 
+            strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD };
+	for (uint32_t column{ row_middle }; column >= 1; --column) {
+	    if (image[row_start + column] >= min_stronger_edge_strength) {
+		strongest_strength = image[row_start + column];
+		strongest_edge_pixel = column;
+                min_stronger_edge_strength =
+                    strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
+	    }
+	}
+	left.push_back(strongest_edge_pixel);
+
+	strongest_strength = image[row_start + row_middle];
+	strongest_edge_pixel = row_middle;
+        min_stronger_edge_strength = 
+            strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
+	for (uint32_t column{ row_middle }; column < width; ++column) {
+	    if (image[row_start + column] >= min_stronger_edge_strength) {
+		strongest_strength = image[row_start + column];
+		strongest_edge_pixel = column;
+                min_stronger_edge_strength =
+                    strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
+	    }
+	}
+	right.push_back(strongest_edge_pixel);
+    }
+}
+
+void mark_edges(const uint8_t* edge, uint8_t* marked,
+		const std::vector<uint32_t>& left, const std::vector<uint32_t>& right,
+                const uint32_t width, const uint32_t height)
+{
+    for (uint32_t row{}; row < height; ++row) {
+        const uint32_t row_start{ row * width };
+
+	uint32_t strongest_pixel{ left[row] };
+	if (edge[row_start + strongest_pixel] > EDGE_STRENGTH_THRESHOLD) {
+            const uint32_t marked_pixel_index{ (row_start + strongest_pixel) * 3 };
+	    marked[marked_pixel_index] = 255;
+	    marked[marked_pixel_index + 1] = 0;
+	    marked[marked_pixel_index + 2] = 0;
+	}
+
+    	strongest_pixel = right[row];
+	if (edge[row_start + strongest_pixel] > EDGE_STRENGTH_THRESHOLD) {
+            const uint32_t marked_pixel_index{ (row_start + strongest_pixel) * 3 };
+	    marked[marked_pixel_index] = 0;
+	    marked[marked_pixel_index + 1] = 255;
+	    marked[marked_pixel_index + 2] = 0;
 	}
     }
 }

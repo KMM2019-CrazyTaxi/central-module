@@ -6,21 +6,13 @@
 
 #ifdef RASPICAM
     #include <raspicam/raspicam.h>
+#else
+    #include <fstream>
 #endif
 
 #include "logging.hpp"
-
-#ifndef RASPICAM
-    #include <string>
-    #include <fstream>
-
-    #include "image_util.hpp"
-
-    const int N_TEST_IMAGES{8};
-    const std::string TEST_IMAGE_PATH = "./src/image_recognition/res/";
-    const std::string TEST_IMAGES[N_TEST_IMAGES] = {"1.ppm", "2.ppm", "3.ppm", "4.ppm",
-						    "5.ppm", "6.ppm", "7.ppm", "8.ppm"};
-#endif
+#include "image_util.hpp"
+#include "image_recognition_constants.hpp"
 
 void camera_thread_main(const std::atomic_bool& running, double_buffer& image_buffer) {
     
