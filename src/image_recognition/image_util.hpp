@@ -25,7 +25,7 @@ void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
 
 #endif
 
-void rgb2gray(const uint8_t* image, uint8_t* gray, const uint32_t width, const uint32_t height);
+void rgb2gray(const uint8_t* image, uint8_t* gray, const int32_t width, const int32_t height);
 void gauss(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height);
 void get_max_edge(uint8_t* image, std::vector<int>& left, std::vector<int>& right,
 		  const int32_t width, const int32_t height);

@@ -142,7 +142,7 @@ void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
 
 #endif
 
-void rgb2gray(const uint8_t* image, uint8_t* gray, const uint32_t width, const uint32_t height)
+void rgb2gray(const uint8_t* image, uint8_t* gray, const int32_t width, const int32_t height)
 {
     for (uint32_t pixel{}; pixel < width*height; ++pixel) {
 	uint32_t sum{};

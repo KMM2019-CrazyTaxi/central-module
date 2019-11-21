@@ -20,9 +20,9 @@
 using hr_clock = std::chrono::high_resolution_clock;
 using time_point = hr_clock::time_point;
 
-const uint32_t WIDTH{ IMAGE_WIDTH };
-const uint32_t HEIGHT{ IMAGE_HEIGHT };
-const uint32_t COLORS{ 3 };
+const int32_t WIDTH{ IMAGE_WIDTH };
+const int32_t HEIGHT{ IMAGE_HEIGHT };
+const int32_t COLORS{ 3 };
 const int SIZE_RGB{ WIDTH * HEIGHT * COLORS };
 const int SIZE_GRAY{ WIDTH * HEIGHT };
 const bool WRITE_IMAGE_TO_FILE{ true };
