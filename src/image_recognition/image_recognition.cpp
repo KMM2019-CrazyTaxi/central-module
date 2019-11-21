@@ -118,7 +118,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 
 	if (WRITE_IMAGE_TO_FILE) {
             std::ofstream output{ std::to_string(n_processed_images++) + "_processed.ppm", std::ios::binary };
-            write_image(gray, output, WIDTH, HEIGHT, 1);
+            write_image(marked, output, WIDTH, HEIGHT, 3);
             output.close();
 	}
     }

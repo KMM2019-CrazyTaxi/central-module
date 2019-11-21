@@ -122,17 +122,13 @@ void rgb2gray_qpu(Ptr<Int> colour, Ptr<Int> gray, Int width, Int height) {
 #else
 
 void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height) {
-    int kernel[3][3] = {{1, 0, -1},
-			{2, 0, -2},
-			{1, 0, -1}};
-    for (int32_t h{1}; h < height - 1; ++h) {
+    int kernel[3] = {1, 0, -1};
+    for (int32_t h{0}; h < height; ++h) {
 	for (int32_t w{1}; w < width - 1; ++w) {
 	    int sum{};
-	    for (int32_t i{}; i < 3; ++i) {
-		for (int32_t j{}; j < 3; ++j) {
-		    sum += kernel[i][j] * image[(h + i - 1) * width + w + j - 1];
-		}
-	    }
+            for (int32_t j{}; j < 3; ++j) {
+                sum += kernel[j] * image[h * width + w + j - 1];
+            }
 	    result[h * width + w] = sum < 0 ? 0 : sum;
 	}
     }
@@ -146,7 +142,7 @@ void rgb2gray(const uint8_t* image, uint8_t* gray, const int32_t width, const in
 	    sum += *image * *image;
 	    ++image;
 	}
-	uint32_t val = sum / sqrt(195075);
+	uint32_t val = sum / 442; // 442 is the length of a (255, 255, 255) rgb vector.
 	*(gray++) = val >= 128 ? 255 : val * 2;
     }
 }
@@ -184,14 +180,14 @@ void mark_edges(uint8_t* edge, uint8_t* marked,
 {
     for (int h{}; h < height; ++h) {
 	int w{ left[h] };
-	if (edge[h*width + w] > 128) {
+	if (edge[h*width + w] > 64) {
 	    marked[h*width*3 + w*3] = 255;
 	    marked[h*width*3 + w*3 + 1] = 0;
 	    marked[h*width*3 + w*3 + 2] = 0;
 	}
 
     	w = right[h];
-	if (edge[h*width + w] > 128) {
+	if (edge[h*width + w] > 64) {
 	    marked[h*width*3 + w*3] = 0;
 	    marked[h*width*3 + w*3 + 1] = 255;
 	    marked[h*width*3 + w*3 + 2] = 0;
