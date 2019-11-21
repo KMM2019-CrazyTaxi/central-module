@@ -83,6 +83,7 @@ void sobel_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
     End
         }
 
+/*
 void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
     Cursor green;
     colour = colour + 3*width*me() + 3*index();
@@ -118,6 +119,7 @@ void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
     gray = gray + width*numQPUs();
     End
 }
+*/
 
 #else
 
@@ -138,6 +140,8 @@ void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
     }
 }
 
+#endif
+
 void rgb2gray(const uint8_t* image, uint8_t* gray, const uint32_t width, const uint32_t height)
 {
     for (uint32_t pixel{}; pixel < width*height; ++pixel) {
@@ -150,8 +154,6 @@ void rgb2gray(const uint8_t* image, uint8_t* gray, const uint32_t width, const u
 	*(gray++) = val >= 128 ? 255 : val * 2;
     }
 }
-
-#endif
 
 void get_max_edge(uint8_t* image, vector<int>& left, vector<int>& right,
 		  const int32_t width, const int32_t height) {
