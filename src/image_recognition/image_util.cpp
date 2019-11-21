@@ -11,19 +11,6 @@
 
 using namespace std;
 
-void rgb2gray(const uint8_t* image, uint8_t* gray, const uint32_t width, const uint32_t height)
-{
-    for (uint32_t pixel{}; pixel < width*height; ++pixel) {
-	uint32_t sum{};
-	for (uint32_t c{}; c < 3; ++c) {
-	    sum += *image * *image;
-	    ++image;
-	}
-	uint32_t val = sum / sqrt(195075);
-	*(gray++) = val >= 128 ? 255 : val * 2;
-    }
-}
-
 void read_image(uint8_t* image, istream& input) {
     uint32_t width, height, scale, size;
     string format;
@@ -50,35 +37,15 @@ void write_image(const uint8_t* image, ostream& output,
     output.write((char*) image, size);
 }
 
-void gauss(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height)
-{
-    int kernel[5][5] = {{1, 4, 6, 4, 1},
-			{4, 16, 24, 1, 4},
-			{6, 24, 36, 24, 6},
-			{4, 16, 24, 16, 4},
-			{1, 4, 6, 4, 1}};
-    for (int32_t h{2}; h < height - 2; ++h) {
-	for (int32_t w{2}; w < width - 2; ++w) {
-	    uint32_t sum{};
-	    for (int32_t i{}; i < 5; ++i) {
-		for (int32_t j{}; j < 5; ++j) {
-		    sum += kernel[i][j] * image[(h + i - 2) * width + w + j - 2];
-		}
-	    }
-	    result[h * width + w] = (sum >> 8);
-	}
-    }
-}
-
 #ifdef QPU_MODE
 
-void sobelx_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
+void sobel_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
 {
     Cursor row[3];
     grid = grid + width*me() + index();
 
     // Skip first row of output grid
-    gridOut = gridOut + pitch;
+    gridOut = gridOut + width;
 
     For (Int y = me(), y < height, y=y+numQPUs())
         // Point p to the output row
@@ -116,31 +83,60 @@ void sobelx_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
     End
         }
 
-#endif
+void sobel(SharedArray<float>& image, SharedArray<float>& result, 
+           const int32_t width, const int32_t height) {
 
-void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height) {
-
-#ifdef QPU_MODE
-
-    SharedArray<float> qpu_image(width * height), qpu_result(width * height);
-    for (int i{}; i < height; ++i) {
-        for (int j{}; j < width; ++j) {
-            qpu_image[i * width + j] = image[i * width + j];
-        }
-    }
-
-    auto qpu_routine = compile(sobelx_qpu);
+    auto qpu_routine = compile(sobel_qpu);
     qpu_routine.setNumQPUs(4);
-    qpu_routine(&qpu_image, &qpu_result, width, height);
+    qpu_routine(&image, &result, width, height);
 
-    for (int i{}; i < height; ++i) {
-        for (int j{}; j < width; ++j) {
-            result[i * width + j] = static_cast<uint8_t>(qpu_result[i * width + j]);
-        }
-    }
+}
+
+void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
+    Cursor red;
+    colour = colour + 3*width*me() + 3*index();
+
+    For (Int y = me(), y < height, y=y+numQPUs())
+        // Point p to the output row
+        Ptr<Float> p = gray + y*width;
+
+    // Initilaise three cursors for the three input rows
+    red.init(colour);
+    red.print();
+
+    // Compute one output row
+    For (Int x = 0, x < width, x=x+16)
+        // Advance three times to get to next red pixel.
+        for (int i = 0; i < 3; ++i)
+            red.advance();
+
+    Float green, blue;
+    row.shiftRight(green);
+    green.shiftRight(blue);
+
+    Float val = (reg + green + blur) / 3.0;
+
+    store(val, p);
+    p = p + 16;
+
+    End
+        red.finish();
+
+    // Move to the next input rows
+    gray = gray + width*numQPUs();
+    End
+}
+
+void rgb2gray(SharedArray<float>& image, SharedArray<float>& result,
+              const int32_t width, const int32_t height) {
+    auto qpu_routine = compile(rbg2gray_qpu);
+    qpu_routine.setNumQPUs(4);
+    qpu_routine(&image, &result, width, height);
+}
 
 #else
 
+void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height) {
     int kernel[3][3] = {{1, 0, -1},
 			{2, 0, -2},
 			{1, 0, -1}};
@@ -155,10 +151,22 @@ void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
 	    result[h * width + w] = sum < 0 ? 0 : sum;
 	}
     }
+}
+
+void rgb2gray(const uint8_t* image, uint8_t* gray, const uint32_t width, const uint32_t height)
+{
+    for (uint32_t pixel{}; pixel < width*height; ++pixel) {
+	uint32_t sum{};
+	for (uint32_t c{}; c < 3; ++c) {
+	    sum += *image * *image;
+	    ++image;
+	}
+	uint32_t val = sum / sqrt(195075);
+	*(gray++) = val >= 128 ? 255 : val * 2;
+    }
+}
 
 #endif
-
-}
 
 void get_max_edge(uint8_t* image, vector<int>& left, vector<int>& right,
 		  const int32_t width, const int32_t height) {
@@ -205,3 +213,24 @@ void mark_edges(uint8_t* edge, uint8_t* marked,
 	}
     }
 }
+
+void gauss(uint8_t* image, uint8_t* result, const int32_t width, const int32_t height)
+{
+    int kernel[5][5] = {{1, 4, 6, 4, 1},
+			{4, 16, 24, 1, 4},
+			{6, 24, 36, 24, 6},
+			{4, 16, 24, 16, 4},
+			{1, 4, 6, 4, 1}};
+    for (int32_t h{2}; h < height - 2; ++h) {
+	for (int32_t w{2}; w < width - 2; ++w) {
+	    uint32_t sum{};
+	    for (int32_t i{}; i < 5; ++i) {
+		for (int32_t j{}; j < 5; ++j) {
+		    sum += kernel[i][j] * image[(h + i - 2) * width + w + j - 2];
+		}
+	    }
+	    result[h * width + w] = (sum >> 8);
+	}
+    }
+}
+
