@@ -99,11 +99,11 @@ void sobelx_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int pitch, Int width, Int h
         row[i].shiftRight(left[i]);
     }
 
-    Float sum = left[0] + row[0].current + right[0] +
-        left[1] +                  right[1] +
-        left[2] + row[2].current + right[2];
+    Float sum = left[0] - right[0] +
+        2*left[1] - 2*right[1] +
+        left[2] - right[2];
 
-    store(row[1].current - K * (row[1].current - sum * 0.125), p);
+    store(sum, p);
     p = p + 16;
 
     End
@@ -133,7 +133,7 @@ void sobel(uint8_t* image, uint8_t* result, const int32_t width, const int32_t h
     qpu_routine.setNumQPUs(4);
     qpu_routine(&qpu_image, &qpu_result);
 
-    for (int i{}; i < height; ++j) {
+    for (int i{}; i < height; ++i) {
         for (int j{}; j < width; ++j) {
             result[i * width + j] = static_cast<uint8_t>(qpu_result[i * width + j]);
         }
