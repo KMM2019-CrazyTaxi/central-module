@@ -151,7 +151,7 @@ void get_max_edge(uint8_t* image, vector<int>& left, vector<int>& right,
 	uint8_t strongest_strength{ image[row * width + width / 2] };
 	int strongest_edge{ width / 2 };
 	for (int col{ width / 2 }; col >= 3; --col) {
-	    if (image[row * width + col] >= 2*strongest_strength) {
+	    if (image[row * width + col] >= 1.5*strongest_strength) {
 		strongest_strength = image[row * width + col];
 		strongest_edge = col;
 	    }
@@ -161,7 +161,7 @@ void get_max_edge(uint8_t* image, vector<int>& left, vector<int>& right,
 	strongest_strength = image[row * width + width / 2];
 	strongest_edge = width / 2;
 	for (int col{ width / 2 }; col < width - 3; ++col) {
-	    if (image[row * width + col] >= 2*strongest_strength) {
+	    if (image[row * width + col] >= 1.5*strongest_strength) {
 		strongest_strength = image[row * width + col];
 		strongest_edge = col;
 	    }
