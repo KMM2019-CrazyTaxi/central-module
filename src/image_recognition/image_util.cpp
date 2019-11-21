@@ -1,6 +1,6 @@
 #include "image_util.hpp"
 
-#ifdef QPU_MODE
+#ifdef QPU
 
 #include "QPULib.h"
 #include "qpu_cursor.hpp"
@@ -37,7 +37,7 @@ void write_image(const uint8_t* image, ostream& output,
     output.write((char*) image, size);
 }
 
-#ifdef QPU_MODE
+#ifdef QPU
 
 void sobel_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
 {

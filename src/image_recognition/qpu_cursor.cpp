@@ -1,4 +1,4 @@
-#ifdef QPU_MODE
+#ifdef QPU
 
 #include "qpu_cursor.hpp"
 

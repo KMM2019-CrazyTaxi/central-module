@@ -6,7 +6,7 @@
 #include <vector>
 #include <fstream>
 
-#ifdef QPU_MODE
+#ifdef QPU
 
 #include "QPULib.h"
 
@@ -38,7 +38,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     image_buffer.swap_buffers();
 
     // Buffers to save partially processed image.
-#ifdef QPU_MODE
+#ifdef QPU
     SharedArray<float> qpu_gray(SIZE_GRAY);
     SharedArray<float> qpu_edge(SIZE_GRAY);
 #endif
@@ -73,15 +73,12 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 
 	// Process image.
 	rgb2gray(marked, gray, WIDTH, HEIGHT);
-#ifdef QPU_MODE
+	time_point gray_time{ hr_clock::now() };
+
+#ifdef QPU
         for (int i{}; i < SIZE_GRAY; ++i) {
             qpu_gray[i] = gray[i];
         }
-#endif
-	time_point gray_time{ hr_clock::now() };
-
-#ifdef QPU_MODE
-
         auto sobel = compile(sobel_qpu);
         sobel.setNumQPUs(NUM_QPU);
         sobel(&qpu_gray, &qpu_edge, WIDTH, HEIGHT);
@@ -89,7 +86,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         for (int i{}; i < SIZE_GRAY; ++i) {
             edge[i] = static_cast<uint8_t>(qpu_edge[i]);
         }
-
+        
 #else
 
 	sobel(gray, edge, WIDTH, HEIGHT);
