@@ -39,7 +39,7 @@ void write_image(const uint8_t* image, ostream& output,
 
 #ifdef QPU
 
-void sobel_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
+void sobel_qpu(Ptr<Int> grid, Ptr<Int> gridOut, Int width, Int height)
 {
     Cursor row[3];
     grid = grid + width*me() + index();
@@ -49,7 +49,7 @@ void sobel_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
 
     For (Int y = me(), y < height, y=y+numQPUs())
         // Point p to the output row
-        Ptr<Float> p = gridOut + y*width;
+        Ptr<Int> p = gridOut + y*width;
 
     // Initilaise three cursors for the three input rows
     for (int i = 0; i < 3; i++) row[i].init(grid + i*width);
@@ -60,13 +60,13 @@ void sobel_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
 
         for (int i = 0; i < 3; i++) row[i].advance();
 
-    Float left[3], right[3];
+    Int left[3], right[3];
     for (int i = 0; i < 3; i++) {
         row[i].shiftLeft(right[i]);
         row[i].shiftRight(left[i]);
     }
 
-    Float sum = left[0] - right[0] +
+    Int sum = left[0] - right[0] +
         2*left[1] - 2*right[1] +
         left[2] - right[2];
 
@@ -83,13 +83,13 @@ void sobel_qpu(Ptr<Float> grid, Ptr<Float> gridOut, Int width, Int height)
     End
         }
 
-void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
+void rgb2gray_qpu(Ptr<Int> colour, Ptr<Int> gray, Int width, Int height) {
     Cursor green;
     colour = colour + 3*width*me() + 3*index();
 
     For (Int y = me(), y < height, y=y+numQPUs())
         // Point p to the output row
-        Ptr<Float> p = gray + y*width;
+        Ptr<Int> p = gray + y*width;
 
     // Initilaise three cursors for the three input rows
     green.init(colour);
@@ -101,11 +101,11 @@ void rgb2gray_qpu(Ptr<Float> colour, Ptr<Float> gray, Int width, Int height) {
         green.advance();
     green.advance();
 
-    Float red, blue;
+    Int red, blue;
     green.shiftLeft(red);
     green.shiftRight(blue);
 
-    Float val = red + green.current + blue;
+    Int val = red + green.current + blue;
 
     store(val, p);
     p = p + 16;

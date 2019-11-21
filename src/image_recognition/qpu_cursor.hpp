@@ -8,7 +8,7 @@ public:
 
     // Initialise to cursor to a given pointer
     // and fetch the first vector.
-    void init(Ptr<Float> p);
+    void init(Ptr<Int> p);
 
     // Receive the first vector and fetch the second.
     // (prime the software pipeline)
@@ -21,12 +21,12 @@ public:
     void finish();
 
     // Shift the current vector left one element
-    void shiftLeft(Float& result);
+    void shiftLeft(Int& result);
 
     // Shift the current vector right one element
-    void shiftRight(Float& result);
+    void shiftRight(Int& result);
 
-    Ptr<Float> cursor;
-    Float prev, current, next;
+    Ptr<Int> cursor;
+    Int prev, current, next;
 
 };

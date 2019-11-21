@@ -16,8 +16,8 @@ void write_image(const uint8_t* image, std::ostream& output,
 
 #ifdef QPU
 
-void rgb2gray_qpu(Ptr<Float> image, Ptr<Float> gray, Int width, Int height);
-void sobel_qpu(Ptr<Float> image, Ptr<Float> result, Int width, Int height);
+void rgb2gray_qpu(Ptr<Int> image, Ptr<Int> gray, Int width, Int height);
+void sobel_qpu(Ptr<Int> image, Ptr<Int> result, Int width, Int height);
 
 #else
 

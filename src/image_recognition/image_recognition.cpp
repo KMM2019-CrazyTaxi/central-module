@@ -39,9 +39,9 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 
     // Buffers to save partially processed image.
 #ifdef QPU
-    SharedArray<float> qpu_image(SIZE_RGB);
-    SharedArray<float> qpu_gray(SIZE_GRAY);
-    SharedArray<float> qpu_edge(SIZE_GRAY);
+    SharedArray<int> qpu_image(SIZE_RGB);
+    SharedArray<int> qpu_gray(SIZE_GRAY);
+    SharedArray<int> qpu_edge(SIZE_GRAY);
 #endif
     uint8_t* gray = new uint8_t[SIZE_GRAY];
     uint8_t* edge = new uint8_t[SIZE_GRAY];
