@@ -43,7 +43,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     SharedBuffer<float> qpu_edge(SIZE_GRAY);
 #else
     uint8_t* gray = new uint8_t[SIZE_GRAY];
-#end
+#endif
     uint8_t* edge = new uint8_t[SIZE_GRAY];
     uint8_t* marked = new uint8_t[SIZE_RGB];
 
