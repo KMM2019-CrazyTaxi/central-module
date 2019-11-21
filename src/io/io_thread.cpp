@@ -32,7 +32,7 @@ void acquire_sensor_data() {
     unsigned char ans_buffer[SPI_SENSOR_FINISH_MSG_SIZE];
 
     int fails = 0;
-    while (fails <= SPI_FAIL_COUNT) {
+    while (fails < SPI_FAIL_COUNT) {
 
         start_buffer[0] = SPI_START;
         start_buffer[1] = 0x00;
@@ -47,6 +47,7 @@ void acquire_sensor_data() {
         // Check answer byte
         if (start_buffer[1] != SPI_ACK) {
                 queue_message("Failed initialising communication with sensor module. Retrying in 1 ms");
+                std::this_thread::sleep_for(std::chrono::milliseconds(SPI_FAILED_WAIT_MS));
                 fails++;
                 continue;
         }
@@ -81,9 +82,7 @@ void acquire_sensor_data() {
         return;
     }
 
-    if (fails == SPI_FAIL_COUNT) {
-        queue_message("Failed communication with sensor module 5 times, skipping.");
-    }
+    queue_message("Failed communication with sensor module 5 times, skipping.");
 }
 
 std::string print_buffer(uint8_t* buffer, int size) {
@@ -109,7 +108,7 @@ void send_control_data() {
     data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
 
     int fails = 0;
-    while (fails <= SPI_FAIL_COUNT) {
+    while (fails < SPI_FAIL_COUNT) {
 
         start_buffer[0] = SPI_START;
 
@@ -148,14 +147,12 @@ void send_control_data() {
         // Write answer
         spi_write(SPI_CONTROL, ans_buffer, SPI_CONTROL_FINISH_MSG_SIZE);
 
-        if (answer == SPI_FINISHED) break;
+        if (answer == SPI_FINISHED) return;
 
         fails++;
     }
 
-    if (fails == SPI_FAIL_COUNT) {
-        queue_message("Failed communication with steering module 5 times, skipping.");
-    }
+    queue_message("Failed communication with steering module 5 times, skipping.");
 }
 
 void io_thread_main(const std::atomic_bool& running) {
