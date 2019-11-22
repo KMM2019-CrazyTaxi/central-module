@@ -78,6 +78,7 @@ struct regulator_param_data{
 struct regulator_sample_data{
   double line_angle_d;
   double line_speed_d;
+  double stopping_speed_d;
 };
 
 #endif
