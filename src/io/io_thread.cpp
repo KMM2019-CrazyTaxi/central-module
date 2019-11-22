@@ -188,8 +188,8 @@ void io_thread_main(const std::atomic_bool& running) {
 
     while (running) {
 
-        acquire_sensor_data();
-        // send_control_data();
+        // acquire_sensor_data();
+        send_control_data();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(IO_UPDATE_MS));
     }
