@@ -25,6 +25,7 @@ struct telemetrics_data {
   double curr_speed;
   double dist_left;
   double dist_right;
+  double dist_stop_line;
 };
 
 struct regulator_out_data {
@@ -56,6 +57,11 @@ struct pid_params{
   double kd;
   double alpha;
   double beta;
+
+  double angle_threshold;
+  double speed_threshold;
+  double min_value;
+  double slope;
 };
 
 struct regulator_param_data{
