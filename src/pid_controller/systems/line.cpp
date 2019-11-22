@@ -1,6 +1,8 @@
 #include "line.hpp"
 #include "logging.hpp"
 #include <cstdint>
+#include <cmath>
+#include "math.h"
 
 double regulate_angle(const telemetrics_data &,
 		      const pid_params &,
@@ -135,8 +137,8 @@ double calc_fact(const double &reg_angle,
   if (slope < 1)
     queue_message("The slope of the calc_fact should never be < 1. Given: " + std::to_string(slope));
 
-  double exp = slope^(-cutoff_func(reg_angle, ref_speed, angle_threshold, speed_threshold));
-  double linear = cutoff_func(reg_angle, ref_speed, angle_threshold, speed_threshold) * (slope(-1) - min_value);
+  double exp = pow(slope, (-cutoff_func(reg_angle, ref_speed, angle_threshold, speed_threshold)));
+  double linear = cutoff_func(reg_angle, ref_speed, angle_threshold, speed_threshold) * (pow(slope, -1) - min_value);
 
   return exp - linear;
 }
@@ -149,8 +151,8 @@ double cutoff_func(const double &x,
 		   const double &c1,
 		   const double &c2) {
   
-  if (abs(x) < c1 || abs(y) < c2)
+  if (fabs(x) < c1 || fabs(y) < c2)
     return 0;
   else
-    return abs((abs(x) - c1) * (abs(y) - c2)/((1 - c1) * (1 - c2)));
+    return fabs((fabs(x) - c1) * (fabs(y) - c2)/((1 - c1) * (1 - c2)));
 }
