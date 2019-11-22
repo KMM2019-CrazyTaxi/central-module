@@ -35,6 +35,7 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
 
   pid_system_out out =
     {
+     .angle = in.out.angle,
      .speed = curr_speed + res,
      .samples = in.out.samples
     };
