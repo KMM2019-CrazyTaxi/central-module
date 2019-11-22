@@ -90,20 +90,19 @@ double regulate_speed(const telemetrics_data &metrics,
   double speed_fact;
   if (reg_angle >= 0) speed_fact = fact + 1;
   else speed_fact = -fact + 1;
+  double ref_speed_updated = ref_speed * speed_fact ;
   
-  double sample_d = beta * ref_speed - metrics.curr_speed;
+  double sample_d = beta * ref_speed_updated - metrics.curr_speed;
 
-  double calc_p = alpha * ref_speed - metrics.curr_speed;
+  double calc_p = alpha * ref_speed_updated - metrics.curr_speed;
   double calc_i = 0;
   double calc_d = (sample_d - samples.line_speed_d) / dt;
 
-  double p = kp * speed_fact * calc_p; // @TODO:Should the speed_fact be elsewhere?
+  double p = kp * calc_p; // @TODO:Should the speed_fact be elsewhere?
   double i = ki * calc_i;
   double d = kd * calc_d;
 
   samples.line_speed_d = sample_d;
   
-  return p + i + d;
-  
-  return 0;
+  return metrics.curr_speed + p + i + d;
 }
