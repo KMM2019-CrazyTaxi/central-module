@@ -38,18 +38,21 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 #endif
 
     uint8_t* gray_image = new uint8_t[IMAGE_SIZE_GRAY];
-    uint8_t* edge_image = new uint8_t[IMAGE_SIZE_GRAY];
+    uint8_t* edgex_image = new uint8_t[IMAGE_SIZE_GRAY];
+    uint8_t* edgey_image = new uint8_t[IMAGE_SIZE_GRAY];
     uint8_t* marked_image = new uint8_t[IMAGE_SIZE_RGB];
 
     // Resulting edge distances.
     std::vector<uint32_t> left_edges{};
     std::vector<uint32_t> right_edges{};
+    std::vector<uint32_t> front_edges{};
 
     uint32_t n_processed_images{};
 
     time_point start_time{};
     time_point rgb2gray_time{};
-    time_point sobel_time{};
+    time_point sobelx_time{};
+    time_point sobely_time{};
     time_point edge_time{};
     time_point mark_time{};
     time_point stop_time{};
@@ -95,17 +98,21 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         }
 #else
 	rgb2gray(marked_image, gray_image, IMAGE_WIDTH, IMAGE_HEIGHT);
-	time_point gray_time = hr_clock::now();
-	sobelx(gray_image, edge_image, IMAGE_WIDTH, IMAGE_HEIGHT);
-	time_point sobel_time = hr_clock::now();
+	gray_time = hr_clock::now();
+	sobelx(gray_image, edgex_image, IMAGE_WIDTH, IMAGE_HEIGHT);
+	sobelx_time = hr_clock::now();
+	sovely(gray_image, edgey_image, IMAGE_WIDTH, IMAGE_HEIGHT);
+	sobely_time = hr_clock::now();
 #endif
 	left_edges.clear();
 	right_edges.clear();
-	get_max_edge(edge_image, left_edges, right_edges,
+	front_edges.clear();
+	get_max_edge(edgex_image, edgey_image,
+		     left_edges, right_edges, front_edges,
                      IMAGE_WIDTH, IMAGE_HEIGHT);
 	edge_time = hr_clock::now();
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
-            mark_edges(edge_image, marked_image, left_edges, right_edges,
+            mark_edges(edgex_image, edgey_image, marked_image, left_edges, right_edges, front_edges,
                        IMAGE_WIDTH, IMAGE_HEIGHT);
             mark_time = hr_clock::now();
         }
@@ -116,10 +123,12 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
                       + std::to_string(to_ms(start_time, stop_time)) + " ms.");
 	queue_message("  RGB2GRAY took "
                       + std::to_string(to_ms(start_time, gray_time)) + " ms.");
-	queue_message("  Sobel took "
-                      + std::to_string(to_ms(gray_time, sobel_time)) + " ms.");
+	queue_message("  Sobelx took "
+                      + std::to_string(to_ms(gray_time, sobelx_time)) + " ms.");
+	queue_message("  Sobely took "
+		      + std::to_string(to_ms(sobelx_time, sobely_time)) + " ms.");
 	queue_message("  Final edge detection took " 
-                      + std::to_string(to_ms(sobel_time, edge_time)) + " ms.");
+                      + std::to_string(to_ms(sobely_time, edge_time)) + " ms.");
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
             queue_message("  Marking test image took "
                           + std::to_string(to_ms(edge_time, mark_time)) + " ms.");

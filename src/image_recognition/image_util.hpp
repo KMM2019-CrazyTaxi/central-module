@@ -35,9 +35,10 @@ void sobely(const uint8_t* image, uint8_t* result,
 
 void gauss(const uint8_t* image, uint8_t* result, 
            const uint32_t width, const uint32_t height);
-void get_max_edge(const uint8_t* image, 
-                  std::vector<uint32_t>& left, std::vector<uint32_t>& right,
+void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
+                  std::vector<uint32_t>& left, std::vector<uint32_t>& right, std::vector<uint32_t>& front,
 		  const uint32_t width, const uint32_t height);
-void mark_edges(const uint8_t* edge, uint8_t* marked,
-		const std::vector<uint32_t>& left, const std::vector<uint32_t>& right, 
+void mark_edges(const uint8_t* edgex_image, const uint8_t* edgey_image, uint8_t* marked,
+		const std::vector<uint32_t>& left, const std::vector<uint32_t>& right,
+		const std::vector<uint32_t>& front,
                 const uint32_t width, const uint32_t height);

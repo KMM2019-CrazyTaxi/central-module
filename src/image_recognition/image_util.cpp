@@ -187,20 +187,20 @@ void gauss(const uint8_t* image, uint8_t* result,
     }
 }
 
-void get_max_edge(const uint8_t* image, 
-                  std::vector<uint32_t>& left, std::vector<uint32_t>& right,
+void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
+                  std::vector<uint32_t>& left, std::vector<uint32_t>& right, std::vector<uint32_t>& front,
 		  const uint32_t width, const uint32_t height) {
     for (int row{}; row < height; ++row) {
         const uint32_t row_start{ row * width };
         const uint32_t row_middle{ width >> 1 };
 
-	uint8_t strongest_strength{ image[row_start + row_middle] };
+	uint8_t strongest_strength{ edgex_image[row_start + row_middle] };
 	uint32_t strongest_edge_pixel{ row_middle };
         double min_stronger_edge_strength{ 
             strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD };
 	for (uint32_t column{ row_middle }; column >= 1; --column) {
-	    if (image[row_start + column] >= min_stronger_edge_strength) {
-		strongest_strength = image[row_start + column];
+	    if (edgex_image[row_start + column] >= min_stronger_edge_strength) {
+		strongest_strength = edgex_image[row_start + column];
 		strongest_edge_pixel = column;
                 min_stronger_edge_strength =
                     strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
@@ -208,13 +208,13 @@ void get_max_edge(const uint8_t* image,
 	}
 	left.push_back(strongest_edge_pixel);
 
-	strongest_strength = image[row_start + row_middle];
+	strongest_strength = edgex_image[row_start + row_middle];
 	strongest_edge_pixel = row_middle;
         min_stronger_edge_strength = 
             strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
 	for (uint32_t column{ row_middle }; column < width; ++column) {
-	    if (image[row_start + column] >= min_stronger_edge_strength) {
-		strongest_strength = image[row_start + column];
+	    if (edgex_image[row_start + column] >= min_stronger_edge_strength) {
+		strongest_strength = edgex_image[row_start + column];
 		strongest_edge_pixel = column;
                 min_stronger_edge_strength =
                     strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
@@ -222,17 +222,36 @@ void get_max_edge(const uint8_t* image,
 	}
 	right.push_back(strongest_edge_pixel);
     }
+    
+    for (int column{}; column < width; ++column) {
+	const uint32_t column_start{ width * (height - 2) + column };
+
+	uint8_t strongest_strength{ edgey_image[column_start] };
+	uint32_t strongest_edge_pixel{ column_start };
+        double min_stronger_edge_strength{ 
+            strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD };
+	for (uint32_t row{ height - 2 }; row >= 1; --row) {
+	    if (edgey_image[column_start - row * width] >= min_stronger_edge_strength) {
+		strongest_strength = edgey_image[column_start - row * width];
+		strongest_edge_pixel = row;
+                min_stronger_edge_strength =
+                    strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
+	    }
+	}
+	front.push_back(strongest_edge_pixel);
+    }
 }
 
-void mark_edges(const uint8_t* edge, uint8_t* marked,
+void mark_edges(const uint8_t* edgex_image, const uint8_t* edgey_image, uint8_t* marked,
 		const std::vector<uint32_t>& left, const std::vector<uint32_t>& right,
+		const std::vector<uint32_t>& front,
                 const uint32_t width, const uint32_t height)
 {
     for (uint32_t row{}; row < height; ++row) {
         const uint32_t row_start{ row * width };
 
 	uint32_t strongest_pixel{ left[row] };
-	if (edge[row_start + strongest_pixel] > EDGE_STRENGTH_THRESHOLD) {
+	if (edgex_image[row_start + strongest_pixel] > EDGE_STRENGTH_THRESHOLD) {
             const uint32_t marked_pixel_index{ (row_start + strongest_pixel) * 3 };
 	    marked[marked_pixel_index] = 255;
 	    marked[marked_pixel_index + 1] = 0;
@@ -240,11 +259,20 @@ void mark_edges(const uint8_t* edge, uint8_t* marked,
 	}
 
     	strongest_pixel = right[row];
-	if (edge[row_start + strongest_pixel] > EDGE_STRENGTH_THRESHOLD) {
+	if (edgex_image[row_start + strongest_pixel] > EDGE_STRENGTH_THRESHOLD) {
             const uint32_t marked_pixel_index{ (row_start + strongest_pixel) * 3 };
 	    marked[marked_pixel_index] = 0;
 	    marked[marked_pixel_index + 1] = 255;
 	    marked[marked_pixel_index + 2] = 0;
+	}
+    }
+    for (uint32_t column{}; column < width; ++column) {
+	uint32_t strongest_pixel{ front[column] };
+	if (edgey_image[width * strongest_pixel + column] > EDGE_STRENGTH_THRESHOLD) {
+            const uint32_t marked_pixel_index{ (width * strongest_pixel + column) * 3 };
+	    marked[marked_pixel_index] = 0;
+	    marked[marked_pixel_index + 1] = 0;
+	    marked[marked_pixel_index + 2] = 255;
 	}
     }
 }
