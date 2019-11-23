@@ -35,7 +35,7 @@ const std::string TEST_IMAGES[N_TEST_IMAGES] = {"1.ppm", "2.ppm", "3.ppm", "4.pp
                                                 "5.ppm", "6.ppm", "7.ppm", "8.ppm"};
 
 // If true, each processed image is save to a file for debug purposes.
-const bool OUTPUT_MARKED_IMAGE_TO_FILE{ true };
+const bool OUTPUT_MARKED_IMAGE_TO_FILE{ false };
 
 // Number of QPUs to use for hardware acceleration, if used.
 const uint32_t NUM_QPU{ 12 };
