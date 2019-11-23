@@ -227,7 +227,7 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
 	const uint32_t column_start{ width * (height - 2) + column };
 
 	uint8_t strongest_strength{ edgey_image[column_start] };
-	uint32_t strongest_edge_pixel{ column_start };
+	uint32_t strongest_edge_pixel{ height - 2 };
         double min_stronger_edge_strength{ 
             strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD };
 	for (uint32_t row{ height - 2 }; row >= 1; --row) {
