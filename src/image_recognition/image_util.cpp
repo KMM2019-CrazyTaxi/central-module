@@ -135,6 +135,15 @@ void sobelx(const uint8_t* image, uint8_t* result,
     }
 }
 
+void sobely(const uint8_t* image, uint8_t* result, 
+            const uint32_t width, const uint32_t height) {
+    const uint32_t size{ width * height };
+    for (uint32_t pos{width}; pos < size - width; ++pos) {
+        int32_t sum = image[pos - width] - image[pos + width];
+        result[pos] = sum < 0 ? 0 : sum;
+    }
+}
+
 void rgb2gray(const uint8_t* image, uint8_t* gray, 
               const uint32_t width, const uint32_t height)
 {

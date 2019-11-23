@@ -28,6 +28,8 @@ void rgb2gray(const uint8_t* image, uint8_t* gray,
               const uint32_t width, const uint32_t height);
 void sobelx(const uint8_t* image, uint8_t* result,
             const uint32_t width, const uint32_t height);
+void sobely(const uint8_t* image, uint8_t* result,
+            const uint32_t width, const uint32_t height);
 
 #endif
 
