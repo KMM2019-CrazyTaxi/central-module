@@ -57,15 +57,15 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     time_point mark_time{};
     time_point stop_time{};
 
+    // Sleep for 1 second to wait for camera to init.
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
     // Main loop
     while (running) 
     {
 
         // Log to stdout and log file
         queue_message("IR Tick");
-
-        // Sleep for 1 second
-        std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	// Start time for benchmarking
 	start_time = hr_clock::now();
