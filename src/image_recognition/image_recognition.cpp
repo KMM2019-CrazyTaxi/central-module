@@ -122,7 +122,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	queue_message("Image processed in "
                       + std::to_string(to_ms(start_time, stop_time)) + " ms.");
 	queue_message("  RGB2GRAY took "
-                      + std::to_string(to_ms(start_time, gray_time)) + " ms.");
+                      + std::to_string(to_ms(start_time, rgb2gray_time)) + " ms.");
 	queue_message("  Sobelx took "
                       + std::to_string(to_ms(rgb2gray_time, sobelx_time)) + " ms.");
 	queue_message("  Sobely took "
