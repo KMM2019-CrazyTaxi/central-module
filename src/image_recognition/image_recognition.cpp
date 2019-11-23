@@ -119,23 +119,25 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	stop_time = hr_clock::now();
 
 	// Log time taken.
-	queue_message("Image processed in "
-                      + std::to_string(to_ms(start_time, stop_time)) + " ms.");
-	queue_message("  RGB2GRAY took "
-                      + std::to_string(to_ms(start_time, rgb2gray_time)) + " ms.");
-	queue_message("  Sobelx took "
-                      + std::to_string(to_ms(rgb2gray_time, sobelx_time)) + " ms.");
-	queue_message("  Sobely took "
-		      + std::to_string(to_ms(sobelx_time, sobely_time)) + " ms.");
-	queue_message("  Final edge detection took " 
-                      + std::to_string(to_ms(sobely_time, edge_time)) + " ms.");
-        if (OUTPUT_MARKED_IMAGE_TO_FILE) {
-            queue_message("  Marking test image took "
-                          + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
-            std::string file_name{ std::to_string(n_processed_images++) + "_processed.ppm" };
-            std::ofstream output{ file_name, std::ios::binary };
-            write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
-            output.close();
+	if (n_processed_images++ % CAMERA_FPS == 0) {
+	    queue_message("Image processed in "
+			  + std::to_string(to_ms(start_time, stop_time)) + " ms.");
+	    queue_message("  RGB2GRAY took "
+			  + std::to_string(to_ms(start_time, rgb2gray_time)) + " ms.");
+	    queue_message("  Sobelx took "
+			  + std::to_string(to_ms(rgb2gray_time, sobelx_time)) + " ms.");
+	    queue_message("  Sobely took "
+			  + std::to_string(to_ms(sobelx_time, sobely_time)) + " ms.");
+	    queue_message("  Final edge detection took " 
+			  + std::to_string(to_ms(sobely_time, edge_time)) + " ms.");
+	    if (OUTPUT_MARKED_IMAGE_TO_FILE) {
+		queue_message("  Marking test image took "
+			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
+		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) + "_processed.ppm" };
+		std::ofstream output{ file_name, std::ios::binary };
+		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
+		output.close();
+	    }
 	}
     }
 }

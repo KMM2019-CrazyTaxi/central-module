@@ -22,7 +22,7 @@ void camera_thread_main(const std::atomic_bool& running, double_buffer& image_bu
         camera.setWidth(IMAGE_WIDTH);
         camera.setHeight(IMAGE_HEIGHT);
 	camera.setFormat(raspicam::RASPICAM_FORMAT_RGB);
-	camera.setFrameRate(60);
+	camera.setFrameRate(CAMERA_FPS);
 
         image_buffer.resize(camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB));
 
