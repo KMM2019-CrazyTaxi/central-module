@@ -64,9 +64,6 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     while (running) 
     {
 
-        // Log to stdout and log file
-        queue_message("IR Tick");
-
 	// Start time for benchmarking
 	start_time = hr_clock::now();
 
