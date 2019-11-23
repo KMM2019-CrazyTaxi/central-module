@@ -21,10 +21,11 @@ void camera_thread_main(const std::atomic_bool& running, double_buffer& image_bu
 
         camera.setWidth(IMAGE_WIDTH);
         camera.setHeight(IMAGE_HEIGHT);
+	camera.setFormat(raspicam::RASPICAM_FORMAT_RGB);
 
         image_buffer.resize(camera.getImageTypeSize(raspicam::RASPICAM_FORMAT_RGB));
 
-        if (!camera.open()) queue_message("Failed to open camera.");
+        if (!camera.open(true)) queue_message("Failed to open camera.");
 
         std::this_thread::sleep_for(std::chrono::seconds(3));
 
@@ -48,7 +49,8 @@ void camera_thread_main(const std::atomic_bool& running, double_buffer& image_bu
         #ifdef _RaspiCam_H_
 
             camera.grab();
-            camera.retrieve(image_buffer.get_write_buffer(), raspicam::RASPICAM_FORMAT_RGB);
+            camera.retrieve(image_buffer.get_write_buffer());
+	    queue_message("Image read");
 
         #else
 
