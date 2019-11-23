@@ -138,8 +138,9 @@ void sobelx(const uint8_t* image, uint8_t* result,
 void sobely(const uint8_t* image, uint8_t* result, 
             const uint32_t width, const uint32_t height) {
     const uint32_t size{ width * height };
-    for (uint32_t pos{width}; pos < size - width; ++pos) {
-        int32_t sum = image[pos - width] - image[pos + width];
+    for (uint32_t pos{width + 1}; pos < size - width - 1; ++pos) {
+        int32_t sum = image[pos - width - 1] + (image[pos - width] << 1) + image[pos - width + 1]
+            - image[pos + width - 1] - (image[pos + width] << 1) - image[pos + width + 1];
         result[pos] = sum < 0 ? 0 : sum;
     }
 }
@@ -224,15 +225,13 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
     }
     
     for (int column{}; column < width; ++column) {
-	const uint32_t column_start{ width * (height - 2) + column };
-
-	uint8_t strongest_strength{ edgey_image[column_start] };
+	uint8_t strongest_strength{ edgey_image[width * (height - 2) + column] };
 	uint32_t strongest_edge_pixel{ height - 2 };
         double min_stronger_edge_strength{ 
             strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD };
 	for (uint32_t row{ height - 2 }; row >= 1; --row) {
-	    if (edgey_image[column_start - row * width] >= min_stronger_edge_strength) {
-		strongest_strength = edgey_image[column_start - row * width];
+	    if (edgey_image[row * width + column] >= min_stronger_edge_strength) {
+		strongest_strength = edgey_image[row * width + column];
 		strongest_edge_pixel = row;
                 min_stronger_edge_strength =
                     strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
