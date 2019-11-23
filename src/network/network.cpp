@@ -9,9 +9,11 @@
 #include <string>
 #include <sstream>
 
+#include "net_message_handler.hpp"
 #include "network.hpp"
 #include "logging.hpp"
 #include "defs.hpp"
+#include "io_thread.hpp"
 
 uint16_t concat_bytes(uint8_t hi, uint8_t lo);
 
@@ -104,38 +106,52 @@ void network_thread_main(const std::atomic_bool& running) {
         while (connection) {
             
             valread = read(new_socket, buffer, NETWORK_BUFFER_SIZE);
-            std::vector<packet> packets;
+            
+            std::vector<packet> read_packets;
+            std::vector<packet> answer_packets;
+
             if (valread > 0) {
 
                 msg << "Read " << valread << " bytes from " << std::string(inet_ntoa(address.sin_addr));
                 queue_message(msg.str());
                 msg.str("");
 
-                packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
-                msg << "Parsed " << packets.size() << " packets";
+                queue_message(print_buffer((uint8_t*) buffer, valread));
+
+                read_packets = parse_packets((uint8_t*) buffer, NETWORK_BUFFER_SIZE);
+                msg << "Parsed " << read_packets.size() << " packets";
                 queue_message(msg.str());
                 msg.str("");
-                
+
+                answer_packets = handle_packets(read_packets);
             }
 
             const char* hello = "Hello from server";
 
             memset(buffer, 0, NETWORK_BUFFER_SIZE);
-            buffer[0] = (uint8_t) packets.size();
+            buffer[0] = (uint8_t) answer_packets.size();
 
             uint8_t* local_buffer = (uint8_t*) buffer + 1;
 
-            for (const auto& packet : packets) {
+            for (const auto& packet : answer_packets) {
                 packet::write(packet, local_buffer);
                 local_buffer += PACKET_HEADER_SIZE + packet.get_size();
             }
 
+            uint32_t answer_size = (uint32_t) (local_buffer - (uint8_t*) buffer);
 
-            int send_error = send(new_socket, buffer, valread, MSG_NOSIGNAL);
+            queue_message(print_buffer((uint8_t*) buffer, answer_size));
+
+            int send_error = send(new_socket, buffer, answer_size, MSG_NOSIGNAL);
 
             if (send_error == -1) {
                 connection = false;
                 queue_message("Connection broken.");
+            }
+
+            if (!running) {
+                if (connection) close(new_socket);
+                close(server_fd);
             }
         }
     }

@@ -12,6 +12,10 @@
 #define SPI_CONTROL_DATA_MSG_SIZE       3
 #define SPI_CONTROL_FINISH_MSG_SIZE     1
 
+#define SPI_SENSOR_INIT_MSG_SIZE        2
+#define SPI_SENSOR_DATA_MSG_SIZE        11
+#define SPI_SENSOR_FINISH_MSG_SIZE      1
+
 #define SPI_FAILED_WAIT_MS 1
 
 #define SPI_FREQ    1000000 / 32
