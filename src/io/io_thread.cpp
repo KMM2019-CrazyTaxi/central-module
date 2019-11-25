@@ -178,12 +178,12 @@ void io_thread_main(const std::atomic_bool& running) {
         queue_message("Setting up SPI channels.");
         wiringPiSetup();
         wiringPiSPISetup(SPI_CHANNEL, SPI_FREQ);
-        pinMode(SPI_CONTROL_SS_PIN, OUTPUT);
-        pinMode(SPI_SENSOR_SS_PIN, OUTPUT);
+        pinMode(SPI_CONTROL, OUTPUT);
+        pinMode(SPI_SENSOR, OUTPUT);
 
         // Slave select is active low, so set pins to high
-        digitalWrite(SPI_CONTROL_SS_PIN, 1);
-        digitalWrite(SPI_SENSOR_SS_PIN, 1);
+        digitalWrite(SPI_CONTROL, 1);
+        digitalWrite(SPI_SENSOR, 1);
     #endif
 
     while (running) {
