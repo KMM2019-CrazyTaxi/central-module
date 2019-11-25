@@ -5,6 +5,8 @@
 
 /**
  * Main function ran by the pid_controller thread
+ * Fetches data for the control system, then sends the
+ * task forward to the decision maker.
  */
 void pid_ctrl_thread_main(const std::atomic_bool&);
 

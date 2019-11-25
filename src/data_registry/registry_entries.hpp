@@ -21,6 +21,9 @@ struct control_change_data {
     char angle_delta;
 };
 
+/**
+  * Necessary data sent to the control system to describe the environment
+  */
 struct telemetrics_data {
   double curr_speed;
   double dist_left;
@@ -28,6 +31,9 @@ struct telemetrics_data {
   double dist_stop_line;
 };
 
+/**
+  * Output of the whole control system, sent to the control module
+  */
 struct regulator_out_data {
   double speed;
   double angle;
@@ -40,16 +46,28 @@ struct regulator_out_data {
  *
  * NOTE: Not a global type itself, part of regulator_param_data.
  *
- * Increasing k leads to:
- * - Increased speed
- * - Decreased stability marginals
- * - Improved compensation of process disturbances
- * - Increased control signal activity
+ * Increasing kp leads to:
+ * - Decreased rise time
+ * - Increased overshoot
+ * - Small settling time change
+ * - Decreased steady-state error
+ * - Degraded stability
  *
- * Increasing td leads to:
- * - Better stability marginals (larger Td-value gives
- *   better stability)
- * - Increased impact from measurement error
+ * Increasing ki leads to:
+ * - Decreased rise time
+ * - Increased overshoot
+ * - Increased settling time
+ * - Eliminated steady-state error
+ * - Degraded stability
+ *
+ * Increasing kd leads to:
+ * - Minor rise time change
+ * - Decreased overshoot
+ * - Decreased settling time
+ * - No effect of steady-state error (in theory)
+ * - Improved stability if kd is small
+ *
+ * The rest of the data is system-specific in how they are used.
  */
 struct pid_params{
   double kp;
@@ -64,6 +82,9 @@ struct pid_params{
   double slope;
 };
 
+/**
+  * Contains all of the parameters for the whole control system
+  */
 struct regulator_param_data{
   pid_params turning;
   pid_params parking;

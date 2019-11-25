@@ -3,6 +3,9 @@
 
 #include "regulator_data.hpp"
 
+/**
+  * This system is used while the car is turning
+  */
 pid_system_out pid_turning(const pid_decision_data &in);
 
 #endif
