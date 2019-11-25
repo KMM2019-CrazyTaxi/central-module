@@ -188,8 +188,8 @@ void io_thread_main(const std::atomic_bool& running) {
 
     while (running) {
 
-        // acquire_sensor_data();
-        send_control_data();
+        acquire_sensor_data();
+        // send_control_data();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(IO_UPDATE_MS));
     }
@@ -198,11 +198,11 @@ void io_thread_main(const std::atomic_bool& running) {
 void spi_write(int slave, unsigned char* buffer, int size) {
 
     #ifdef __WIRING_PI_H__
-        // queue_message("Transmitted " + print_buffer((uint8_t*) buffer, size));
+        queue_message("Transmitted " + print_buffer((uint8_t*) buffer, size));
         activate_slave(slave);
         wiringPiSPIDataRW(SPI_CHANNEL, buffer, size);
         deactivate_slave(slave);
-        // queue_message("Received " + print_buffer((uint8_t*) buffer, size));
+        queue_message("Received " + print_buffer((uint8_t*) buffer, size));
     #endif
 }
 
