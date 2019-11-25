@@ -6,12 +6,6 @@
 #include <vector>
 #include <fstream>
 
-#ifdef QPU
-
-#include "QPULib.h"
-
-#endif
-
 #include "logging.hpp"
 #include "double_buffer.hpp"
 #include "camera_thread.hpp"
@@ -21,6 +15,7 @@
 using hr_clock = std::chrono::high_resolution_clock;
 using time_point = hr_clock::time_point;
 
+// Returns the time difference in ms between to time points.
 int to_ms(const time_point& time1, const time_point& time2) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1).count();
 }
@@ -31,16 +26,14 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     image_buffer.swap_buffers();
 
     // Buffers to save partially processed image.
-#ifdef QPU
-    SharedArray<int> qpu_image(IMAGE_SIZE_RGB);
-    SharedArray<int> qpu_gray(IMAGE_SIZE_GRAY);
-    SharedArray<int> qpu_edge(IMAGE_SIZE_GRAY);
-#endif
-
     uint8_t* gray_image = new uint8_t[IMAGE_SIZE_GRAY];
     uint8_t* edgex_image = new uint8_t[IMAGE_SIZE_GRAY];
     uint8_t* edgey_image = new uint8_t[IMAGE_SIZE_GRAY];
-    uint8_t* marked_image = new uint8_t[IMAGE_SIZE_RGB];
+    uint8_t* marked_image;
+    if (OUTPUT_MARKED_IMAGE_TO_FILE)
+    {
+        marked_image = new uint8_t[IMAGE_SIZE_RGB];
+    }
 
     // Resulting edge distances.
     std::vector<uint32_t> left_edges{};
@@ -75,32 +68,14 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	image_buffer.swap_buffers();
 
 	// Process image.
-#ifdef QPU
-        for (int i{}; i < IMAGE_SIZE_RGB; ++i) {
-            qpu_image[i] = marked[i];
-        }
-
-        auto rgb2gray = compile(rgb2gray_qpu);
-        rgb2gray.setNumQPUs(NUM_QPU);
-        rgb2gray(&qpu_image, &qpu_gray, IMAGE_WIDTH, IMAGE_HEIGHT);
-        rgb2gray_time = hr_clock::now();
-
-        auto sobel = compile(sobel_qpu);
-        sobel.setNumQPUs(NUM_QPU);
-        sobel(&qpu_gray, &qpu_edge, WIDTH, HEIGHT);
-	sobel_time = hr_clock::now();
-
-        for (int i{}; i < IMAGE_SIZE_GRAY; ++i) {
-            edge[i] = static_cast<uint8_t>(qpu_edge[i]);
-        }
-#else
 	rgb2gray(marked_image, gray_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	rgb2gray_time = hr_clock::now();
+
 	sobelx(gray_image, edgex_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	sobelx_time = hr_clock::now();
 	sobely(gray_image, edgey_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	sobely_time = hr_clock::now();
-#endif
+
 	left_edges.clear();
 	right_edges.clear();
 	front_edges.clear();
@@ -108,14 +83,16 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 		     left_edges, right_edges, front_edges,
                      IMAGE_WIDTH, IMAGE_HEIGHT);
 	edge_time = hr_clock::now();
+
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
-            mark_edges(edgex_image, edgey_image, marked_image, left_edges, right_edges, front_edges,
+            mark_edges(edgex_image, edgey_image, marked_image, 
+                       left_edges, right_edges, front_edges,
                        IMAGE_WIDTH, IMAGE_HEIGHT);
             mark_time = hr_clock::now();
         }
 	stop_time = hr_clock::now();
 
-	// Log time taken.
+        // Log information once per second.
 	if (n_processed_images++ % CAMERA_FPS == 0) {
 	    queue_message("Image processed in "
 			  + std::to_string(to_ms(start_time, stop_time)) + " ms.");
@@ -127,10 +104,12 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 			  + std::to_string(to_ms(sobelx_time, sobely_time)) + " ms.");
 	    queue_message("  Final edge detection took " 
 			  + std::to_string(to_ms(sobely_time, edge_time)) + " ms.");
+
 	    if (OUTPUT_MARKED_IMAGE_TO_FILE) {
 		queue_message("  Marking test image took "
 			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
-		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) + "_processed.ppm" };
+		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) 
+                                       + "_processed.ppm" };
 		std::ofstream output{ file_name, std::ios::binary };
 		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
 		output.close();
