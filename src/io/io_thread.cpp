@@ -79,13 +79,13 @@ void acquire_sensor_data() {
         if (answer == SPI_RESTART) continue;
 
         // Otherwise read the data
-        short status = concat_bytes(msg_buffer[1], msg_buffer[2]);
-        short acc_x  = concat_bytes(msg_buffer[3], msg_buffer[4]);
-        short acc_y  = concat_bytes(msg_buffer[5], msg_buffer[6]);
-        short acc_z  = concat_bytes(msg_buffer[7], msg_buffer[8]);
+        short status = concat_bytes(msg_buffer[2], msg_buffer[1]);
+        short acc_x  = concat_bytes(msg_buffer[4], msg_buffer[3]);
+        short acc_y  = concat_bytes(msg_buffer[6], msg_buffer[5]);
+        short acc_z  = concat_bytes(msg_buffer[8], msg_buffer[7]);
 
-        char distance = msg_buffer[9];
-        char speed    = msg_buffer[10];
+        char distance = concat_bytes(msg_buffer[10], msg_buffer[9]);
+        char speed    = msg_buffer[11];
 
         return;
     }
