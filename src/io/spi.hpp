@@ -19,13 +19,10 @@
 #define SPI_FAILED_WAIT_MS 1
 
 #define SPI_FREQ    1000000 / 32
-#define SPI_CONTROL 0
-#define SPI_SENSOR  1
+#define SPI_CONTROL 0 // Physical pin 11
+#define SPI_SENSOR  1 // Physical pin 12
 #define SPI_CHANNEL 0
 
 #define SPI_FAIL_COUNT 5
-
-#define SPI_CONTROL_SS_PIN 0 // Physical pin 11
-#define SPI_SENSOR_SS_PIN  1 // Physical pin 12
 
 #endif

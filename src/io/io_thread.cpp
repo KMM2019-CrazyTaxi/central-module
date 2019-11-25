@@ -216,7 +216,12 @@ char calc_checkbyte(unsigned char* buffer, int size) {
     return acc;
 }
 
-void set_slave(int slave, int val);
+void set_slave(int slave, int val) {
+
+    #ifdef __WIRING_PI_H__ 
+        digitalWrite(slave, val);
+    #endif
+}
 
 void activate_slave(int slave) {
     set_slave(slave, 0);
@@ -224,23 +229,6 @@ void activate_slave(int slave) {
 
 void deactivate_slave(int slave) {
     set_slave(slave, 1);
-}
-
-void set_slave(int slave, int val) {
-    int pin;
-
-    switch (slave) {
-        case SPI_CONTROL:
-            pin = SPI_CONTROL_SS_PIN;
-            break;
-        case SPI_SENSOR:
-            pin = SPI_SENSOR_SS_PIN;
-            break;
-    }
-
-    #ifdef __WIRING_PI_H__ 
-        digitalWrite(pin, val);
-    #endif
 }
 
 bool test_checkbyte(unsigned char* buffer, int size, char checkbyte) {
