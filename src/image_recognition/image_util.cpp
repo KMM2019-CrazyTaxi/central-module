@@ -58,7 +58,7 @@ void sobelx(const uint8_t* image, uint8_t* result,
     const uint32_t size{ width * height };
     for (uint32_t pos{1}; pos < size - 1; ++pos) {
         int32_t sum = image[pos - 1] - image[pos + 1];
-        result[pos] = sum < 0 ? 0 : sum;
+        result[pos] = sum < 0 ? 0 : (sum > 255 ? 255 : sum);
     }
 }
 
@@ -68,7 +68,7 @@ void sobely(const uint8_t* image, uint8_t* result,
     for (uint32_t pos{width + 1}; pos < size - width - 1; ++pos) {
         int32_t sum = image[pos - width - 1] + (image[pos - width] << 1) + image[pos - width + 1]
             - image[pos + width - 1] - (image[pos + width] << 1) - image[pos + width + 1];
-        result[pos] = sum < 0 ? 0 : sum;
+        result[pos] = sum < 0 ? 0 : (sum > 255 ? 255 : sum);
     }
 }
 
