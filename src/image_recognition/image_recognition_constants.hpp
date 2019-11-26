@@ -38,7 +38,7 @@ const std::string TEST_IMAGES[N_TEST_IMAGES] = {"1.ppm", "2.ppm", "3.ppm", "4.pp
 const bool OUTPUT_MARKED_IMAGE_TO_FILE{ true };
 
 // Frame taken by the camera each second.
-const uint32_t CAMERA_FPS{ 1 };
+const uint32_t CAMERA_FPS{ 60 };
 
 const uint32_t BOUND_DISTANCE_PIXEL{ 60 };
 
