@@ -78,12 +78,31 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	get_max_edge(edgex_image, edgey_image,
 		     left_edges, right_edges, front_edges,
                      IMAGE_WIDTH, IMAGE_HEIGHT);
+
+        const uint32_t distance_end{ IMAGE_HEIGHT - BOUND_DISTANCE_PIXEL };
+        const uint32_t distance_start{ distance_end - EDGE_AVG_PIXELS };
+        const uint32_t middle_end{ (IMAGE_WIDTH + EDGE_AVG_PIXELS) >> 1 };
+        const uint32_t middle_start{ middle_end - EDGE_AVG_PIXELS };
+        double left_distance = get_distance_to_side(edgex_image, left_edges,
+                                                    distance_start, distance_end,
+                                                    IMAGE_WIDTH, IMAGE_HEIGHT);
+        double right_distance = get_distance_to_side(edgex_image, right_edges,
+                                                     distance_start, distance_end,
+                                                     IMAGE_WIDTH, IMAGE_HEIGHT);
+        double front_distance = get_distance_to_stop(edgey_image, front_edges,
+                                                     middle_start, middle_end,
+                                                     IMAGE_WIDTH, IMAGE_HEIGHT);
 	edge_time = hr_clock::now();
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
+/*
             mark_edges(edgex_image, edgey_image, marked_image, 
                        left_edges, right_edges, front_edges,
                        IMAGE_WIDTH, IMAGE_HEIGHT);
+*/
+            mark_selected_edges(marked_image, left_distance, right_distance, front_distance,
+                                distance_start, distance_end, middle_start, middle_end,
+                                IMAGE_WIDTH, IMAGE_HEIGHT);
             mark_time = hr_clock::now();
         }
 	stop_time = hr_clock::now();
