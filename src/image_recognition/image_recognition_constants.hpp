@@ -35,9 +35,13 @@ const std::string TEST_IMAGES[N_TEST_IMAGES] = {"1.ppm", "2.ppm", "3.ppm", "4.pp
                                                 "5.ppm", "6.ppm", "7.ppm", "8.ppm"};
 
 // If true, each processed image is save to a file for debug purposes.
-const bool OUTPUT_MARKED_IMAGE_TO_FILE{ false };
+const bool OUTPUT_MARKED_IMAGE_TO_FILE{ true };
 
 // Frame taken by the camera each second.
-const uint32_t CAMERA_FPS{ 60 };
+const uint32_t CAMERA_FPS{ 1 };
+
+const uint32_t BOUND_DISTANCE_PIXEL{ 60 };
+
+const uint32_t EDGE_AVG_PIXELS{ 20 };
 
 enum IMAGE_TYPE{ RGB, GRAY };
