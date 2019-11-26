@@ -6,6 +6,8 @@
 #include <vector>
 #include <fstream>
 
+#include "data_registry.hpp"
+#include "registry_entries.hpp"
 #include "logging.hpp"
 #include "double_buffer.hpp"
 #include "camera_thread.hpp"
@@ -24,6 +26,8 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 
     // Swap the buffers to notify camera thread to grab image
     image_buffer.swap_buffers();
+
+    data_registry& registry{ data_registry::get_instance() };
 
     // Buffers to save partially processed image.
     uint8_t* gray_image = new uint8_t[IMAGE_SIZE_GRAY];
@@ -96,7 +100,14 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         double front_pixel_distance = get_distance_to_stop(edgey_image, front_edges,
                                                            middle_start, middle_end,
                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
+	double adjusted_front_pixel_distance = IMAGE_HEIGHT - front_pixel_distance;
 	edge_time = hr_clock::now();
+
+	telemetrics_data* data{ static_cast<telemetrics_data*>(registry.acquire_data(TELEMETRICS_DATA_ID)) };
+	data->dist_left = left_real_distance;
+	data->dist_right = right_real_distance;
+	data->dist_stop_line = front_pixel_distance;
+	registry.release_data(TELEMETRICS_DATA_ID);
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
 /*
