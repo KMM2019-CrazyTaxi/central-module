@@ -1,6 +1,7 @@
 #include "pid_controller.hpp"
 #include "control_decisions.hpp"
 
+#include "update_constroller.hpp"
 #include "registry_entries.hpp"
 #include "data_registry.hpp"
 
@@ -15,7 +16,11 @@ void set_samples(regulator_sample_data);
 
 void pid_ctrl_thread_main(const std::atomic_bool& running){
 
+  update_controller upd_controller{};
+
   while (running) {
+
+    upd_controller.start();
 
     // Get all data for the regulator
     telemetrics_data metrics = get_metrics();
@@ -46,6 +51,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     // Send output
     set_output(reg_out);
     set_samples(samples);
+    upd_controller.wait();
       
     }
   
