@@ -1,6 +1,7 @@
 
 #include "data_registry.hpp"
 #include "registry_entries.hpp"
+#include "defs.hpp"
 
 data_registry::data_registry() {
 
@@ -12,6 +13,22 @@ data_registry::data_registry() {
     control_change_data* ccd = new control_change_data();
     registry[CONTROL_CHANGE_DATA_ID].id = CONTROL_CHANGE_DATA_ID;
     registry[CONTROL_CHANGE_DATA_ID].data = (void*) ccd;
+
+    telemetrics_data* td = new telemetrics_data();
+    registry[TELEMETRICS_DATA_ID].id = TELEMETRICS_DATA_ID;
+    registry[TELEMETRICS_DATA_ID].data = (void*) td;
+
+    regulator_out_data* rod = new regulator_out_data();
+    registry[REGULATOR_OUT_DATA_ID].id = REGULATOR_OUT_DATA_ID;
+    registry[REGULATOR_OUT_DATA_ID].data = (void*) rod;
+
+    regulator_param_data* rpd = new regulator_param_data();
+    registry[REGULATOR_PARAM_DATA_ID].id = REGULATOR_PARAM_DATA_ID;
+    registry[REGULATOR_PARAM_DATA_ID].data = (void*) rpd;
+
+    regulator_sample_data* rsd = new regulator_sample_data();
+    registry[REGULATOR_SAMPLE_DATA_ID].id = REGULATOR_SAMPLE_DATA_ID;
+    registry[REGULATOR_SAMPLE_DATA_ID].data = (void*) rsd;
 
 }
 
