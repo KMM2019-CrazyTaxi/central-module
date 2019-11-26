@@ -1,7 +1,7 @@
 #include "pid_controller.hpp"
 #include "control_decisions.hpp"
 
-#include "update_constroller.hpp"
+#include "update_controller.hpp"
 #include "registry_entries.hpp"
 #include "data_registry.hpp"
 
