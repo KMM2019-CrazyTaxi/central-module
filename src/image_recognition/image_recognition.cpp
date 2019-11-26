@@ -83,29 +83,43 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 		     left_edges, right_edges, front_edges,
                      IMAGE_WIDTH, IMAGE_HEIGHT);
 
-        const uint32_t distance_end{ IMAGE_HEIGHT - BOUND_DISTANCE_PIXEL };
-        const uint32_t distance_start{ distance_end - EDGE_AVG_PIXELS };
+        const uint32_t distance_end_1{ IMAGE_HEIGHT - BOUND_DISTANCE_1_PIXEL };
+        const uint32_t distance_start_1{ distance_end_1 - EDGE_AVG_PIXELS };
+        const uint32_t distance_end_2{ IMAGE_HEIGHT - BOUND_DISTANCE_2_PIXEL };
+        const uint32_t distance_start_2{ distance_end_2 - EDGE_AVG_PIXELS };
         const uint32_t middle_end{ (IMAGE_WIDTH + EDGE_AVG_PIXELS) >> 1 };
         const uint32_t middle_start{ middle_end - EDGE_AVG_PIXELS };
-        double left_pixel_distance = get_distance_to_side(edgex_image, left_edges,
-                                                          distance_start, distance_end,
-                                                          IMAGE_WIDTH, IMAGE_HEIGHT);
-        double left_real_distance =
-            (IMAGE_WIDTH / 2 - left_pixel_distance) * CM_PER_PIXEL_AT_BOUND_DISTANCE;
-        double right_pixel_distance = get_distance_to_side(edgex_image, right_edges,
-                                                           distance_start, distance_end,
-                                                           IMAGE_WIDTH, IMAGE_HEIGHT);
-        double right_real_distance =
-            (right_pixel_distance - IMAGE_WIDTH / 2) * CM_PER_PIXEL_AT_BOUND_DISTANCE;
+
+        double left_pixel_distance_1 = get_distance_to_side(edgex_image, left_edges,
+                                                            distance_start_1, distance_end_1,
+                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
+        double right_pixel_distance_1 = get_distance_to_side(edgex_image, right_edges,
+                                                             distance_start_1, distance_end_1,
+                                                             IMAGE_WIDTH, IMAGE_HEIGHT);
+        double left_pixel_distance_2 = get_distance_to_side(edgex_image, left_edges,
+                                                            distance_start_2, distance_end_2,
+                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
+        double right_pixel_distance_2 = get_distance_to_side(edgex_image, right_edges,
+                                                             distance_start_2, distance_end_2,
+                                                             IMAGE_WIDTH, IMAGE_HEIGHT);
         double front_pixel_distance = get_distance_to_stop(edgey_image, front_edges,
                                                            middle_start, middle_end,
                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
-	double adjusted_front_pixel_distance = IMAGE_HEIGHT - front_pixel_distance;
+
+        double left_real_distance_1 =
+            (IMAGE_WIDTH / 2 - left_pixel_distance_1) * CM_PER_PIXEL_AT_BOUND_DISTANCE_1;
+        double right_real_distance_1 =
+            (right_pixel_distance_1 - IMAGE_WIDTH / 2) * CM_PER_PIXEL_AT_BOUND_DISTANCE_1;
+        double left_real_distance_2 =
+            (IMAGE_WIDTH / 2 - left_pixel_distance_2) * CM_PER_PIXEL_AT_BOUND_DISTANCE_2;
+        double right_real_distance_2 =
+            (right_pixel_distance_2 - IMAGE_WIDTH / 2) * CM_PER_PIXEL_AT_BOUND_DISTANCE_2;
+        double adjusted_front_pixel_distance = IMAGE_HEIGHT - front_pixel_distance;
 	edge_time = hr_clock::now();
 
 	telemetrics_data* data{ static_cast<telemetrics_data*>(registry.acquire_data(TELEMETRICS_DATA_ID)) };
-	data->dist_left = left_real_distance;
-	data->dist_right = right_real_distance;
+	data->dist_left = left_real_distance_1;
+	data->dist_right = right_real_distance_1;
 	data->dist_stop_line = front_pixel_distance;
 	registry.release_data(TELEMETRICS_DATA_ID);
 
@@ -115,9 +129,13 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
                        left_edges, right_edges, front_edges,
                        IMAGE_WIDTH, IMAGE_HEIGHT);
 */
-            mark_selected_edges(marked_image,
-                                left_pixel_distance, right_pixel_distance, front_pixel_distance,
-                                distance_start, distance_end, middle_start, middle_end,
+            mark_selected_edges(marked_image, left_pixel_distance_1,
+                                right_pixel_distance_1, front_pixel_distance,
+                                distance_start_1, distance_end_1, middle_start, middle_end,
+                                IMAGE_WIDTH, IMAGE_HEIGHT);
+            mark_selected_edges(marked_image, left_pixel_distance_2,
+                                right_pixel_distance_2, front_pixel_distance,
+                                distance_start_2, distance_end_2, middle_start, middle_end,
                                 IMAGE_WIDTH, IMAGE_HEIGHT);
             mark_time = hr_clock::now();
         }
@@ -137,9 +155,11 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 			  + std::to_string(to_ms(sobely_time, edge_time)) + " ms.");
 
 	    if (OUTPUT_MARKED_IMAGE_TO_FILE) {
-                queue_message("  Left edge distance: " + std::to_string(left_real_distance));
-                queue_message("  Right edge distance: " + std::to_string(right_real_distance));
-                queue_message("  Front edge distance: " + std::to_string(IMAGE_HEIGHT - front_pixel_distance));
+                queue_message("  Left edge distance 1: " + std::to_string(left_real_distance_1));
+                queue_message("  Right edge distance 1: " + std::to_string(right_real_distance_1));
+                queue_message("  Left edge distance 2: " + std::to_string(left_real_distance_2));
+                queue_message("  Right edge distance 2: " + std::to_string(right_real_distance_2));
+                queue_message("  Front edge distance: " + std::to_string(adjusted_front_pixel_distance));
 		queue_message("  Marking test image took "
 			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
 		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) 
