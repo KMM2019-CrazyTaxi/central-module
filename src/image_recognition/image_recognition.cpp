@@ -29,11 +29,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     uint8_t* gray_image = new uint8_t[IMAGE_SIZE_GRAY];
     uint8_t* edgex_image = new uint8_t[IMAGE_SIZE_GRAY];
     uint8_t* edgey_image = new uint8_t[IMAGE_SIZE_GRAY];
-    uint8_t* marked_image;
-    if (OUTPUT_MARKED_IMAGE_TO_FILE)
-    {
-        marked_image = new uint8_t[IMAGE_SIZE_RGB];
-    }
+    uint8_t* marked_image = new uint8_t[IMAGE_SIZE_RGB];
 
     // Resulting edge distances.
     std::vector<uint32_t> left_edges{};
