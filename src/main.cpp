@@ -32,7 +32,8 @@ int main() {
     
     // Create image recognition thread for image processing
     std::thread ir_thread(image_recognition_main, std::ref(running), std::ref(image_buffer));
-
+  
+    // Create regulator thread
     std::thread pid_thread(pid_ctrl_thread_main, std::ref(running));
 
     // Store name for each thread so logging thread knows where messages come from

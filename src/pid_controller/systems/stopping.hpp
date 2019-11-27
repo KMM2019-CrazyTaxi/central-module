@@ -3,6 +3,9 @@
 
 #include "regulator_data.hpp"
 
+/**
+  * This system is used when the car is getting to a full stop
+  */
 pid_system_out pid_stopping(const pid_decision_data &in);
 
 #endif

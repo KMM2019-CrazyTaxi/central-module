@@ -3,24 +3,29 @@
 
 #include <cstdint>
 
-
-#define SENSOR_DATA_ID "sensor_data"
-#define CONTROL_CHANGE_DATA_ID "control_change_data"
-#define TELEMETRICS_DATA_ID "telemetrics_data"
-#define REGULATOR_OUT_DATA_ID "regulator_out_data"
-#define REGULATOR_PARAM_DATA_ID "regulator_param_data"
-#define REGULATOR_SAMPLE_DATA_ID "regulator_sample_data"
+#define SENSOR_DATA_ID 				1
+#define CONTROL_CHANGE_DATA_ID 		2
+#define TELEMETRICS_DATA_ID 		3
+#define REGULATOR_OUT_DATA_ID 		4
+#define REGULATOR_PARAM_DATA_ID 	5
+#define REGULATOR_SAMPLE_DATA_ID 	6
 
 struct sensor_data {
-    float distance;
-    float acceleration;
+    int16_t acc_x;
+    int16_t acc_y;
+    int16_t acc_z;
+    uint8_t dist;
+    uint8_t speed;
 };
 
 struct control_change_data {
-    char speed_delta;
-    char angle_delta;
+    char speed;
+    char angle;
 };
 
+/**
+  * Necessary data sent to the control system to describe the environment
+  */
 struct telemetrics_data {
   double curr_speed;
   double dist_left;
@@ -28,6 +33,9 @@ struct telemetrics_data {
   double dist_stop_line;
 };
 
+/**
+  * Output of the whole control system, sent to the control module
+  */
 struct regulator_out_data {
   double speed;
   double angle;
@@ -40,16 +48,28 @@ struct regulator_out_data {
  *
  * NOTE: Not a global type itself, part of regulator_param_data.
  *
- * Increasing k leads to:
- * - Increased speed
- * - Decreased stability marginals
- * - Improved compensation of process disturbances
- * - Increased control signal activity
+ * Increasing kp leads to:
+ * - Decreased rise time
+ * - Increased overshoot
+ * - Small settling time change
+ * - Decreased steady-state error
+ * - Degraded stability
  *
- * Increasing td leads to:
- * - Better stability marginals (larger Td-value gives
- *   better stability)
- * - Increased impact from measurement error
+ * Increasing ki leads to:
+ * - Decreased rise time
+ * - Increased overshoot
+ * - Increased settling time
+ * - Eliminated steady-state error
+ * - Degraded stability
+ *
+ * Increasing kd leads to:
+ * - Minor rise time change
+ * - Decreased overshoot
+ * - Decreased settling time
+ * - No effect of steady-state error (in theory)
+ * - Improved stability if kd is small
+ *
+ * The rest of the data is system-specific in how they are used.
  */
 struct pid_params{
   double kp;
@@ -64,6 +84,9 @@ struct pid_params{
   double slope;
 };
 
+/**
+  * Contains all of the parameters for the whole control system
+  */
 struct regulator_param_data{
   pid_params turning;
   pid_params parking;

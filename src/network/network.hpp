@@ -7,7 +7,7 @@
 #include "packet.hpp"
 
 // The size of the network buffer
-#define NETWORK_BUFFER_SIZE 1024
+#define NETWORK_BUFFER_SIZE 4096
 
 // The port used for communication
 #define PORT 20001
