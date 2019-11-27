@@ -84,15 +84,29 @@ void acquire_sensor_data() {
 
         if (answer == SPI_RESTART) continue;
 
+        sensor_data result;
+
         // Otherwise read the data
-        short status = concat_bytes(msg_buffer[2], msg_buffer[1]);
-        short acc_x  = concat_bytes(msg_buffer[4], msg_buffer[3]);
-        short acc_y  = concat_bytes(msg_buffer[6], msg_buffer[5]);
-        short acc_z  = concat_bytes(msg_buffer[8], msg_buffer[7]);
+        short status = concat_bytes(msg_buffer[1], msg_buffer[0]);
+        short acc_x  = concat_bytes(msg_buffer[3], msg_buffer[2]);
+        short acc_y  = concat_bytes(msg_buffer[5], msg_buffer[4]);
+        short acc_z  = concat_bytes(msg_buffer[7], msg_buffer[6]);
 
-        char distance = concat_bytes(msg_buffer[10], msg_buffer[9]);
-        char speed    = msg_buffer[11];
+        char distance = concat_bytes(msg_buffer[9], msg_buffer[8]);
+        char speed    = msg_buffer[10];
 
+        result.acc_x = acc_x;
+        result.acc_y = acc_y;
+        result.acc_x = acc_z;
+
+        result.dist = distance;
+        result.speed = speed;
+
+        sensor_data* sd = (sensor_data*) data_registry::get_instance().acquire_data(SENSOR_DATA_ID);
+        *sd = result;
+
+        data_registry::get_instance().release_data(SENSOR_DATA_ID);
+    
         return;
     }
 
