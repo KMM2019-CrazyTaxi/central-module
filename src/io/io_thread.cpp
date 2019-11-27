@@ -28,13 +28,14 @@ void spi_write(int slave, unsigned char* buffer, int size);
 void acquire_sensor_data() {
     
     unsigned char start_buffer[SPI_SENSOR_INIT_MSG_SIZE];
+    unsigned char confirm_buffer[SPI_SENSOR_CONFIRM_MSG_SIZE];
     unsigned char msg_buffer[SPI_SENSOR_DATA_MSG_SIZE];
     unsigned char ans_buffer[SPI_SENSOR_FINISH_MSG_SIZE];
 
     int fails = 0;
     while (fails < SPI_FAIL_COUNT) {
 
-        start_buffer[0] = SPI_START;
+        start_buffer[0] = SPI_START_SENSOR;
         start_buffer[1] = 0x00;
 
         // If wiring pi library is not present, return
@@ -47,10 +48,16 @@ void acquire_sensor_data() {
         // Check answer byte
         if (start_buffer[1] != SPI_ACK) {
                 queue_message("Failed initialising communication with sensor module. Retrying in 1 ms");
+
                 std::this_thread::sleep_for(std::chrono::milliseconds(SPI_FAILED_WAIT_MS));
                 fails++;
                 continue;
         }
+
+	// Send success confirm byte
+	confirm_buffer[0] = SPI_CONFIRM;
+	spi_write(SPI_SENSOR, confirm_buffer, SPI_SENSOR_CONFIRM_MSG_SIZE);
+
 
         // Read the sensor data
         spi_write(SPI_SENSOR, msg_buffer, SPI_SENSOR_DATA_MSG_SIZE);
@@ -118,7 +125,7 @@ void send_control_data() {
     int fails = 0;
     while (fails < SPI_FAIL_COUNT) {
 
-        start_buffer[0] = SPI_START;
+        start_buffer[0] = SPI_START_CONTROL;
 
         // If wiring pi library is not present, return
         #ifndef __WIRING_PI_H__ 
@@ -178,17 +185,17 @@ void io_thread_main(const std::atomic_bool& running) {
         queue_message("Setting up SPI channels.");
         wiringPiSetup();
         wiringPiSPISetup(SPI_CHANNEL, SPI_FREQ);
-        pinMode(SPI_CONTROL_SS_PIN, OUTPUT);
-        pinMode(SPI_SENSOR_SS_PIN, OUTPUT);
+        pinMode(SPI_CONTROL, OUTPUT);
+        pinMode(SPI_SENSOR, OUTPUT);
 
         // Slave select is active low, so set pins to high
-        digitalWrite(SPI_CONTROL_SS_PIN, 1);
-        digitalWrite(SPI_SENSOR_SS_PIN, 1);
+        digitalWrite(SPI_CONTROL, 1);
+        digitalWrite(SPI_SENSOR, 1);
     #endif
 
     while (running) {
 
-        // acquire_sensor_data();
+        acquire_sensor_data();
         send_control_data();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(IO_UPDATE_MS));
@@ -198,11 +205,11 @@ void io_thread_main(const std::atomic_bool& running) {
 void spi_write(int slave, unsigned char* buffer, int size) {
 
     #ifdef __WIRING_PI_H__
-        // queue_message("Transmitted " + print_buffer((uint8_t*) buffer, size));
+        queue_message("Transmitted " + print_buffer((uint8_t*) buffer, size));
         activate_slave(slave);
         wiringPiSPIDataRW(SPI_CHANNEL, buffer, size);
         deactivate_slave(slave);
-        // queue_message("Received " + print_buffer((uint8_t*) buffer, size));
+        queue_message("Received " + print_buffer((uint8_t*) buffer, size));
     #endif
 }
 
