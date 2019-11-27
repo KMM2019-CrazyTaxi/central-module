@@ -18,7 +18,11 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
   update_controller upd_controller{};
 
+  auto previous_time = std::chrono::steady_clock::now();
+
   while (running) {
+
+    auto current_time = std::chrono::steady_clock::now();
 
     upd_controller.start();
 
@@ -27,7 +31,8 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     regulator_param_data params = get_params();
     
     regulator_sample_data samples = get_samples();
-    double dt = 1; // Sample time
+    
+    double dt = std::chrono::duration_cast<std::chrono::seconds>(current_time - previous_time).count();
 
     pid_decision_in dec_in =
       {
@@ -51,9 +56,11 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     // Send output
     set_output(reg_out);
     set_samples(samples);
+    previous_time = current_time;
+    
     upd_controller.wait();
       
-    }
+  }
   
 }
 
