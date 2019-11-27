@@ -32,7 +32,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     
     regulator_sample_data samples = get_samples();
     
-    double dt = std::chrono::duration_cast<std::chrono::seconds>(current_time - previous_time).count();
+    double dt = std::chrono::duration_cast<std::chrono::duration<double>>(current_time - previous_time).count();
 
     pid_decision_in dec_in =
       {
