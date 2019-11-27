@@ -3,13 +3,12 @@
 
 #include <cstdint>
 
-
-#define SENSOR_DATA_ID "sensor_data"
-#define CONTROL_CHANGE_DATA_ID "control_change_data"
-#define TELEMETRICS_DATA_ID "telemetrics_data"
-#define REGULATOR_OUT_DATA_ID "regulator_out_data"
-#define REGULATOR_PARAM_DATA_ID "regulator_param_data"
-#define REGULATOR_SAMPLE_DATA_ID "regulator_sample_data"
+#define SENSOR_DATA_ID 				1
+#define CONTROL_CHANGE_DATA_ID 		2
+#define TELEMETRICS_DATA_ID 		3
+#define REGULATOR_OUT_DATA_ID 		4
+#define REGULATOR_PARAM_DATA_ID 	5
+#define REGULATOR_SAMPLE_DATA_ID 	6
 
 struct sensor_data {
     float distance;
