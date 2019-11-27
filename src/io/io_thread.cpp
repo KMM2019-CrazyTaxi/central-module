@@ -54,10 +54,9 @@ void acquire_sensor_data() {
                 continue;
         }
 
-	// Send success confirm byte
-	confirm_buffer[0] = SPI_CONFIRM;
-	spi_write(SPI_SENSOR, confirm_buffer, SPI_SENSOR_CONFIRM_MSG_SIZE);
-
+        // Send success confirm byte
+        confirm_buffer[0] = SPI_CONFIRM;
+        spi_write(SPI_SENSOR, confirm_buffer, SPI_SENSOR_CONFIRM_MSG_SIZE);
 
         // Read the sensor data
         spi_write(SPI_SENSOR, msg_buffer, SPI_SENSOR_DATA_MSG_SIZE);
