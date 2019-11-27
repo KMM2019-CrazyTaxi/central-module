@@ -36,7 +36,7 @@ data_registry::~data_registry() {
 
     for (auto& pair : registry) {
         pair.second.lock.lock();
-        delete pair.second.data;
+        delete (uint8_t*) pair.second.data;
         pair.second.lock.unlock();
     }
 }
@@ -46,7 +46,7 @@ data_registry& data_registry::get_instance() {
     return instance;
 }
 
-void* data_registry::acquire_data(const std::string& id) {
+void* data_registry::acquire_data(int id) {
 
     void* data;
 
@@ -63,7 +63,7 @@ void* data_registry::acquire_data(const std::string& id) {
     return data;
 }
 
-void data_registry::release_data(const std::string& id) {
+void data_registry::release_data(int id) {
 
     // Check if entry exists
     if (!registry.count(id)) {
