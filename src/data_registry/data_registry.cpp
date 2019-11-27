@@ -7,11 +7,6 @@ data_registry::data_registry() {
 
     // Initialise sensor data entry
     sensor_data* sd = new sensor_data();
-    sd->acc_x = 0x1111;
-    sd->acc_y = 0x2222;
-    sd->acc_z = 0x3333;
-    sd->dist  = 0x44;
-    sd->speed = 0x55;
     registry[SENSOR_DATA_ID].id = SENSOR_DATA_ID;
     registry[SENSOR_DATA_ID].data = (void*) sd;
 
