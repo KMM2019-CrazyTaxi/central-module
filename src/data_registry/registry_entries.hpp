@@ -72,9 +72,9 @@ struct regulator_out_data {
  * The rest of the data is system-specific in how they are used.
  */
 struct pid_params{
-  double kp;
+  double kp = 5;
   double ki;
-  double kd;
+  double kd = 5;
   double alpha;
   double beta;
 
