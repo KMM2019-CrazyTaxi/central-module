@@ -104,8 +104,11 @@ void acquire_sensor_data() {
 
         sensor_data* sd = (sensor_data*) data_registry::get_instance().acquire_data(SENSOR_DATA_ID);
         *sd = result;
-
         data_registry::get_instance().release_data(SENSOR_DATA_ID);
+
+        telemetrics_data* td = (telemetrics_data*) data_registry::get_instance().acquire_data(TELEMETRICS_DATA_ID);
+        td->curr_speed = static_cast<double>(speed);
+        data_registry::get_instance().release_data(TELEMETRICS_DATA_ID);
     
         return;
     }
