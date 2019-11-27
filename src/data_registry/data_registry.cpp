@@ -36,7 +36,7 @@ data_registry::~data_registry() {
 
     for (auto& pair : registry) {
         pair.second.lock.lock();
-        delete pair.second.data;
+        delete (uint8_t*) pair.second.data;
         pair.second.lock.unlock();
     }
 }
