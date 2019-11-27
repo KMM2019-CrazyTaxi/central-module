@@ -1,21 +1,39 @@
 CCX=clang++
 CCXFLAGS = -std=c++17 -pthread 
 LDFLAGS :=
+QPUFLAGS :=
 
 SRCDIR  = ./src
 OBJSDIR = ./build
 DEPDIR	= ./include
 GPUDIR = ./include/QPULib/Lib
+
 QPULIB :=
 
 ifeq ($(QPU), 1)
-	CCXFLAGS += -DQPU_MODE
+	CCXFLAGS += -DQPU_MODE -DQPU
 	QPULIB := ./include/QPULib/qpulib.a
 endif
 
+ifeq ($(QPUE), 1)
+	CCXFLAGS += -DEMULATION_MODE -DQPU
+	QPULIB := ./include/QPULib/qpulib.a
+	QPUFLAGS += EMU=1
+endif
+
 ifeq ($(WIRING), 1)
-	LDFLAGS += -lwiringPi
 	CCXFLAGS += -DWIRING_PI=1
+	LDFLAGS  += -lwiringPi
+endif
+
+ifeq ($(CAM), 1) 
+	CCXFLAGS += -DRASPICAM=1
+	LDFLAGS  += -lraspicam
+endif
+
+ifeq ($(OPENCV), 1)
+	CCXFLAGS += -DOPENCV=1
+	LDFLAGS  += -lopencv_core -lopencv_imgcodecs 
 endif
 
 # Find all subdirectories
@@ -37,21 +55,21 @@ $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
 
 $(QPULIB):
-	cd ./include/QPULib && make
+	cd ./include/QPULib && make $(QPUFLAGS)
 
 $(OBJSDIR):
 	mkdir build
 
 all:
-	make WIRING=1 QPU=1
+	make WIRING=1 QPU=1 CAM=1 OPENCV=1
+
+emulation:
+	make WIRING=1 QPUE=1 CAM=1 OPENCV=1
 
 clean:
 	cd ./include/QPULib && make clean
 	rm -f project.out
 	rm -rf $(OBJSDIR)
-	find $(OBJSDIR)/ -name '*.o' -delete
-	find $(DEPDIR)/ -name '*.h.gch' -delete
-	rm -r project.dSYM
 
 run:
 	@echo "------------------------------ Compiling project... ------------------------------"		
