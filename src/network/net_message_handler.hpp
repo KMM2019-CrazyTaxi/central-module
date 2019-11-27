@@ -23,6 +23,39 @@ std::vector<packet> handle_packets(const std::vector<packet>& packets);
  */
 packet handle_packet(const packet& p);
 
+/**
+ * 
+ */
+packet handle_request_sensor_data(const packet& p);
 
+/**
+ * 
+ */
+packet handle_send_max_speed(const packet& p);
+
+/**
+ * 
+ */
+packet handle_request_turn(const packet& p);
+
+/**
+ * 
+ */
+packet handle_request_temperature(const packet& p);
+
+/**
+ * 
+ */
+packet handle_send_current_date_time(const packet& p);
+
+/**
+ * 
+ */
+packet handle_request_control_parameters(const packet& p);
+
+/**
+ * 
+ */
+packet handle_send_control_parameters(const packet& p);
 
 #endif
