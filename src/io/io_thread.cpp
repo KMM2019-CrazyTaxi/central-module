@@ -113,13 +113,13 @@ void send_control_data() {
     unsigned char msg_buffer[SPI_CONTROL_DATA_MSG_SIZE];
     unsigned char ans_buffer[SPI_CONTROL_FINISH_MSG_SIZE];
 
-    control_change_data data;
+    regulator_out_data data;
 
-    control_change_data* registry_entry = 
-        (control_change_data*) data_registry::get_instance().acquire_data(CONTROL_CHANGE_DATA_ID);
+    regulator_out_data* registry_entry = 
+        (regulator_out_data*) data_registry::get_instance().acquire_data(REGULATOR_OUT_DATA_ID);
     
     data = *registry_entry;
-    data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
+    data_registry::get_instance().release_data(REGULATOR_OUT_DATA_ID);
 
     int fails = 0;
     while (fails < SPI_FAIL_COUNT) {
@@ -140,8 +140,8 @@ void send_control_data() {
             continue;
         }
 
-        msg_buffer[0] = data.speed;
-        msg_buffer[1] = data.angle;
+        msg_buffer[0] = static_cast<int8_t>(data.speed);
+        msg_buffer[1] = static_cast<int8_t>(data.angle);
         msg_buffer[2] = SPI_NAN;
 
         unsigned char expected_checkbyte = calc_checkbyte(msg_buffer, SPI_CONTROL_DATA_MSG_SIZE - 1);
