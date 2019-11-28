@@ -40,8 +40,14 @@ OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
 project: $(OBJSDIR) $(OBJECTS)
 	$(CCX) $(CCXFLAGS) $(OBJECTS) $(LDFLAGS) -o project.out
 
-$(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
+$(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $@
+
+%.d: %.c
+	@set -e; rm -f $@; \
+		$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
+		sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+		rm -f $@.$$$$
 
 $(OBJSDIR):
 	# Recusively copy directory structure of src/ to build/ without files
