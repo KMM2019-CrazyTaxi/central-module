@@ -32,19 +32,20 @@ INCLUDES = $(shell find $(SRCDIR) -type d | sed s/^/-I/)
 HEADERS = $(shell find $(SRCDIR) -type f -name '*.hpp')
 SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 
-# Generate all objects and matching objects without directory path
+# Generate all objects
 OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
-OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
+#OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
 # Add qpulib to rule if you want to make with it
 project: $(OBJSDIR) $(OBJECTS)
-	$(CCX) $(CCXFLAGS) $(OBJECTS_NO_PATH) $(LDFLAGS) -o project.out
+	$(CCX) $(CCXFLAGS) $(OBJECTS) $(LDFLAGS) -o project.out
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
-	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
+	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $@
 
 $(OBJSDIR):
-	mkdir build
+	# Recusively copy directory structure of src/ to build/ without files
+	rsync -av -f"+ */" -f"- *" $(SRCDIR)/ $(OBJSDIR)
 
 all:
 	@echo "------------------------------ Compiling project... ------------------------------"		
