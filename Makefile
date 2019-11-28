@@ -1,5 +1,5 @@
 CCX=clang++
-CCXFLAGS = -std=c++17 -pthread
+CCXFLAGS = -std=c++17 -pthread -MD -MP
 LDFLAGS :=
 
 SRCDIR  = ./src
@@ -34,17 +34,19 @@ SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 
 # Generate all objects
 OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
-#OBJECTS_NO_PATH = $(foreach obj, $(OBJECTS), $(OBJSDIR)/$(notdir $(obj)))
 
 # Add qpulib to rule if you want to make with it
 project: $(OBJSDIR) $(OBJECTS)
 	$(CCX) $(CCXFLAGS) $(OBJECTS) $(LDFLAGS) -o project.out
 
-$(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
+$(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $@
 
+# Generate dependency files for each object
+-include $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.d)
+
+# Recusively copy directory structure of src/ to build/ without files
 $(OBJSDIR):
-	# Recusively copy directory structure of src/ to build/ without files
 	rsync -av -f"+ */" -f"- *" $(SRCDIR)/ $(OBJSDIR)
 
 all:
@@ -58,6 +60,5 @@ release:
 	@echo "------------------------------- Compiled project! --------------------------------"
 
 clean:
-	# cd ./include/QPULib && make clean
 	rm -f project.out
 	rm -rf $(OBJSDIR)
