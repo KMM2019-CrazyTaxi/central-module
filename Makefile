@@ -1,28 +1,13 @@
 CCX=clang++
 CCXFLAGS = -std=c++17 -pthread
 LDFLAGS :=
-QPUFLAGS :=
 
 SRCDIR  = ./src
 OBJSDIR = ./build
 DEPDIR	= ./include
-GPUDIR = ./include/QPULib/Lib
-
-QPULIB :=
 
 ifeq ($(RELEASE), 1)
 	CCXFLAGS += -Ofast
-endif
-
-ifeq ($(QPU), 1)
-	CCXFLAGS += -DQPU_MODE -DQPU
-	QPULIB := ./include/QPULib/qpulib.a
-endif
-
-ifeq ($(QPUE), 1)
-	CCXFLAGS += -DEMULATION_MODE -DQPU
-	QPULIB := ./include/QPULib/qpulib.a
-	QPUFLAGS += EMU=1
 endif
 
 ifeq ($(WIRING), 1)
@@ -42,7 +27,6 @@ endif
 
 # Find all subdirectories
 INCLUDES = $(shell find $(SRCDIR) -type d | sed s/^/-I/)
-# INCLUDES += $(shell find $(GPUDIR) -type d | sed s/^/-I/)
 
 # Get all headers and sources from source directory
 HEADERS = $(shell find $(SRCDIR) -type f -name '*.hpp')
@@ -58,9 +42,6 @@ project: $(OBJSDIR) $(OBJECTS)
 
 $(OBJECTS): $(OBJSDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	$(CCX) $(CCXFLAGS) $(INCLUDES) -c $< -o $(OBJSDIR)/$(@F)
-
-$(QPULIB):
-	cd ./include/QPULib && make $(QPUFLAGS)
 
 $(OBJSDIR):
 	mkdir build
