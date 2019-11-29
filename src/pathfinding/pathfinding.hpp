@@ -3,11 +3,7 @@
 
 #include <vector>
 
-enum direction {
-    STRAIGHT,
-    LEFT,
-    RIGHT
-};
+#include "graph.hpp"
 
 struct path_step {
     int node;

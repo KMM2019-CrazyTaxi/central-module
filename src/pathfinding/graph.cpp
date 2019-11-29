@@ -15,8 +15,8 @@ int graph::get_nodes() {
 
 edge graph::get_edge(int start, int end) {
 
-    for (auto edge& : get_edges(start)) {
-        if (edge.end == end) return edge;
+    for (edge& e : get_edges(start)) {
+        if (e.end == end) return e;
     }
     
 }

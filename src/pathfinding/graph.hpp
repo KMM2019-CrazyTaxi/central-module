@@ -4,7 +4,11 @@
 #include <unordered_map>
 #include <vector>
 
-#include "pathfinding.hpp"
+enum direction {
+    STRAIGHT,
+    LEFT,
+    RIGHT
+};
 
 struct edge {
     int start;
