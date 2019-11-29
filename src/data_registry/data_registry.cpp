@@ -2,6 +2,7 @@
 #include "data_registry.hpp"
 #include "registry_entries.hpp"
 #include "defs.hpp"
+#include "graph.hpp"
 
 data_registry::data_registry() {
 
@@ -29,6 +30,10 @@ data_registry::data_registry() {
     regulator_sample_data* rsd = new regulator_sample_data();
     registry[REGULATOR_SAMPLE_DATA_ID].id = REGULATOR_SAMPLE_DATA_ID;
     registry[REGULATOR_SAMPLE_DATA_ID].data = (void*) rsd;
+
+    graph* g = new graph();
+    registry[GRAPH_ID].id = GRAPH_ID;
+    registry[GRAPH_ID].data = g;
 
 }
 
