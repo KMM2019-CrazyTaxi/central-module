@@ -4,19 +4,36 @@
 #include <unordered_map>
 #include <vector>
 
+/**
+ * Directions used by the pathfinding and decision system
+ */
 enum direction {
     STRAIGHT,
     LEFT,
     RIGHT
 };
 
+/**
+ * An edge in a graph
+ */
 struct edge {
+
+    // The start node of the edge
     int start;
+    
+    // The end node of the edge
     int end;
+
+    // The cost of the edge
     int cost;
+
+    // The direction of the edge
     direction dir;
 };
 
+/**
+ * Class representing a weighted-directed graph
+ */
 class graph {
 
 public:
