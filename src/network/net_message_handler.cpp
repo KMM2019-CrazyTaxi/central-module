@@ -2,6 +2,7 @@
 #include "net_message_handler.hpp"
 #include "data_registry.hpp"
 #include "packet_ids.hpp"
+#include "graph.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -15,6 +16,7 @@ packet handle_request_control_parameters(const packet& p);
 packet handle_send_control_parameters(const packet& p);
 packet handle_request_control_decision(const packet& p);
 packet handle_request_ir_data(const packet& p);
+packet handle_send_map(const packet& p);
 
 std::vector<packet> handle_packets(const std::vector<packet>& packets) {
 
@@ -256,4 +258,19 @@ packet handle_request_ir_data(const packet& p) {
     buffer[2] = data.dist_stop_line;
 
     return packet(p.get_id(), CURRENT_IR_DATA, sizeof(buffer), (uint8_t*) buffer);
+}
+
+packet handle_send_map(const packet& p) {
+
+    data_registry& registry = data_registry::get_instance();
+
+    graph new_graph = graph(p.get_data());
+
+    graph* entry = (graph*) registry.acquire_data(GRAPH_ID);
+
+    *entry = std::move(new_graph);
+
+    registry.release_data(GRAPH_ID);
+
+    return packet(p.get_id(), MAP_ACKNOWLEDGEMENT, 0, nullptr);
 }
