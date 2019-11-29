@@ -51,5 +51,6 @@ edge graph::get_edge(int start, int end) {
     for (edge& e : get_edges(start)) {
         if (e.end == end) return e;
     }
-    
+
+    return (edge){0, 0, -1, (direction) 0};
 }
