@@ -26,7 +26,7 @@ public:
     /**
      * Constructs a graph from the given byte buffer
      */
-    graph(uint8_t* buffer);
+    graph(const uint8_t* buffer);
 
     /**
      * Returns the vector of edges 
