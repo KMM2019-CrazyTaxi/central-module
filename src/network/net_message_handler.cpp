@@ -6,6 +6,16 @@
 #include <stdio.h>
 #include <string.h>
 
+packet handle_request_sensor_data(const packet& p);
+packet handle_send_max_speed(const packet& p);
+packet handle_request_turn(const packet& p);
+packet handle_request_temperature(const packet& p);
+packet handle_send_current_date_time(const packet& p);
+packet handle_request_control_parameters(const packet& p);
+packet handle_send_control_parameters(const packet& p);
+packet handle_request_control_decision(const packet& p);
+packet handle_request_ir_data(const packet& p);
+
 std::vector<packet> handle_packets(const std::vector<packet>& packets) {
 
     std::vector<packet> result;
@@ -44,6 +54,12 @@ packet handle_packet(const packet& p) {
 
         case SEND_CONTROL_PARAMETERS: 
             return handle_send_control_parameters(p);
+
+        case REQUEST_CONTROL_DECISION:
+            return handle_request_control_decision(p);
+        
+        case REQUEST_IR_DATA:
+            return handle_request_ir_data(p);
 
         default:
             return packet(p.get_id(), REMOTE_MODULE_COMMUNICATION_ERROR, 0, nullptr);
@@ -203,4 +219,41 @@ packet handle_send_control_parameters(const packet& p) {
     reg_params = nullptr;
 
     return packet(p.get_id(), PARAMETERS_ACKNOWLEDGEMENT, 0, nullptr);
+}
+
+packet handle_request_control_decision(const packet& p) {
+
+    data_registry& registry = data_registry::get_instance();
+
+    regulator_out_data data;
+    regulator_out_data* registry_entry = 
+        (regulator_out_data*) data_registry::get_instance().acquire_data(REGULATOR_OUT_DATA_ID);
+    
+    data = *registry_entry;
+    data_registry::get_instance().release_data(REGULATOR_OUT_DATA_ID);
+
+    int8_t buffer[2];
+    buffer[0] = static_cast<int8_t>(data.speed);
+    buffer[1] = static_cast<int8_t>(data.angle);
+
+    return packet(p.get_id(), CURRENT_CONTROL_DECISION, sizeof(buffer), (uint8_t*) buffer);
+}
+
+packet handle_request_ir_data(const packet& p) {
+
+    data_registry& registry = data_registry::get_instance();
+
+    telemetrics_data data;
+    telemetrics_data* registry_entry = 
+        (telemetrics_data*) data_registry::get_instance().acquire_data(REGULATOR_OUT_DATA_ID);
+    
+    data = *registry_entry;
+    data_registry::get_instance().release_data(REGULATOR_OUT_DATA_ID);
+
+    double buffer[3];
+    buffer[0] = data.dist_left;
+    buffer[1] = data.dist_right;
+    buffer[2] = data.dist_stop_line;
+
+    return packet(p.get_id(), CURRENT_IR_DATA, sizeof(buffer), (uint8_t*) buffer);
 }
