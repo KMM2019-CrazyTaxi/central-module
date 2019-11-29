@@ -6,11 +6,7 @@
 
 #include "graph.hpp"
 
-
 std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
-
-    // A node is a pair of ints first being cost and second is node id
-    // NOTE: Cost is first to allow default sorting 
 
     std::unordered_map<int, int> previous;
     std::unordered_map<int, int> dist;
@@ -20,8 +16,6 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
 
     // Use comparator lambda above that uses dist to compare
     std::vector<int> queue;
-
-    // std::priority_queue<int, std::vector<int>, decltype(comparator)> queue(comparator);
 
     dist[start] = 0;
     queue.push_back(start);
