@@ -87,7 +87,7 @@ struct pid_params{
   double angle_threshold;
   double speed_threshold;
   double min_value;
-  double slope;
+  double slope = 1;
 };
 
 /**
