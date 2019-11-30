@@ -128,7 +128,8 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
 
 double get_distance_to_side(const uint8_t* edge_image, std::vector<uint32_t>& best,
                             const uint32_t start_row, const uint32_t end_row,
-                            const uint32_t width, const uint32_t height)
+                            const uint32_t width, const uint32_t height,
+			    const double default_edge)
 {
     double weighted_edge_location_sum{};
     double edge_strength_sum{};
@@ -138,7 +139,16 @@ double get_distance_to_side(const uint8_t* edge_image, std::vector<uint32_t>& be
         weighted_edge_location_sum += edge_strength * best[row];
         edge_strength_sum += edge_strength;
     }
-    return weighted_edge_location_sum / edge_strength_sum;
+
+    // Ignore low strength edges.
+    if (edge_strength_sum < EDGE_STRENGTH_THRESHOLD * (end_row - start_row + 1))
+    {
+	return default_edge;
+    }
+    else
+    {
+	return weighted_edge_location_sum / edge_strength_sum;
+    }
 }
 
 double get_distance_to_stop(const uint8_t* edge_image, std::vector<uint32_t>& best,
