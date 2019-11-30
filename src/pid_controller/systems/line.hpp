@@ -3,8 +3,6 @@
 
 #include "regulator_data.hpp"
 
-#define MAX_INPUT_ANGLE 90
-#define MAX_INPUT_SPEED 128
 
 /**
   * Line follower

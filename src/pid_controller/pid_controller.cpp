@@ -7,6 +7,7 @@
 
 #include "logging.hpp"
 
+// Forward declarations
 telemetrics_data get_metrics();
 regulator_param_data get_params();
 regulator_sample_data get_samples();
@@ -26,6 +27,10 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
   while (running) {
 
+    mission_data mission_data = get_mission_data();
+    // Check if we have any current missions to run
+    //if (mission_data.missions.size() == 0) continue;
+
     auto current_time = std::chrono::steady_clock::now();
 
     upd_controller.start();
@@ -34,11 +39,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     telemetrics_data metrics = get_metrics();
     regulator_param_data params = get_params();
     regulator_sample_data samples = get_samples();
-    mission_data mission_data = get_mission_data();
     std::vector<path_step> path = get_path();
-
-    // Check if we have any current missions to run
-    //if (mission_data.missions.size() == 0) continue;
 
     // Set deltatime
     double dt = std::chrono::duration_cast<std::chrono::duration<double>>(current_time - previous_time).count();
@@ -84,6 +85,15 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     mission_data.current_pos = regulate.current_pos;
 
     samples = regulate.samples;
+
+    // Bind the angle
+    if (regulate.angle > MAX_INPUT_ANGLE) regulate.angle = MAX_INPUT_ANGLE;
+    else if (regulate.angle < -MAX_INPUT_ANGLE) regulate.angle = -MAX_INPUT_ANGLE;
+
+    // Bind the speed
+    if (regulate.speed > MAX_INPUT_SPEED) regulate.speed = MAX_INPUT_SPEED;
+    else if (regulate.angle < -MAX_INPUT_SPEED) regulate.speed = -MAX_INPUT_SPEED;
+
 
     regulator_out_data reg_out =
       {

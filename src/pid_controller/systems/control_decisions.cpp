@@ -18,6 +18,7 @@ pid_decision_data decide(pid_decision_in &in) {
     pid_decision_data data =
         {
         .sys = line,
+        .current_pos = in.current_pos,
         .out.metrics = in.metrics,
         .out.params = in.params,
         .out.samples = in.samples,
