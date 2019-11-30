@@ -1,28 +1,63 @@
 #include "control_decisions.hpp"
 #include "logging.hpp"
 
-pid_decision_data decide(const pid_decision_in &);
+pid_decision_data decide(pid_decision_in &);
 pid_decision_return regulate(const pid_decision_data &);
 
 
-pid_decision_return pid_decision(const pid_decision_in &in) {
-  pid_decision_data data = decide(in);
-  pid_decision_return out = regulate(data);
-  return out;
+pid_decision_return pid_decision(pid_decision_in &in) {
+    pid_decision_data data = decide(in);
+    pid_decision_return out = regulate(data);
+    out.current_pos = data.current_pos;
+    return out;
 }
 
-pid_decision_data decide(const pid_decision_in &in) {
-  // TODO: Implement decision making
-  pid_decision_data data =
-    {
-     .sys = line,
-     .out.dt = in.dt,
-     .out.samples = in.samples,
-     .out.angle = 0,
-     .out.metrics.dist_left = in.metrics.dist_left,
-     .out.metrics.dist_right = in.metrics.dist_right
-    };
-  return data;
+pid_decision_data decide(pid_decision_in &in) {
+
+    // Default settings for line following
+    pid_decision_data data =
+        {
+        .sys = line,
+        .out.metrics = in.metrics,
+        .out.params = in.params,
+        .out.samples = in.samples,
+        .out.samples.dist_stop_line = in.metrics.dist_stop_line,
+        .out.angle = 0,
+        .out.speed = 10
+        };
+    return data; // TESTING
+
+    // If the next stop line is far away, return line follower
+    if (in.metrics.dist_stop_line > 10) return data;
+
+    int current_pos = in.current_pos;
+    // If distance to stop line increased, we assume we passed one.
+    // This also means that the initial sample value should be big.
+    if (in.metrics.dist_stop_line > in.samples.dist_stop_line) current_pos++;
+    data.current_pos = current_pos;
+
+    path_step next = in.path[current_pos];
+
+    int num_edges = in.g.get_edges(next.node).size();
+
+    // Turning areas have more than 2 edges
+    if (num_edges > 2) {
+        data.sys = turning;
+        data.out.angle = next.dir * 30;
+        data.out.speed = 10;
+        return data;
+    }
+
+    // Approaching a stop-line, is it the end node?
+    if (next.node == in.path.back().node) {
+        data.sys = stopping;
+        data.out.speed = 5;
+        return data;
+    }
+
+    // A stop-line which is not the end-node.
+    return data;
+
 }
 
 pid_decision_return regulate(const pid_decision_data &dec) {
