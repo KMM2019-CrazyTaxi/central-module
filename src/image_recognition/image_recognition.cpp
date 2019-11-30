@@ -164,6 +164,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
 		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) 
                                        + "_processed.ppm" };
+		queue_message("  Saving marked image to " + file_name);
 		std::ofstream output{ file_name, std::ios::binary };
 		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
 		output.close();
