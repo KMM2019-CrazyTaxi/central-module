@@ -2,7 +2,7 @@
 #include "data_registry.hpp"
 #include "registry_entries.hpp"
 #include "defs.hpp"
-#include "graph.hpp"
+#include "pathfinding.hpp"
 
 data_registry::data_registry() {
 
@@ -31,10 +31,17 @@ data_registry::data_registry() {
     registry[REGULATOR_SAMPLE_DATA_ID].id = REGULATOR_SAMPLE_DATA_ID;
     registry[REGULATOR_SAMPLE_DATA_ID].data = (void*) rsd;
 
+    mission_data* md = new mission_data();
+    registry[MISSION_DATA_ID].id = MISSION_DATA_ID;
+    registry[MISSION_DATA_ID].data = (void*) md;
+
+    std::vector<path_step>* p = new std::vector<path_step>();
+    registry[PATH_ID].id = PATH_ID;
+    registry[PATH_ID].data = (void*) p;
+
     graph* g = new graph();
     registry[GRAPH_ID].id = GRAPH_ID;
-    registry[GRAPH_ID].data = g;
-
+    registry[GRAPH_ID].data = (void*) g;
 }
 
 data_registry::~data_registry() {
@@ -77,5 +84,5 @@ void data_registry::release_data(int id) {
 
     registry_entry& entry = registry[id];
     entry.lock.unlock();
-    
+
 }

@@ -12,6 +12,8 @@
 
 #include <cstdint>
 #include "registry_entries.hpp"
+#include "pathfinding.hpp"
+#include "graph.hpp"
 
 /**
  * Enumerates all of the available sub systems.
@@ -24,7 +26,11 @@ enum System {decision, turning, parking, stopping, line};
 struct pid_decision_in{
   telemetrics_data metrics;
   regulator_param_data params;
-  
+
+  graph g;
+  std::vector<path_step> path;
+  int current_pos;
+
   double dt;
   regulator_sample_data samples;
 };
@@ -46,6 +52,7 @@ struct pid_decision_return{
   double angle;
   double speed;
   regulator_sample_data samples;
+  int current_pos;
 };
 
 /**
@@ -54,6 +61,7 @@ struct pid_decision_return{
 struct pid_decision_data{
   pid_system_out out;
   System sys;
+  int current_pos;
 };
 
 #endif

@@ -2,6 +2,9 @@
 #define CM_REGISTRY_ENTRIES_H
 
 #include <cstdint>
+#include <vector>
+#include <utility>
+#include "graph.hpp"
 
 #define SENSOR_DATA_ID 				    1
 #define CONTROL_CHANGE_DATA_ID 		2
@@ -9,7 +12,9 @@
 #define REGULATOR_OUT_DATA_ID 		4
 #define REGULATOR_PARAM_DATA_ID 	5
 #define REGULATOR_SAMPLE_DATA_ID 	6
-#define GRAPH_ID                  7
+#define MISSION_DATA_ID             7
+#define PATH_ID                     8
+#define GRAPH_ID                    9
 
 struct sensor_data {
     int16_t acc_x;
@@ -103,6 +108,16 @@ struct regulator_sample_data{
   double line_angle_d;
   double line_speed_d;
   double stopping_speed_d;
+  double dist_stop_line;
+};
+
+/**
+  * Contains data about the map and missions
+  */
+struct mission_data{
+    graph g;
+    std::vector<std::pair<int,int>> missions;
+    int current_pos;
 };
 
 #endif

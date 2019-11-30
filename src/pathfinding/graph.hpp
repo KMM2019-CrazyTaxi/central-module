@@ -8,9 +8,9 @@
  * Directions used by the pathfinding and decision system
  */
 enum direction {
-    STRAIGHT,
-    LEFT,
-    RIGHT
+    STRAIGHT = 0,
+    LEFT = -1,
+    RIGHT = 1
 };
 
 /**
@@ -20,7 +20,7 @@ struct edge {
 
     // The start node of the edge
     int start;
-    
+
     // The end node of the edge
     int end;
 
@@ -46,7 +46,7 @@ public:
     graph(const uint8_t* buffer);
 
     /**
-     * Returns the vector of edges 
+     * Returns the vector of edges
      */
     std::vector<edge>& get_edges(int node);
 
@@ -58,10 +58,10 @@ public:
     /**
      * Gets the directed edge that goes from start to end
      */
-    edge get_edge(int start, int end);  
+    edge get_edge(int start, int end);
 
 private:
-    
+
     int nodes;
     std::unordered_map<int, std::vector<edge>> g;
 
