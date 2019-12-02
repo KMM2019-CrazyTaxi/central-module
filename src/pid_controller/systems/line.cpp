@@ -58,6 +58,7 @@ double regulate_angle(const telemetrics_data &metrics,
               const double &ref_angle,
               const double &dt,
               regulator_sample_data &samples){
+    queue_message("line angle: " + std::to_string(ref_angle));
   double kp = params.kp;
   double ki = params.ki;
   double kd = params.kd;
