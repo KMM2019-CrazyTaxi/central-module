@@ -99,7 +99,7 @@ double regulate_speed(const telemetrics_data &metrics,
   double slope = params.slope;
 
   double speed_fact = calc_fact(reg_angle/MAX_INPUT_ANGLE,
-          ref_speed/MAX_INPUT_SPEED, angle_threshold/MAX_INPUT_ANGLE,
+          metrics.curr_speed/MAX_INPUT_SPEED, angle_threshold/MAX_INPUT_ANGLE,
           speed_threshold/MAX_INPUT_SPEED, min_value, slope);
   double ref_speed_updated = ref_speed * speed_fact ;
 
@@ -114,8 +114,6 @@ double regulate_speed(const telemetrics_data &metrics,
   double d = kd * calc_d;
 
   samples.line_speed_d = sample_d;
-
-  queue_message("Speed fact: " + std::to_string(speed_fact));
 
   return (metrics.curr_speed + p + i + d) * speed_fact;
 }
