@@ -135,7 +135,7 @@ packet handle_request_control_parameters(const packet& p) {
 
     data_registry& registry = data_registry::get_instance();
     pid_params params;
-    int params_to_get = (int) *p.get_data();
+    uint8_t params_to_get = p.get_data()[0];
 
     regulator_param_data* reg_params = (regulator_param_data*) registry.acquire_data(REGULATOR_PARAM_DATA_ID);
 
@@ -161,20 +161,26 @@ packet handle_request_control_parameters(const packet& p) {
     reg_params = nullptr;
     
     constexpr int PACKET_SIZE = 9 * sizeof(double);
+
+    uint8_t buffer[1 + PACKET_SIZE];
+
+    buffer[0] = params_to_get;
     
-    double buffer[PACKET_SIZE / sizeof(double)];
+    double d_buffer[PACKET_SIZE / sizeof(double)];
 
-    buffer[0] = params.kp;
-    buffer[1] = params.ki;
-    buffer[2] = params.kd;
-    buffer[3] = params.alpha;
-    buffer[4] = params.beta;
-    buffer[5] = params.angle_threshold;
-    buffer[6] = params.speed_threshold;
-    buffer[7] = params.min_value;
-    buffer[8] = params.slope;
+    d_buffer[0] = params.kp;
+    d_buffer[1] = params.ki;
+    d_buffer[2] = params.kd;
+    d_buffer[3] = params.alpha;
+    d_buffer[4] = params.beta;
+    d_buffer[5] = params.angle_threshold;
+    d_buffer[6] = params.speed_threshold;
+    d_buffer[7] = params.min_value;
+    d_buffer[8] = params.slope;
 
-    return packet(p.get_id(), CURRENT_CONTROL_PARAMETERS, PACKET_SIZE, (uint8_t*) buffer);
+    memcpy(buffer + 1, d_buffer, PACKET_SIZE);
+
+    return packet(p.get_id(), CURRENT_CONTROL_PARAMETERS, PACKET_SIZE, buffer);
 }
 
 packet handle_send_control_parameters(const packet& p) {
