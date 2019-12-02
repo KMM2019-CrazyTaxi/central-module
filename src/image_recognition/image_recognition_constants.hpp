@@ -40,7 +40,7 @@ const bool OUTPUT_MARKED_IMAGE_TO_FILE{ true };
 // Frame taken by the camera each second.
 const uint32_t CAMERA_FPS{ 60 };
 
-const uint32_t BOUND_DISTANCE_1_PIXEL{ 100 };
+const uint32_t BOUND_DISTANCE_1_PIXEL{ 75 };
 const uint32_t BOUND_DISTANCE_2_PIXEL{ 100 };
 
 const uint32_t EDGE_AVG_PIXELS{ 20 };
