@@ -58,20 +58,20 @@ double regulate_angle(const telemetrics_data &metrics,
               const double &ref_angle,
               const double &dt,
               regulator_sample_data &samples){
-  double kp = 1; //params.kp;
-  double ki = 0; //params.ki;
-  double kd = 0; //params.kd;
-  double alpha = 1; //params.alpha;
-  double beta = 1; //params.beta;
+  double kp = params.kp;
+  double ki = params.ki;
+  double kd = params.kd;
+  double alpha = params.alpha;
+  double beta = params.beta;
 
   double dist_left = metrics.dist_left;
   double dist_right = metrics.dist_right;
-  double diff = 0; //dist_left - dist_right;
+  double diff = dist_left - dist_right;
   double sample_d = beta * ref_angle - diff;
 
   double calc_p = alpha * ref_angle - diff;
   double calc_i = 0;
-  double calc_d = 0 ;//(sample_d - samples.line_angle_d) / dt;
+  double calc_d = (sample_d - samples.line_angle_d) / dt;
 
   double p = kp * calc_p;
   double i = ki * calc_i;
@@ -87,16 +87,16 @@ double regulate_speed(const telemetrics_data &metrics,
               const double &dt,
               regulator_sample_data &samples){
 
-  double kp = 1;//params.kp;
-  double ki = 1;//params.ki;
-  double kd = 1;//params.kd;
-  double alpha = 1;//params.alpha;
-  double beta = 1;//params.beta;
+  double kp = params.kp;
+  double ki = params.ki;
+  double kd = params.kd;
+  double alpha = params.alpha;
+  double beta = params.beta;
 
-  double angle_threshold = 10;//params.angle_threshold;
-  double speed_threshold = 10;//params.speed_threshold;
-  double min_value = 0.2;//params.min_value;
-  double slope = 1;//params.slope;
+  double angle_threshold = params.angle_threshold;
+  double speed_threshold = params.speed_threshold;
+  double min_value = params.min_value;
+  double slope = params.slope;
 
   queue_message("Calc fact reg angle: " + std::to_string(reg_angle));
   queue_message("Calc fact reg speed: " + std::to_string(ref_speed));
@@ -111,7 +111,7 @@ double regulate_speed(const telemetrics_data &metrics,
 
   double calc_p = alpha * ref_speed_updated - metrics.curr_speed;
   double calc_i = 0;
-  double calc_d = 0;//(sample_d - samples.line_speed_d) / dt;
+  double calc_d = (sample_d - samples.line_speed_d) / dt;
 
   double p = kp * calc_p;
   double i = ki * calc_i;
