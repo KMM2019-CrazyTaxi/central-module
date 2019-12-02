@@ -162,12 +162,12 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
                 queue_message("  Front edge distance: " + std::to_string(adjusted_front_pixel_distance));
 		queue_message("  Marking test image took "
 			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
-		//std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) 
-        //                               + "_processed.ppm" };
-		// queue_message("  Saving marked image to " + file_name);
-		// std::ofstream output{ file_name, std::ios::binary };
-		// write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
-		// output.close();
+		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) 
+                                       + "_processed.ppm" };
+		queue_message("  Saving marked image to " + file_name);
+		std::ofstream output{ file_name, std::ios::binary };
+		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
+		output.close();
 	    }
 	}
     }
