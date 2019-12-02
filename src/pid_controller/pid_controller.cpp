@@ -101,9 +101,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
        .speed = regulate.speed
       };
 
-    queue_message("Output Speed: " + std::to_string(reg_out.speed));
-    queue_message("Output Angle:" + std::to_string(reg_out.angle));
-
     // Send output
     set_output(reg_out);
     set_samples(samples);
