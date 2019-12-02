@@ -23,6 +23,7 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.params = in.params,
         .out.samples = in.samples,
         .out.samples.dist_stop_line = in.metrics.dist_stop_line,
+        .out.dt = in.dt,
         .out.angle = 0,
         .out.speed = 10
         };
