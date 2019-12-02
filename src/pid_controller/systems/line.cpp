@@ -75,7 +75,7 @@ double regulate_angle(const telemetrics_data &metrics,
 
   double p = kp * calc_p;
   double i = ki * calc_i;
-  double d = 0; //kd * calc_d;
+  double d = kd * calc_d;
 
   return p + i + d;
 }
@@ -111,7 +111,7 @@ double regulate_speed(const telemetrics_data &metrics,
 
   double p = kp * calc_p;
   double i = ki * calc_i;
-  double d = 0; //kd * calc_d;
+  double d = kd * calc_d;
 
   samples.line_speed_d = sample_d;
 
