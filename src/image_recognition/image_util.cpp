@@ -163,7 +163,14 @@ double get_distance_to_stop(const uint8_t* edge_image, std::vector<uint32_t>& be
         weighted_edge_location_sum += edge_strength * best[column];
         edge_location_sum += edge_strength;
     }
-    return weighted_edge_location_sum / edge_location_sum;
+    if (edge_location_sum < EDGE_STRENGTH_THRESHOLD * (end_column - start_column + 1))
+    {
+        return 0;
+    }
+    else
+    {
+        return weighted_edge_location_sum / edge_location_sum;
+    }
 }
 
 void mark_selected_edges(uint8_t* marked,

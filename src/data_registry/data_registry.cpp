@@ -38,10 +38,7 @@ data_registry::data_registry() {
     std::vector<path_step>* p = new std::vector<path_step>();
     registry[PATH_ID].id = PATH_ID;
     registry[PATH_ID].data = (void*) p;
-
-    graph* g = new graph();
-    registry[GRAPH_ID].id = GRAPH_ID;
-    registry[GRAPH_ID].data = (void*) g;
+    
 }
 
 data_registry::~data_registry() {
