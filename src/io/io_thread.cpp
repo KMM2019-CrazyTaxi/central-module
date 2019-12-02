@@ -3,6 +3,7 @@
 #include "logging.hpp"
 #include "data_registry.hpp"
 #include "registry_entries.hpp"
+#include "update_controller.hpp"
 
 #ifdef WIRING_PI
     #include <wiringPi.h>
@@ -196,6 +197,8 @@ void send_control_data() {
 
 void io_thread_main(const std::atomic_bool& running) {
 
+    update_controller upd_controller;
+
     // Set up SPI busses
     #ifdef __WIRING_PI_H__ 
         queue_message("Setting up SPI channels.");
@@ -211,21 +214,23 @@ void io_thread_main(const std::atomic_bool& running) {
 
     while (running) {
 
+        upd_controller.start();
+
         acquire_sensor_data();
         send_control_data();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(IO_UPDATE_MS));
+        upd_controller.wait();
     }
 }
 
 void spi_write(int slave, unsigned char* buffer, int size) {
 
     #ifdef __WIRING_PI_H__
-        queue_message("Transmitted " + print_buffer((uint8_t*) buffer, size));
+        // queue_message("Transmitted " + print_buffer((uint8_t*) buffer, size));
         activate_slave(slave);
         wiringPiSPIDataRW(SPI_CHANNEL, buffer, size);
         deactivate_slave(slave);
-        queue_message("Received " + print_buffer((uint8_t*) buffer, size));
+        // queue_message("Received " + print_buffer((uint8_t*) buffer, size));
     #endif
 }
 
