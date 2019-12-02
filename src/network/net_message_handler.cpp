@@ -224,6 +224,8 @@ packet handle_send_control_parameters(const packet& p) {
             break;
     }
 
+    queue_message("Updated parameters: " + std::to_string(params_to_get) + " New kp: " + std::to_string(params.kp));
+
     registry.release_data(REGULATOR_PARAM_DATA_ID);
     reg_params = nullptr;
 
