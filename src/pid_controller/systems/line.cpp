@@ -76,9 +76,6 @@ double regulate_angle(const telemetrics_data &metrics,
   double p = kp * calc_p;
   double i = ki * calc_i;
   double d = kd * calc_d;
-    queue_message("p: " + std::to_string(p));
-    queue_message("i" + std::to_string(i));
-    queue_message("d" + std::to_string(d));
 
   return p + i + d;
 }
