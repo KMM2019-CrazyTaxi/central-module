@@ -71,7 +71,7 @@ double regulate_angle(const telemetrics_data &metrics,
 
   double calc_p = alpha * ref_angle - diff;
   double calc_i = 0;
-  double calc_d = (sample_d - samples.line_angle_d) / dt;
+  double calc_d = 0; //(sample_d - samples.line_angle_d) / dt;
 
   double p = kp * calc_p;
   double i = ki * calc_i;
