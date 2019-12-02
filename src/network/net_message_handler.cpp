@@ -3,6 +3,7 @@
 #include "data_registry.hpp"
 #include "packet_ids.hpp"
 #include "graph.hpp"
+#include "logging.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -262,6 +263,8 @@ packet handle_request_ir_data(const packet& p) {
     buffer[0] = data.dist_left;
     buffer[1] = data.dist_right;
     buffer[2] = data.dist_stop_line;
+
+    queue_message("Left: " + std::to_string(buffer[0]) + " Right: " + std::to_string(buffer[1]));
 
     return packet(p.get_id(), CURRENT_IR_DATA, sizeof(buffer), (uint8_t*) buffer);
 }
