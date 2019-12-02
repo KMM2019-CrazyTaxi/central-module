@@ -13,7 +13,7 @@ class update_controller {
 public:
 
     // The default period
-    const int64_t DEFAULT_PERIOD = 500;
+    const int64_t DEFAULT_PERIOD = 20;
 
     /**
      * Default constructor
