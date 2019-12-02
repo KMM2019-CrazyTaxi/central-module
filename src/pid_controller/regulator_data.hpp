@@ -15,8 +15,8 @@
 #include "pathfinding.hpp"
 #include "graph.hpp"
 
-#define MAX_INPUT_ANGLE 90
-#define MAX_INPUT_SPEED 128
+#define MAX_INPUT_ANGLE 45
+#define MAX_INPUT_SPEED 40
 
 /**
  * Enumerates all of the available sub systems.
