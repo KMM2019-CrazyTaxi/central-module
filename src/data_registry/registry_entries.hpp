@@ -98,7 +98,7 @@ struct regulator_param_data{
   pid_params stopping;
   pid_params line_angle =
   {
-      .kp = 5,
+      .kp = 10,
       .ki = 0,
       .kd = 0,
       .alpha = 1,
@@ -106,7 +106,7 @@ struct regulator_param_data{
   };
   pid_params line_speed =
   {
-      .kp = 5,
+      .kp = 2.5,
       .ki = 0,
       .kd = 0,
       .alpha = 1,
