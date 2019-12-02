@@ -61,7 +61,7 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
         // Add destination node (current) and the direction for each step
         edge e = g.get_edge(prev, current);
         path.push_back((path_step){current, e.dir});
-
+        current = prev;
     }
 
     // Path is backwards so reverse it
