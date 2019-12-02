@@ -272,11 +272,11 @@ packet handle_send_map(const packet& p) {
 
     graph new_graph = graph(p.get_data());
 
-    graph* entry = (graph*) registry.acquire_data(GRAPH_ID);
+    mission_data* entry = (mission_data*) registry.acquire_data(MISSION_DATA_ID);
 
-    *entry = std::move(new_graph);
+    entry->g = std::move(new_graph);
 
-    registry.release_data(GRAPH_ID);
+    registry.release_data(MISSION_DATA_ID);
 
     return packet(p.get_id(), MAP_ACKNOWLEDGEMENT, 0, nullptr);
 }
