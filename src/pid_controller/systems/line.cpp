@@ -73,9 +73,30 @@ double regulate_angle(const telemetrics_data &metrics,
   double calc_i = 0;
   double calc_d = (sample_d - samples.line_angle_d) / dt;
 
+  queue_message("samples.line_angle_d" + std::to_string(samples.line_angle_d));
+  queue_message("ref_angle: " + std::to_string(ref_angle));
+  queue_message("dt: " + std::to_string(dt));
+
+  queue_message("Dist_left: " + std::to_string(dist_left));
+  queue_message("Dist_right: " + std::to_string(dist_right));
+  queue_message("kp: " + std::to_string(kp));
+  queue_message("ki: " + std::to_string(ki));
+  queue_message("kd: " + std::to_string(kd));
+  queue_message("alpha: " + std::to_string(alpha));
+  queue_message("beta: " + std::to_string(beta));
+  queue_message("diff: " + std::to_string(diff));
+  queue_message("sample_d: " + std::to_string(sample_d));
+  queue_message("calc_p: " + std::to_string(calc_p));
+  queue_message("calc_i: " + std::to_string(calc_i));
+
+
   double p = kp * calc_p;
   double i = ki * calc_i;
-  double d = kd * calc_d;
+  double d = 0; //kd * calc_d;
+
+  queue_message("p: " + std::to_string(p));
+  queue_message("i: " + std::to_string(i));
+  queue_message("d: " + std::to_string(d));
 
   return p + i + d;
 }
@@ -115,7 +136,7 @@ double regulate_speed(const telemetrics_data &metrics,
 
   double p = kp * calc_p;
   double i = ki * calc_i;
-  double d = kd * calc_d;
+  double d = 0; //kd * calc_d;
 
   samples.line_speed_d = sample_d;
 

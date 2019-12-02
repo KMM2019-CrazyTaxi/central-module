@@ -77,16 +77,16 @@ struct regulator_out_data {
  * The rest of the data is system-specific in how they are used.
  */
 struct pid_params{
-  double kp = 5;
+  double kp;
   double ki;
-  double kd = 5;
+  double kd;
   double alpha;
   double beta;
 
   double angle_threshold;
   double speed_threshold;
   double min_value;
-  double slope = 1;
+  double slope;
 };
 
 /**
@@ -96,8 +96,26 @@ struct regulator_param_data{
   pid_params turning;
   pid_params parking;
   pid_params stopping;
-  pid_params line_angle;
-  pid_params line_speed;
+  pid_params line_angle =
+  {
+      .kp = 5,
+      .ki = 0,
+      .kd = 0,
+      .alpha = 1,
+      .beta = 1
+  };
+  pid_params line_speed =
+  {
+      .kp = 5,
+      .ki = 0,
+      .kd = 0,
+      .alpha = 1,
+      .beta = 1,
+      .angle_threshold = 5,
+      .speed_threshold = 5,
+      .min_value = 0.5,
+      .slope = 1
+  };
 };
 
 /**
