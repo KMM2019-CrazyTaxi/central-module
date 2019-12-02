@@ -253,10 +253,10 @@ packet handle_request_ir_data(const packet& p) {
 
     telemetrics_data data;
     telemetrics_data* registry_entry = 
-        (telemetrics_data*) data_registry::get_instance().acquire_data(REGULATOR_OUT_DATA_ID);
+        (telemetrics_data*) data_registry::get_instance().acquire_data(TELEMETRICS_DATA_ID);
     
     data = *registry_entry;
-    data_registry::get_instance().release_data(REGULATOR_OUT_DATA_ID);
+    data_registry::get_instance().release_data(TELEMETRICS_DATA_ID);
 
     double buffer[3];
     buffer[0] = data.dist_left;
