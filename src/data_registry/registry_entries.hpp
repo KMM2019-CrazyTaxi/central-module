@@ -93,7 +93,14 @@ struct pid_params{
   * Contains all of the parameters for the whole control system
   */
 struct regulator_param_data{
-  pid_params turning;
+  pid_params turning =
+  {
+      .kp = 1,
+      .ki = 0,
+      .kd = 0,
+      .alpha = 1,
+      .beta = 1
+  };
   pid_params parking;
   pid_params stopping;
   pid_params line_angle =

@@ -5,7 +5,8 @@ pid_system_out pid_turning(const pid_decision_data &in) {
 
   /* For the moment, this is basically identical to the line follower's
      angle regulator. This can be tweaked in the future if necessary. */
-  
+
+
   double kp = in.out.params.turning.kp;
   double ki = in.out.params.turning.ki;
   double kd = in.out.params.turning.kd;
@@ -13,7 +14,8 @@ pid_system_out pid_turning(const pid_decision_data &in) {
   double beta = in.out.params.turning.beta;
 
   double ref_angle = in.out.angle;
-  
+    queue_message("Ref angle: " + std::to_string(ref_angle));
+
   double dist_left = in.out.metrics.dist_left;
   double dist_right = in.out.metrics.dist_right;
   double diff = dist_left - dist_right;
@@ -40,6 +42,6 @@ pid_system_out pid_turning(const pid_decision_data &in) {
      .speed = in.out.speed,
      .samples = in.out.samples
     };
-  
+
   return out;
 }
