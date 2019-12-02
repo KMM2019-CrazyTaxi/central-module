@@ -73,6 +73,7 @@ double regulate_angle(const telemetrics_data &metrics,
   double calc_i = 0;
   double calc_d = (sample_d - samples.line_angle_d) / dt;
 
+  queue_message("samples.line_angle_d" + std::to_string(samples.line_angle_d));
   queue_message("ref_angle: " + std::to_string(ref_angle));
   queue_message("dt: " + std::to_string(dt));
 
