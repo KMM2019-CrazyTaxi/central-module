@@ -180,7 +180,7 @@ packet handle_request_control_parameters(const packet& p) {
 
     memcpy(buffer + 1, d_buffer, PACKET_SIZE);
 
-    return packet(p.get_id(), CURRENT_CONTROL_PARAMETERS, PACKET_SIZE, buffer);
+    return packet(p.get_id(), CURRENT_CONTROL_PARAMETERS, PACKET_SIZE + sizeof(uint8_t), buffer);
 }
 
 packet handle_send_control_parameters(const packet& p) {
@@ -188,10 +188,10 @@ packet handle_send_control_parameters(const packet& p) {
     data_registry& registry = data_registry::get_instance();
     pid_params params;
 
-    int params_to_get = (int) *p.get_data();
+    uint8_t params_to_get = p.get_data()[0];
 
     double buffer[9];
-    memcpy(buffer, p.get_data()+sizeof(int), 9 * sizeof(double));
+    memcpy(buffer, p.get_data()+sizeof(uint8_t), 9 * sizeof(double));
 
     params.kp               = buffer[0];
     params.ki               = buffer[1];
