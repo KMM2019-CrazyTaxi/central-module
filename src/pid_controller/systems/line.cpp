@@ -115,6 +115,8 @@ double regulate_speed(const telemetrics_data &metrics,
 
   samples.line_speed_d = sample_d;
 
+  queue_message("Speed fact: " + std::to_string(speed_fact));
+
   return (metrics.curr_speed + p + i + d) * speed_fact;
 }
 
