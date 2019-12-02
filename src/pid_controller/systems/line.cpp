@@ -105,7 +105,7 @@ double regulate_speed(const telemetrics_data &metrics,
 
   double sample_d = beta * ref_speed - metrics.curr_speed;
 
-  double calc_p = alpha * ref_speed_updated - metrics.curr_speed;
+  double calc_p = alpha * ref_speed - metrics.curr_speed;
   double calc_i = 0;
   double calc_d = (sample_d - samples.line_speed_d) / dt;
 
