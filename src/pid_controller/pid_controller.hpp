@@ -2,6 +2,9 @@
 #define CM_PID_CONTROLLER_H
 
 #include <atomic>
+#include "pathfinding.hpp"
+#include "graph.hpp"
+#include <vector>
 
 /**
  * Main function ran by the pid_controller thread

@@ -92,16 +92,16 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 
         double left_pixel_distance_1 = get_distance_to_side(edgex_image, left_edges,
                                                             distance_start_1, distance_end_1,
-                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
+                                                            IMAGE_WIDTH, IMAGE_HEIGHT, 0);
         double right_pixel_distance_1 = get_distance_to_side(edgex_image, right_edges,
                                                              distance_start_1, distance_end_1,
-                                                             IMAGE_WIDTH, IMAGE_HEIGHT);
+                                                             IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_WIDTH - 1);
         double left_pixel_distance_2 = get_distance_to_side(edgex_image, left_edges,
                                                             distance_start_2, distance_end_2,
-                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
+                                                            IMAGE_WIDTH, IMAGE_HEIGHT, 0);
         double right_pixel_distance_2 = get_distance_to_side(edgex_image, right_edges,
                                                              distance_start_2, distance_end_2,
-                                                             IMAGE_WIDTH, IMAGE_HEIGHT);
+                                                             IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_WIDTH - 1);
         double front_pixel_distance = get_distance_to_stop(edgey_image, front_edges,
                                                            middle_start, middle_end,
                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -164,6 +164,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
 		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) 
                                        + "_processed.ppm" };
+		queue_message("  Saving marked image to " + file_name);
 		std::ofstream output{ file_name, std::ios::binary };
 		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
 		output.close();

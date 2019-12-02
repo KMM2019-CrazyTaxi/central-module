@@ -5,44 +5,44 @@
 #include "math.h"
 
 double regulate_angle(const telemetrics_data &,
-		      const pid_params &,
-		      const double &,
-		      const double &,
-		      regulator_sample_data &);
+              const pid_params &,
+              const double &,
+              const double &,
+              regulator_sample_data &);
 
 double regulate_speed(const telemetrics_data &,
-		      const pid_params &,
-		      const double &,
-		      const double &,
-		      const double &,
-		      regulator_sample_data &);
+              const pid_params &,
+              const double &,
+              const double &,
+              const double &,
+              regulator_sample_data &);
 
 double calc_fact(const double &,
-		 const double &,
-		 const double &,
-		 const double &,
-		 const double &,
-		 const double &);
+         const double &,
+         const double &,
+         const double &,
+         const double &,
+         const double &);
 
 double cutoff_func(const double &,
-		   const double &,
-		   const double &,
-		   const double &);
+           const double &,
+           const double &,
+           const double &);
 
 pid_system_out pid_line(pid_system_out &in){
 
-  double reg_angle = regulate_angle(in.metrics,
-				    in.params.line_angle,
-				    in.angle,
-				    in.dt,
-				    in.samples);
-  double reg_speed = regulate_speed(in.metrics,
-				    in.params.line_speed,
-				    in.speed,
-				    reg_angle,
-				    in.dt,
-				    in.samples);
-  
+    double reg_angle = regulate_angle(in.metrics,
+                    in.params.line_angle,
+                    in.angle,
+                    in.dt,
+                    in.samples);
+    double reg_speed = regulate_speed(in.metrics,
+                    in.params.line_speed,
+                    in.speed,
+                    reg_angle,
+                    in.dt,
+                    in.samples);
+
   pid_system_out out =
     {
      .angle = reg_angle,
@@ -54,70 +54,71 @@ pid_system_out pid_line(pid_system_out &in){
 }
 
 double regulate_angle(const telemetrics_data &metrics,
-		      const pid_params &params,
-		      const double &ref_angle,
-		      const double &dt,
-		      regulator_sample_data &samples){
+              const pid_params &params,
+              const double &ref_angle,
+              const double &dt,
+              regulator_sample_data &samples){
+  double kp = 1; //params.kp;
+  double ki = 0; //params.ki;
+  double kd = 0; //params.kd;
+  double alpha = 1; //params.alpha;
+  double beta = 1; //params.beta;
 
-  double kp = params.kp;
-  double ki = params.ki;
-  double kd = params.kd;
-  double alpha = params.alpha;
-  double beta = params.beta;
-  
   double dist_left = metrics.dist_left;
   double dist_right = metrics.dist_right;
-  double diff = dist_left - dist_right;
+  double diff = 0; //dist_left - dist_right;
   double sample_d = beta * ref_angle - diff;
 
   double calc_p = alpha * ref_angle - diff;
   double calc_i = 0;
-  double calc_d = (sample_d - samples.line_angle_d) / dt;
+  double calc_d = 0 ;//(sample_d - samples.line_angle_d) / dt;
 
   double p = kp * calc_p;
   double i = ki * calc_i;
   double d = kd * calc_d;
 
-  samples.line_angle_d = sample_d;
-  
   return p + i + d;
 }
 
 double regulate_speed(const telemetrics_data &metrics,
-		      const pid_params &params,
-		      const double &ref_speed,
-		      const double &reg_angle,
-		      const double &dt,
-		      regulator_sample_data &samples){
+              const pid_params &params,
+              const double &ref_speed,
+              const double &reg_angle,
+              const double &dt,
+              regulator_sample_data &samples){
 
-  double min_fact = 10; // @TODO: SEND THIS VIA PARAMS OR SET CONSTANT?
+  double kp = 1;//params.kp;
+  double ki = 1;//params.ki;
+  double kd = 1;//params.kd;
+  double alpha = 1;//params.alpha;
+  double beta = 1;//params.beta;
 
-  double kp = params.kp;
-  double ki = params.ki;
-  double kd = params.kd;
-  double alpha = params.alpha;
-  double beta = params.beta;
+  double angle_threshold = 10;//params.angle_threshold;
+  double speed_threshold = 10;//params.speed_threshold;
+  double min_value = 0.2;//params.min_value;
+  double slope = 1;//params.slope;
 
-  double angle_threshold = params.angle_threshold;
-  double speed_threshold = params.speed_threshold;
-  double min_value = params.min_value;
-  double slope = params.slope;
+  queue_message("Calc fact reg angle: " + std::to_string(reg_angle));
+  queue_message("Calc fact reg speed: " + std::to_string(ref_speed));
 
-  double speed_fact = calc_fact(reg_angle, ref_speed, angle_threshold, speed_threshold, min_value, slope);
+  double speed_fact = calc_fact(reg_angle/MAX_INPUT_ANGLE,
+          ref_speed/MAX_INPUT_SPEED, angle_threshold/MAX_INPUT_ANGLE,
+          speed_threshold/MAX_INPUT_SPEED, min_value, slope);
+  queue_message("Speed factor: " + std::to_string(speed_fact));
   double ref_speed_updated = ref_speed * speed_fact ;
-  
+
   double sample_d = beta * ref_speed_updated - metrics.curr_speed;
 
   double calc_p = alpha * ref_speed_updated - metrics.curr_speed;
   double calc_i = 0;
-  double calc_d = (sample_d - samples.line_speed_d) / dt;
+  double calc_d = 0;//(sample_d - samples.line_speed_d) / dt;
 
   double p = kp * calc_p;
   double i = ki * calc_i;
   double d = kd * calc_d;
 
   samples.line_speed_d = sample_d;
-  
+
   return metrics.curr_speed + p + i + d;
 }
 
@@ -125,21 +126,22 @@ double regulate_speed(const telemetrics_data &metrics,
  * Calculates a factor for the speed between min_value and 1.
  * Will always be 1 if |reg_angle| < angle_threshold or
  * if |ref_speed| < speed_threshold. Otherwise calculates an appropriate factor based on slope.
- * 
+ *
  */
 double calc_fact(const double &reg_angle,
-		 const double &ref_speed,
-		 const double &angle_threshold,
-		 const double &speed_threshold,
-		 const double &min_value,
-		 const double &slope) {
+         const double &ref_speed,
+         const double &angle_threshold,
+         const double &speed_threshold,
+         const double &min_value,
+         const double &slope) {
 
   if (slope < 1)
     queue_message("The slope of the calc_fact should never be < 1. Given: " + std::to_string(slope));
 
-  double exp = pow(slope, (-cutoff_func(reg_angle, ref_speed, angle_threshold, speed_threshold)));
-  double linear = cutoff_func(reg_angle, ref_speed, angle_threshold, speed_threshold) * (pow(slope, -1) - min_value);
-
+  double exp = pow(slope, -cutoff_func(reg_angle, ref_speed,
+              angle_threshold, speed_threshold));
+  double linear = cutoff_func(reg_angle, ref_speed,
+          angle_threshold, speed_threshold) * (pow(slope, -1) - min_value);
   return exp - linear;
 }
 
@@ -147,10 +149,10 @@ double calc_fact(const double &reg_angle,
  * Will return 0 if |x| or |y| is within a threshold, or otherwise a linear function
  */
 double cutoff_func(const double &x,
-		   const double &y,
-		   const double &c1,
-		   const double &c2) {
-  
+           const double &y,
+           const double &c1,
+           const double &c2) {
+
   if (fabs(x) < c1 || fabs(y) < c2)
     return 0;
   else

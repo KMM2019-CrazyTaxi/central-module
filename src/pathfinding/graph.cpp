@@ -12,15 +12,15 @@ graph::graph(const uint8_t* buffer) {
 
     for (int i = 0; i < nodes; i++) {
         int neighbor_count = (int) buffer[index++];
-        
+
         std::vector<edge> neighbors(neighbor_count);
-        
+
         for (int i = 0; i < neighbor_count; i++) {
             edge e;
 
             // Get the end of the edge
             e.end = (int) buffer[index++];
-            
+
             // Get the cost of the edge
             e.cost = (int) concat_bytes(buffer[index+1], buffer[index]);
             index += 2;
