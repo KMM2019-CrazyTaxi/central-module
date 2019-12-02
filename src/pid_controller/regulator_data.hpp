@@ -15,7 +15,7 @@
 #include "pathfinding.hpp"
 #include "graph.hpp"
 
-#define MAX_INPUT_ANGLE 45
+#define MAX_INPUT_ANGLE 70
 #define MAX_INPUT_SPEED 40
 
 /**
