@@ -25,7 +25,7 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
 
         if (i == start) continue;
 
-        dist[i] = std::numeric_limits<int>::infinity();
+        dist[i] = std::numeric_limits<int>::max();
         queue.push_back(i);
     }
 
