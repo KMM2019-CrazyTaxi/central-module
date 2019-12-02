@@ -113,7 +113,7 @@ struct regulator_param_data{
   };
   pid_params line_speed =
   {
-      .kp = 2.5,
+      .kp = 0,
       .ki = 0,
       .kd = 0,
       .alpha = 1,
