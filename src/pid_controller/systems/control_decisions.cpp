@@ -115,6 +115,7 @@ pid_decision_return regulate(const pid_decision_data &dec) {
 
   }
 
+  line_in.dt = dec.out.dt;
   pid_system_out line_out = pid_line(line_in);
   pid_decision_return out =
     {

@@ -17,7 +17,7 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
   double ref_speed = in.out.speed;
   double threshold = in.out.params.stopping.speed_threshold;
 
-  regulator_sample_data samples  = in.out.samples;
+  regulator_sample_data samples = in.out.samples;
   double sample_d = beta * ref_speed - curr_speed;
   double dt = in.out.dt;
 
@@ -37,9 +37,9 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
     {
      .angle = in.out.angle,
      .speed = curr_speed + res,
-     .samples = in.out.samples
+     .samples = samples
     };
-  
+
   return out;
 }
 

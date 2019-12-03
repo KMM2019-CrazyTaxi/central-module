@@ -25,7 +25,7 @@ pid_system_out pid_turning(const pid_decision_data &in) {
 
   double calc_p = alpha * ref_angle - diff;
   double calc_i = 0;
-  double calc_d = 0; //(sample_d - samples.line_angle_d) / dt;
+  double calc_d = (sample_d - samples.line_angle_d) / dt;
 
   double p = kp * calc_p;
   double i = ki * calc_i;
@@ -39,7 +39,7 @@ pid_system_out pid_turning(const pid_decision_data &in) {
     {
      .angle = res,
      .speed = in.out.speed,
-     .samples = in.out.samples
+     .samples = samples
     };
 
   return out;

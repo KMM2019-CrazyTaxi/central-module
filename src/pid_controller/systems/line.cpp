@@ -71,11 +71,13 @@ double regulate_angle(const telemetrics_data &metrics,
 
   double calc_p = alpha * ref_angle - diff;
   double calc_i = 0;
-  double calc_d = 0; //(sample_d - samples.line_angle_d) / dt;
+  double calc_d = (sample_d - samples.line_angle_d) / dt;
 
   double p = kp * calc_p;
   double i = ki * calc_i;
   double d = kd * calc_d;
+
+  samples.line_angle_d = sample_d;
 
   return p + i + d;
 }
@@ -101,13 +103,12 @@ double regulate_speed(const telemetrics_data &metrics,
   double speed_fact = calc_fact(reg_angle/MAX_INPUT_ANGLE,
           metrics.curr_speed/10, angle_threshold/MAX_INPUT_ANGLE,
           speed_threshold/10, min_value, slope);
-  double ref_speed_updated = ref_speed * speed_fact ;
 
   double sample_d = beta * ref_speed - metrics.curr_speed;
 
   double calc_p = alpha * ref_speed - metrics.curr_speed;
   double calc_i = 0;
-  double calc_d = 0; //(sample_d - samples.line_speed_d) / dt;
+  double calc_d = (sample_d - samples.line_speed_d) / dt;
 
   double p = kp * calc_p;
   double i = ki * calc_i;
