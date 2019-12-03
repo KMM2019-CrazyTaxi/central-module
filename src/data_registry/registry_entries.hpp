@@ -140,7 +140,7 @@ struct regulator_sample_data{
   */
 struct mission_data{
     graph g;
-    std::vector<std::pair<int,int>> missions;
+    std::vector<std::pair<int,int>> missions; // TODO: Change to a deque
     int current_pos;
 };
 
