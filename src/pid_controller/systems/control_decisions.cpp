@@ -47,10 +47,10 @@ pid_decision_data decide(pid_decision_in &in) {
     if (num_edges > 2) {
         double offset = 0;
         data.sys = turning;
-        if (in.metrics.dist_left > 18)
-            offset += 10;
-        if (in.metrics.dist_right > 18)
-            offset -= 10;
+        if (in.metrics.dist_left > 15)
+            offset += 15;
+        else if (in.metrics.dist_right > 15)
+            offset -= 15;
 
         data.out.angle = offset; //next.dir * 30 + offset;
         data.out.speed = 10;
