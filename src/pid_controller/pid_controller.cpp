@@ -97,9 +97,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     else if (regulate.angle < -MAX_INPUT_SPEED) regulate.speed = -MAX_INPUT_SPEED;
     */
 
-    queue_message("Reg speed: " + std::to_string(regulate.speed));
-    queue_message("Reg angle: " + std::to_string(regulate.angle));
-
     regulator_out_data reg_out =
       {
        .angle = regulate.angle,

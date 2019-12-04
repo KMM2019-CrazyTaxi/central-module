@@ -27,7 +27,7 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.angle = 0,
         .out.speed = 10
         };
-    return data; // TESTING
+    //return data; // TESTING
 
     // If the next stop line is far away, return line follower
     //if (in.metrics.dist_stop_line > 10) return data;
@@ -47,9 +47,9 @@ pid_decision_data decide(pid_decision_in &in) {
     if (num_edges > 2) {
         double offset = 0;
         data.sys = turning;
-        if (in.metrics.dist_left > 18)
+        if (in.metrics.dist_left > 15)
             offset += 10;
-        if (in.metrics.dist_right > 18)
+        if (in.metrics.dist_right > 15)
             offset -= 10;
 
         data.out.angle = offset; //next.dir * 30 + offset;
