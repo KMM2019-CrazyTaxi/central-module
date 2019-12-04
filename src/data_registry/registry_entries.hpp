@@ -3,23 +3,25 @@
 
 #include <cstdint>
 #include <vector>
+#include <deque>
 #include <utility>
 #include "graph.hpp"
 
-#define SENSOR_DATA_ID 				      1
-#define CONTROL_CHANGE_DATA_ID 		  2
-#define TELEMETRICS_DATA_ID 		    3
-#define REGULATOR_OUT_DATA_ID 		  4
-#define REGULATOR_PARAM_DATA_ID 	  5
-#define REGULATOR_SAMPLE_DATA_ID 	  6
+#define SENSOR_DATA_ID              1
+#define CONTROL_CHANGE_DATA_ID      2
+#define TELEMETRICS_DATA_ID         3
+#define REGULATOR_OUT_DATA_ID       4
+#define REGULATOR_PARAM_DATA_ID     5
+#define REGULATOR_SAMPLE_DATA_ID    6
 #define MISSION_DATA_ID             7
 #define PATH_ID                     8
+#define MODE_ID                     9
 
 struct sensor_data {
     int16_t acc_x;
     int16_t acc_y;
     int16_t acc_z;
-    uint8_t dist;
+    uint16_t dist;
     uint8_t speed;
 };
 
@@ -32,18 +34,18 @@ struct control_change_data {
   * Necessary data sent to the control system to describe the environment
   */
 struct telemetrics_data {
-  double curr_speed;
-  double dist_left;
-  double dist_right;
-  double dist_stop_line;
+    double curr_speed;
+    double dist_left;
+    double dist_right;
+    double dist_stop_line;
 };
 
 /**
   * Output of the whole control system, sent to the control module
   */
 struct regulator_out_data {
-  double speed;
-  double angle;
+    double speed;
+    double angle;
 };
 
 /**
@@ -77,16 +79,16 @@ struct regulator_out_data {
  * The rest of the data is system-specific in how they are used.
  */
 struct pid_params{
-  double kp;
-  double ki;
-  double kd;
-  double alpha;
-  double beta;
+    double kp;
+    double ki;
+    double kd;
+    double alpha;
+    double beta;
 
-  double angle_threshold;
-  double speed_threshold;
-  double min_value;
-  double slope;
+    double angle_threshold;
+    double speed_threshold;
+    double min_value;
+    double slope;
 };
 
 /**
@@ -140,8 +142,13 @@ struct regulator_sample_data{
   */
 struct mission_data{
     graph g;
-    std::vector<std::pair<int,int>> missions; // TODO: Change to a deque
+    std::deque<std::pair<int,int>> missions;
     int current_pos;
 };
+
+/**
+ * The control mode of the system
+ */
+enum mode : int8_t { MANUAL, AUTONOMOUS };
 
 #endif

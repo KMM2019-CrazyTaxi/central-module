@@ -38,7 +38,10 @@ class graph {
 
 public:
 
-    graph() = default;
+    /**
+     * Default constructor that creates the base graph with two junctions 
+     */
+    graph();
 
     /**
      * Constructs a graph from the given byte buffer

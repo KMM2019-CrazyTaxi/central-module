@@ -38,7 +38,11 @@ data_registry::data_registry() {
     std::vector<path_step>* p = new std::vector<path_step>();
     registry[PATH_ID].id = PATH_ID;
     registry[PATH_ID].data = (void*) p;
-    
+
+    mode *m = new mode();
+    registry[MODE_ID].id = MODE_ID;
+    registry[MODE_ID].data = (void*) m;
+
 }
 
 data_registry::~data_registry() {
