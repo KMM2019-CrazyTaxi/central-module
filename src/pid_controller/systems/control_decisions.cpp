@@ -17,15 +17,15 @@ pid_decision_data decide(pid_decision_in &in) {
     // Default settings for line following
     pid_decision_data data =
         {
-        .sys = turning,
+        .sys = line,
         .current_pos = in.current_pos,
         .out.metrics = in.metrics,
         .out.params = in.params,
         .out.samples = in.samples,
         .out.samples.dist_stop_line = in.metrics.dist_stop_line,
         .out.dt = in.dt,
-        .out.angle = -90,
-        .out.speed = 5
+        .out.angle = 0,
+        .out.speed = 10
         };
     return data; // TESTING
 
