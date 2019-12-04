@@ -27,25 +27,35 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.angle = 1,
         .out.speed = 10
         };
-    return data; // TESTING
+    /*return data; // TESTING
 
     // If the next stop line is far away, return line follower
-    if (in.metrics.dist_stop_line > 10) return data;
+    //if (in.metrics.dist_stop_line > 10) return data;
 
-    int current_pos = in.current_pos;
+    //int current_pos = in.current_pos;
     // If distance to stop line increased, we assume we passed one.
     // This also means that the initial sample value should be big.
     if (in.metrics.dist_stop_line > in.samples.dist_stop_line) current_pos++;
     data.current_pos = current_pos;
 
     path_step next = in.path[current_pos];
+    */
 
-    int num_edges = in.g.get_edges(next.node).size();
+    int num_edges = 3; //in.g.get_edges(next.node).size();
+    next.dir = STRAIGHT;
 
     // Turning areas have more than 2 edges
     if (num_edges > 2) {
         data.sys = turning;
-        data.out.angle = next.dir * 30;
+        double offset = 0;
+        if (next.dir == STRAIGHT) {
+            if (in.metrics.dist_left > 18)
+                offset += 10;
+            if (in.metrics.dist_right > 18)
+                offset -= 10;
+
+        }
+        data.out.angle = next.dir * 30 + offset;
         data.out.speed = 10;
         return data;
     }
