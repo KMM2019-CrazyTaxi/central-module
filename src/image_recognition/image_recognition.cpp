@@ -5,6 +5,7 @@
 #include <cstring>
 #include <vector>
 #include <fstream>
+#include <deque>
 
 #include "data_registry.hpp"
 #include "registry_entries.hpp"
@@ -39,6 +40,9 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     std::vector<uint32_t> left_edges{};
     std::vector<uint32_t> right_edges{};
     std::vector<uint32_t> front_edges{};
+
+    // Previous distance value for rolling average.
+    std::deque<double> front_distances{0, 0, 0, 0, 0};
 
     uint32_t n_processed_images{};
 
@@ -115,12 +119,22 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         double right_real_distance_2 =
             (right_pixel_distance_2 - IMAGE_WIDTH / 2) * CM_PER_PIXEL_AT_BOUND_DISTANCE_2;
         double adjusted_front_pixel_distance = IMAGE_HEIGHT - front_pixel_distance;
+
+	// Front distance if calculated as the average over five pictures to limit noise.
+	front_distances.pop_front();
+	front_distances.push_back(adjusted_front_pixel_distance);
+	double average_front_pixel_distance{};
+	for (const double& d : front_distances)
+	{
+	    average_front_pixel_distance += d;
+	}
+	average_front_pixel_distance /= 5;
 	edge_time = hr_clock::now();
 
 	telemetrics_data* data{ static_cast<telemetrics_data*>(registry.acquire_data(TELEMETRICS_DATA_ID)) };
 	data->dist_left = left_real_distance_1;
 	data->dist_right = right_real_distance_1;
-	data->dist_stop_line = adjusted_front_pixel_distance;
+	data->dist_stop_line = average_front_pixel_distance;
 	registry.release_data(TELEMETRICS_DATA_ID);
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
