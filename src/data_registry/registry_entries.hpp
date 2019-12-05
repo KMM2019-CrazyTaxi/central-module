@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <deque>
 #include <utility>
 #include "graph.hpp"
 
@@ -141,7 +142,7 @@ struct regulator_sample_data{
   */
 struct mission_data{
     graph g;
-    std::vector<std::pair<int,int>> missions; // TODO: Change to a deque
+    std::deque<std::pair<int,int>> missions;
     int current_pos;
 };
 

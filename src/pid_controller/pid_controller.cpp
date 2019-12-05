@@ -46,7 +46,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     mission_data mission_data = get_mission_data();
     // Check if we have any current missions to run
-    //if (mission_data.missions.size() == 0) continue;
+    //if (mission_data.missions.empty()) == 0) continue;
 
     auto current_time = std::chrono::steady_clock::now();
 
@@ -64,19 +64,20 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     std::pair<int, int> mission;// = mission_data.missions[0];
     mission.first = 1;
     mission.second = 5;
-    /*
 
     // If we are not already at the start position for some reason, go there
-    if (mission_data.current_pos != mission.first && path.back().node != mission.second)
+    if (mission_data.current_pos != mission.first &&
+            path.back().node != mission.second) {
         path = find_shortest_path(mission_data.g, mission_data.current_pos,
                                     mission.first);
-        // @TODO: Push the new mission to go to the start point to the front
+        mission = std::make_pair(mission_data.current_pos, mission.first);
+        mission_data.missions.push_front(mission);
+    }
     // Or if we haven't found the path yet, do it.
     else if (path.back().node != mission.second)
         path = find_shortest_path(mission_data.g, mission_data.current_pos,
                                     mission.second);
     set_path(path);
-    */
 
     // Define input to the regulator
     pid_decision_in dec_in =
