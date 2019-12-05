@@ -93,7 +93,7 @@ void acquire_sensor_data() {
         short acc_y  = concat_bytes(msg_buffer[5], msg_buffer[4]);
         short acc_z  = concat_bytes(msg_buffer[7], msg_buffer[6]);
 
-        char distance = concat_bytes(msg_buffer[9], msg_buffer[8]);
+        short distance = concat_bytes(msg_buffer[9], msg_buffer[8]);
         char speed    = msg_buffer[10];
 
         result.acc_x = acc_x;

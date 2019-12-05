@@ -120,7 +120,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	telemetrics_data* data{ static_cast<telemetrics_data*>(registry.acquire_data(TELEMETRICS_DATA_ID)) };
 	data->dist_left = left_real_distance_1;
 	data->dist_right = right_real_distance_1;
-	data->dist_stop_line = front_pixel_distance;
+	data->dist_stop_line = adjusted_front_pixel_distance;
 	registry.release_data(TELEMETRICS_DATA_ID);
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
