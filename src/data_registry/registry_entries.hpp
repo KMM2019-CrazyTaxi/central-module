@@ -6,14 +6,15 @@
 #include <utility>
 #include "graph.hpp"
 
-#define SENSOR_DATA_ID 				      1
-#define CONTROL_CHANGE_DATA_ID 		  2
-#define TELEMETRICS_DATA_ID 		    3
-#define REGULATOR_OUT_DATA_ID 		  4
-#define REGULATOR_PARAM_DATA_ID 	  5
-#define REGULATOR_SAMPLE_DATA_ID 	  6
+#define SENSOR_DATA_ID                    1
+#define CONTROL_CHANGE_DATA_ID        2
+#define TELEMETRICS_DATA_ID             3
+#define REGULATOR_OUT_DATA_ID         4
+#define REGULATOR_PARAM_DATA_ID       5
+#define REGULATOR_SAMPLE_DATA_ID      6
 #define MISSION_DATA_ID             7
 #define PATH_ID                     8
+#define MODE_ID                     9
 
 struct sensor_data {
     int16_t acc_x;
@@ -32,18 +33,18 @@ struct control_change_data {
   * Necessary data sent to the control system to describe the environment
   */
 struct telemetrics_data {
-  double curr_speed;
-  double dist_left;
-  double dist_right;
-  double dist_stop_line;
+    double curr_speed;
+    double dist_left;
+    double dist_right;
+    double dist_stop_line;
 };
 
 /**
   * Output of the whole control system, sent to the control module
   */
 struct regulator_out_data {
-  double speed;
-  double angle;
+    double speed;
+    double angle;
 };
 
 /**
@@ -77,52 +78,52 @@ struct regulator_out_data {
  * The rest of the data is system-specific in how they are used.
  */
 struct pid_params{
-  double kp;
-  double ki;
-  double kd;
-  double alpha;
-  double beta;
+    double kp;
+    double ki;
+    double kd;
+    double alpha;
+    double beta;
 
-  double angle_threshold;
-  double speed_threshold;
-  double min_value;
-  double slope;
+    double angle_threshold;
+    double speed_threshold;
+    double min_value;
+    double slope;
 };
 
 /**
   * Contains all of the parameters for the whole control system
   */
 struct regulator_param_data{
-  pid_params turning =
-  {
-      .kp = 1,
-      .ki = 0,
-      .kd = 0,
-      .alpha = 1,
-      .beta = 1
-  };
-  pid_params parking;
-  pid_params stopping;
-  pid_params line_angle =
-  {
-      .kp = 10,
-      .ki = 0,
-      .kd = 0,
-      .alpha = 1,
-      .beta = 1
-  };
-  pid_params line_speed =
-  {
-      .kp = 2.5,
-      .ki = 0,
-      .kd = 0,
-      .alpha = 1,
-      .beta = 1,
-      .angle_threshold = 5,
-      .speed_threshold = 5,
-      .min_value = 0.5,
-      .slope = 1
-  };
+    pid_params turning =
+    {
+        .kp = 1,
+        .ki = 0,
+        .kd = 0,
+        .alpha = 1,
+        .beta = 1
+    };
+    pid_params parking;
+    pid_params stopping;
+    pid_params line_angle =
+    {
+        .kp = 10,
+        .ki = 0,
+        .kd = 0,
+        .alpha = 1,
+        .beta = 1
+    };
+    pid_params line_speed =
+    {
+        .kp = 2.5,
+        .ki = 0,
+        .kd = 0,
+        .alpha = 1,
+        .beta = 1,
+        .angle_threshold = 5,
+        .speed_threshold = 5,
+        .min_value = 0.5,
+        .slope = 1
+    };
 };
 
 /**
@@ -143,5 +144,7 @@ struct mission_data{
     std::vector<std::pair<int,int>> missions; // TODO: Change to a deque
     int current_pos;
 };
+
+enum mode { MANUAL, AUTONOMOUS };
 
 #endif

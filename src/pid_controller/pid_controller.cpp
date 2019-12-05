@@ -13,6 +13,9 @@ regulator_param_data get_params();
 regulator_sample_data get_samples();
 mission_data get_mission_data();
 std::vector<path_step> get_path();
+mode get_mode();
+control_change_data get_request();
+
 void set_output(regulator_out_data);
 void set_samples(regulator_sample_data);
 void set_mission_data(mission_data);
@@ -26,6 +29,20 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
   auto previous_time = std::chrono::steady_clock::now();
 
   while (running) {
+
+    uint8_t mode = get_mode();
+
+    // In manual mode, just forward the requested output
+    if (mode == MANUAL) {
+        control_change_data requested = get_request();
+        regulator_out_data reg_out =
+        {
+            .angle = (double)requested.angle,
+            .speed = (double)requested.speed
+        };
+        set_output(reg_out);
+        continue;
+    }
 
     mission_data mission_data = get_mission_data();
     // Check if we have any current missions to run
@@ -172,6 +189,30 @@ std::vector<path_step> get_path(){
     p = *registry_entry;
     data_registry::get_instance().release_data(PATH_ID);
     return p;
+}
+
+// Get mode from global registry
+mode get_mode(){
+    mode m;
+
+    mode *registry_entry =
+      (mode*) data_registry::get_instance().
+      acquire_data(MODE_ID);
+    m = *registry_entry;
+    data_registry::get_instance().release_data(MODE_ID);
+    return m;
+}
+
+// Get request from global registry
+control_change_data get_request(){
+    control_change_data ccd;
+
+    control_change_data *registry_entry =
+      (control_change_data*) data_registry::get_instance().
+      acquire_data(CONTROL_CHANGE_DATA_ID);
+    ccd = *registry_entry;
+    data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
+    return ccd;
 }
 
 void set_output(regulator_out_data output){
