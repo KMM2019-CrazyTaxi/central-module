@@ -19,7 +19,7 @@ struct sensor_data {
     int16_t acc_x;
     int16_t acc_y;
     int16_t acc_z;
-    uint8_t dist;
+    uint16_t dist;
     uint8_t speed;
 };
 
