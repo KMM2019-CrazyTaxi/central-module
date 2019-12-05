@@ -70,6 +70,9 @@ packet handle_packet(const packet& p) {
         case REQUEST_MODE:
             return handle_get_mode(p);
 
+        case SEND_MAP:
+            return handle_send_map(p);
+
         case SET_MODE:
             return handle_set_mode(p);
 
