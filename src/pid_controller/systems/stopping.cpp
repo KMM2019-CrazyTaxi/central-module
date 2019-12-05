@@ -1,8 +1,7 @@
 #include "stopping.hpp"
 #include "logging.hpp"
-#include <algorithm>
 
-double calc_dist(const double &, const double &);
+double calc_ref_speed(double, double, double, double);
 
 pid_system_out pid_stopping(const pid_decision_data &in) {
 
@@ -15,13 +14,16 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
   double dist = in.out.metrics.dist_stop_line;
   double curr_speed = in.out.metrics.curr_speed;
   double ref_speed = in.out.speed;
-  double threshold = in.out.params.stopping.speed_threshold;
+  double thold = in.out.params.stopping.speed_threshold;
+  double min_dist = in.out.params.stopping.min_value;
+
+  double ref_speed_updated = calc_ref_speed(ref_speed, dist, min_dist, thold);
 
   regulator_sample_data samples = in.out.samples;
-  double sample_d = beta * ref_speed - curr_speed;
+  double sample_d = beta * ref_speed_updated - curr_speed;
   double dt = in.out.dt;
 
-  double calc_p = alpha * ref_speed * calc_dist(dist, threshold) - curr_speed;
+  double calc_p = alpha * ref_speed_updated - curr_speed;
   double calc_i = 0;
   double calc_d = (sample_d - samples.stopping_speed_d) / dt;
 
@@ -43,6 +45,8 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
   return out;
 }
 
-double calc_dist(const double &dist, const double &threshold) {
-  return std::min(dist, threshold);
+double calc_ref_speed(double ref_speed, double dist,
+                        double min_dist, double threshold) {
+    if (dist > threshold) return ref_speed;
+    return (ref_speed / (threshold - min_dist)) * (dist - min_dist);
 }

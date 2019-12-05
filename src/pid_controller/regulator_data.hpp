@@ -37,10 +37,9 @@ struct map_data{
  */
 struct pid_decision_in{
   telemetrics_data metrics;
+  sensor_data sensor_data;
   regulator_param_data params;
-
   map_data map;
-
   double dt;
   regulator_sample_data samples;
 };
@@ -52,6 +51,7 @@ struct pid_system_out{
   double angle;
   double speed;
   telemetrics_data metrics;
+  sensor_data sensor_data;
   regulator_param_data params;
 
   double dt;
@@ -70,6 +70,7 @@ struct pid_decision_return{
  */
 struct pid_decision_data{
   pid_system_out out;
+  double dist;
   System sys;
   map_data map;
 };

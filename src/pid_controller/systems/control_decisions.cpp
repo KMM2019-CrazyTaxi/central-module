@@ -31,6 +31,14 @@ pid_decision_data decide(pid_decision_in &in) {
         };
     //return data; // TESTING
 
+    // If an obstacle is ahead, we stop
+    // TODO: Update values, don't know what's reasonable
+    if (in.sensor_data.dist < 20) {
+        data.sys = stopping;
+        data.out.speed = 5;
+        data.dist = (double)in.sensor_data.dist;
+    }
+
     // If the next stop line is far away, return line follower
     //if (in.metrics.dist_stop_line > 10) return data;
 
@@ -56,6 +64,7 @@ pid_decision_data decide(pid_decision_in &in) {
     if (next.node == in.map.path.back().node) {
         data.sys = stopping;
         data.out.speed = 5;
+        data.dist = in.metrics.dist_stop_line;
         return data;
     }
 

@@ -15,6 +15,7 @@ mission_data get_mission_data();
 std::vector<path_step> get_path();
 mode get_mode();
 control_change_data get_request();
+sensor_data get_sensor_data();
 
 void set_output(regulator_out_data);
 void set_samples(regulator_sample_data);
@@ -57,6 +58,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     regulator_param_data params = get_params();
     regulator_sample_data samples = get_samples();
     std::vector<path_step> path = get_path();
+    sensor_data sensor_data = get_sensor_data();
 
     // Set deltatime
     double dt = std::chrono::duration_cast<std::chrono::duration<double>>(current_time - previous_time).count();
@@ -83,6 +85,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     pid_decision_in dec_in =
       {
        .metrics = metrics,
+       .sensor_data = sensor_data,
        .params = params,
        .dt = dt,
        .samples = samples,
@@ -97,7 +100,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     // Stay at the end for some time, then continue
     if (mission_data.current_pos == mission.second && metrics.curr_speed <= 1){
         std::this_thread::sleep_for(std::chrono::seconds(3));
-        mission_data.missions.erase(mission_data.missions.begin());
+        mission_data.missions.pop_front();
     }
 
     // Update current position
@@ -214,6 +217,18 @@ control_change_data get_request(){
     ccd = *registry_entry;
     data_registry::get_instance().release_data(CONTROL_CHANGE_DATA_ID);
     return ccd;
+}
+
+// Get sensor data from global registry
+sensor_data get_sensor_data(){
+    sensor_data sd;
+
+    sensor_data *registry_entry =
+      (sensor_data*) data_registry::get_instance().
+      acquire_data(SENSOR_DATA_ID);
+    sd = *registry_entry;
+    data_registry::get_instance().release_data(SENSOR_DATA_ID);
+    return sd;
 }
 
 void set_output(regulator_out_data output){
