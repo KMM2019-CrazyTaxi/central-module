@@ -55,8 +55,10 @@ graph::graph(const uint8_t* buffer) {
 
         std::vector<edge> neighbors(neighbor_count);
 
-        for (int i = 0; i < neighbor_count; i++) {
+        for (int j = 0; j < neighbor_count; j++) {
             edge e;
+
+            e.start = i;
 
             // Get the end of the edge
             e.end = (int) buffer[index++];
@@ -71,7 +73,7 @@ graph::graph(const uint8_t* buffer) {
             // Get the direction
             e.dir = (direction) buffer[index++];
 
-            neighbors[i] = e;
+            neighbors[j] = e;
         }
 
         g[i] = std::move(neighbors);
