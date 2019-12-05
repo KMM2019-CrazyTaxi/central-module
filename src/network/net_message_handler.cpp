@@ -1,5 +1,6 @@
 
 #include "net_message_handler.hpp"
+#include "registry_entries.hpp"
 #include "data_registry.hpp"
 #include "packet_ids.hpp"
 #include "graph.hpp"
@@ -18,6 +19,8 @@ packet handle_send_control_parameters(const packet& p);
 packet handle_request_control_decision(const packet& p);
 packet handle_request_ir_data(const packet& p);
 packet handle_send_map(const packet& p);
+packet handle_get_mode(const packet& p);
+packet handle_set_mode(const packet& p);
 
 std::vector<packet> handle_packets(const std::vector<packet>& packets) {
 
@@ -63,6 +66,12 @@ packet handle_packet(const packet& p) {
         
         case REQUEST_IR_DATA:
             return handle_request_ir_data(p);
+
+        case REQUEST_MODE:
+            return handle_get_mode(p);
+
+        case SET_MODE:
+            return handle_set_mode(p);
 
         default:
             return packet(p.get_id(), REMOTE_MODULE_COMMUNICATION_ERROR, 0, nullptr);
@@ -280,4 +289,29 @@ packet handle_send_map(const packet& p) {
     registry.release_data(MISSION_DATA_ID);
 
     return packet(p.get_id(), MAP_ACKNOWLEDGEMENT, 0, nullptr);
+}
+
+packet handle_get_mode(const packet& p) {
+
+    data_registry& registry = data_registry::get_instance();
+
+    mode current_mode =  *(mode*) registry.acquire_data(MODE_ID);
+    registry.release_data(MODE_ID);
+
+    return packet(p.get_id(), CURRENT_MODE, sizeof(mode), (uint8_t*) &current_mode);
+}
+
+packet handle_set_mode(const packet& p) {
+
+    data_registry& registry = data_registry::get_instance();
+
+    mode new_mode = (mode) *p.get_data();
+
+    mode* global_mode = (mode*) registry.acquire_data(MODE_ID);
+
+    *global_mode = new_mode;
+
+    registry.release_data(MODE_ID);
+
+    return packet(p.get_id(), MODE_ACKNOWLEDGEMENT, 0, nullptr);
 }

@@ -7,12 +7,12 @@
 #include <utility>
 #include "graph.hpp"
 
-#define SENSOR_DATA_ID                    1
-#define CONTROL_CHANGE_DATA_ID        2
-#define TELEMETRICS_DATA_ID             3
-#define REGULATOR_OUT_DATA_ID         4
-#define REGULATOR_PARAM_DATA_ID       5
-#define REGULATOR_SAMPLE_DATA_ID      6
+#define SENSOR_DATA_ID              1
+#define CONTROL_CHANGE_DATA_ID      2
+#define TELEMETRICS_DATA_ID         3
+#define REGULATOR_OUT_DATA_ID       4
+#define REGULATOR_PARAM_DATA_ID     5
+#define REGULATOR_SAMPLE_DATA_ID    6
 #define MISSION_DATA_ID             7
 #define PATH_ID                     8
 #define MODE_ID                     9
@@ -146,6 +146,9 @@ struct mission_data{
     int current_pos;
 };
 
-enum mode { MANUAL, AUTONOMOUS };
+/**
+ * The control mode of the system
+ */
+enum mode : int8_t { MANUAL, AUTONOMOUS };
 
 #endif
