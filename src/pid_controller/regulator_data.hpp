@@ -24,15 +24,22 @@
 enum System {decision, turning, parking, stopping, line};
 
 /**
+  * Map data
+  */
+struct map_data{
+    int current_pos;
+    graph g;
+    std::vector<path_step> path;
+};
+
+/**
  * Contains data which is sent to the regulator's decision maker.
  */
 struct pid_decision_in{
   telemetrics_data metrics;
   regulator_param_data params;
 
-  graph g;
-  std::vector<path_step> path;
-  int current_pos;
+  map_data map;
 
   double dt;
   regulator_sample_data samples;
@@ -64,7 +71,7 @@ struct pid_decision_return{
 struct pid_decision_data{
   pid_system_out out;
   System sys;
-  int current_pos;
+  map_data map;
 };
 
 #endif

@@ -2,13 +2,13 @@
 #include "logging.hpp"
 
 pid_decision_data decide(pid_decision_in &);
-pid_decision_return regulate(const pid_decision_data &);
+pid_decision_return regulate(pid_decision_data &);
 
 
 pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
     pid_decision_return out = regulate(data);
-    out.current_pos = data.current_pos;
+    out.current_pos = data.map.current_pos;
     return out;
 }
 
@@ -18,7 +18,9 @@ pid_decision_data decide(pid_decision_in &in) {
     pid_decision_data data =
         {
         .sys = line,
-        .current_pos = in.current_pos,
+        .map.g = in.map.g,
+        .map.path = in.map.path,
+        .map.current_pos = in.map.current_pos,
         .out.metrics = in.metrics,
         .out.params = in.params,
         .out.samples = in.samples,
@@ -32,33 +34,26 @@ pid_decision_data decide(pid_decision_in &in) {
     // If the next stop line is far away, return line follower
     //if (in.metrics.dist_stop_line > 10) return data;
 
-    int current_pos = in.current_pos;
+    int current_pos = in.map.current_pos;
 
     // If distance to stop line increased, we assume we passed one.
     // This also means that the initial sample value should be big.
     if (in.metrics.dist_stop_line > in.samples.dist_stop_line) current_pos++;
-    data.current_pos = current_pos;
+    data.map.current_pos = current_pos;
 
-    path_step next = in.path[current_pos];
+    path_step next = in.map.path[current_pos];
 
     int num_edges = 3; //in.g.get_edges(next.node).size();
 
     // Turning areas have more than 2 edges
     if (num_edges > 2) {
-        double offset = 0;
-        data.sys = turning;
-        if (in.metrics.dist_left > 15)
-            offset += 10;
-        if (in.metrics.dist_right > 15)
-            offset -= 10;
-
-        data.out.angle = offset; //next.dir * 30 + offset;
+        data.out.angle = next.dir * 30;
         data.out.speed = 10;
         return data;
     }
 
     // Approaching a stop-line, is it the end node?
-    if (next.node == in.path.back().node) {
+    if (next.node == in.map.path.back().node) {
         data.sys = stopping;
         data.out.speed = 5;
         return data;
@@ -69,7 +64,7 @@ pid_decision_data decide(pid_decision_in &in) {
 
 }
 
-pid_decision_return regulate(const pid_decision_data &dec) {
+pid_decision_return regulate(pid_decision_data &dec) {
 
   pid_system_out line_in;
 

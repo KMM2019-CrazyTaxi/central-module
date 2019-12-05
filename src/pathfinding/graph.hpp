@@ -10,7 +10,9 @@
 enum direction {
     STRAIGHT = 0,
     LEFT = -1,
-    RIGHT = 1
+    RIGHT = 1,
+
+    NUM_DIRECTIONS = 3
 };
 
 /**
@@ -39,7 +41,7 @@ class graph {
 public:
 
     /**
-     * Default constructor that creates the base graph with two junctions 
+     * Default constructor that creates the base graph with two junctions
      */
     graph();
 

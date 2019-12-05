@@ -86,9 +86,9 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
        .params = params,
        .dt = dt,
        .samples = samples,
-       .g = mission_data.g,
-       .path = path,
-       .current_pos = mission_data.current_pos
+       .map.g = mission_data.g,
+       .map.path = path,
+       .map.current_pos = mission_data.current_pos
       };
 
     // Regulate

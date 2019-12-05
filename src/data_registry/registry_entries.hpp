@@ -101,7 +101,8 @@ struct regulator_param_data{
         .ki = 0,
         .kd = 0,
         .alpha = 1,
-        .beta = 1
+        .beta = 1,
+        .min_value = 5
     };
     pid_params parking;
     pid_params stopping;
