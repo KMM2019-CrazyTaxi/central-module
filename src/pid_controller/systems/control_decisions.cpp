@@ -33,20 +33,25 @@ pid_decision_data decide(pid_decision_in &in) {
 
     // If an obstacle is ahead, we stop
     // TODO: Update values, don't know what's reasonable
-    if (in.sensor_data.dist < 20) {
+    if (in.sensor_data.dist < 200) {
         data.sys = stopping;
         data.out.speed = 5;
         data.dist = (double)in.sensor_data.dist;
     }
 
     // If the next stop line is far away, return line follower
-    //if (in.metrics.dist_stop_line > 10) return data;
+    // if (in.metrics.dist_stop_line > INC_POS_UPPER_LIMIT) return data;
 
     int current_pos = in.map.current_pos;
 
     // If distance to stop line increased, we assume we passed one.
     // This also means that the initial sample value should be big.
-    if (in.metrics.dist_stop_line > in.samples.dist_stop_line) current_pos++;
+    double curr_line_height = in.metrics.dist_stop_line;
+    double prev_line_height = in.samples.dist_stop_line;
+
+    if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
+            prev_line_height < INC_POS_LOWER_LIMIT)
+        current_pos++;
     data.map.current_pos = current_pos;
 
     path_step next = in.map.path[current_pos];

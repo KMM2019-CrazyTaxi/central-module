@@ -9,7 +9,11 @@
 
 #include "pathfinding.hpp"
 #include "graph.hpp"
-#include <vector>
+#include "image_recognition_constants.hpp"
+
+#define INC_POS_ERROR_DELTA IMAGE_HEIGHT/10
+#define INC_POS_LOWER_LIMIT IMAGE_HEIGHT/8
+#define INC_POS_UPPER_LIMIT IMAGE_HEIGHT - INC_POS_ERROR_DELTA
 
 /**
   * This system makes control decisions and sends it forward to the next
