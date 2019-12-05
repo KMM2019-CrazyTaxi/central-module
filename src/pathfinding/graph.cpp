@@ -4,6 +4,8 @@
 // Io thread has concat_bytes, should probably move it
 #include "io_thread.hpp"
 
+#include "logging.hpp"
+
 graph::graph() {
 
     nodes = 12;
@@ -74,6 +76,16 @@ graph::graph(const uint8_t* buffer) {
 
         g[i] = std::move(neighbors);
     }
+
+    queue_message("Received new map with " + std::to_string(nodes) + " nodes.");
+
+    for (int i = 0; i < nodes; i++) {
+        queue_message("Node " + std::to_string(i) + " edges:");
+        for (auto edge : get_edges(i)) {
+            queue_message("\tEdge: " + std::to_string(edge.start) + " " + std::to_string(edge.end) + " " + std::to_string(edge.cost) + " " + std::to_string((int) edge.dir));
+        }
+    }
+    
 }
 
 std::vector<edge>& graph::get_edges(int node) {
