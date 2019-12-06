@@ -29,7 +29,6 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.angle = 1,
         .out.speed = 10
         };
-    return data; // TESTING
 
     // If an obstacle is ahead, we stop
     // TODO: Update values, don't know what's reasonable
@@ -43,6 +42,7 @@ pid_decision_data decide(pid_decision_in &in) {
     // if (in.metrics.dist_stop_line > INC_POS_UPPER_LIMIT) return data;
 
     int current_pos = in.map.current_pos;
+    queue_message("Current pos: " + std::to_string(current_pos));
 
     // If distance to stop line increased, we assume we passed one.
     // This also means that the initial sample value should be big.
@@ -53,6 +53,7 @@ pid_decision_data decide(pid_decision_in &in) {
             prev_line_height < INC_POS_LOWER_LIMIT)
         current_pos++;
     data.map.current_pos = current_pos;
+    return data; // TESTING
 
     path_step next = in.map.path[current_pos];
 
