@@ -144,6 +144,7 @@ struct mission_data{
     graph g;
     std::deque<std::pair<int,int>> missions = {std::make_pair(11, 2)};
     int current_pos = 10;
+    int index = 0;
 };
 
 /**

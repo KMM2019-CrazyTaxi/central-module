@@ -99,7 +99,8 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
        .samples = samples,
        .map.g = mission_data.g,
        .map.path = path,
-       .map.current_pos = mission_data.current_pos
+       .map.current_pos = mission_data.current_pos,
+       .map.index = mission_data.index
       };
 
     // Regulate
@@ -114,6 +115,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     // Update current position
     mission_data.current_pos = regulate.current_pos;
+    mission_data.index = regulate.index;
 
     samples = regulate.samples;
 

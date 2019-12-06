@@ -28,6 +28,7 @@ enum System {decision, turning, parking, stopping, line};
   */
 struct map_data{
     int current_pos;
+    int index;
     graph g;
     std::vector<path_step> path;
 };
@@ -63,6 +64,7 @@ struct pid_decision_return{
   double speed;
   regulator_sample_data samples;
   int current_pos;
+  int index;
 };
 
 /**

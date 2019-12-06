@@ -21,6 +21,7 @@ pid_decision_data decide(pid_decision_in &in) {
         .map.g = in.map.g,
         .map.path = in.map.path,
         .map.current_pos = in.map.current_pos,
+        .map.index = in.map.index,
         .out.metrics = in.metrics,
         .out.params = in.params,
         .out.samples = in.samples,
@@ -41,8 +42,8 @@ pid_decision_data decide(pid_decision_in &in) {
     // If the next stop line is far away, return line follower
     if (in.metrics.dist_stop_line > INC_POS_UPPER_LIMIT) return data;
 
-    int current_pos = in.map.current_pos;
-    queue_message("Current pos: " + std::to_string(current_pos));
+    int index = in.map.index;
+    queue_message("Index: " + std::to_string(index));
 
     // If distance to stop line increased, we assume we passed one.
     // This also means that the initial sample value should be big.
@@ -51,13 +52,13 @@ pid_decision_data decide(pid_decision_in &in) {
 
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
-        current_pos++;
-    data.map.current_pos = current_pos;
+    {
+        index++;
+    }
+    data.map.index = index;
 
-    if (current_pos == -1)
-        return data;
-
-    path_step next = in.map.path[current_pos];
+    path_step next = in.map.path[index];
+    data.map.current_pos = next.node;
 
     // Approaching a stop-line, is it the end node?
     if (next.node == in.map.path.back().node) {
