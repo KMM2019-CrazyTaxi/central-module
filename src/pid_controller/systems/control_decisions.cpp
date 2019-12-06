@@ -51,7 +51,7 @@ pid_decision_data decide(pid_decision_in &in) {
 
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
-        current_pos++;
+        current_pos += 2;
     data.map.current_pos = current_pos;
     return data; // TESTING
 
