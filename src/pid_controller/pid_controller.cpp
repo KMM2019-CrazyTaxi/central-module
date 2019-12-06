@@ -84,7 +84,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     // If we are not already at the start position for some reason, go there
     if (mission_data.current_pos != mission.first &&
-            path.back().node != mission.second)
+            (path.empty() || path.back().node != mission.second))
     {
         path = find_shortest_path(mission_data.g, mission_data.current_pos,
                                     mission.first);
