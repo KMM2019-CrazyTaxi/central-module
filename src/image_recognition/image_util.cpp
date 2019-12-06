@@ -48,7 +48,6 @@ void rgb2gray(const uint8_t* image, uint8_t* gray,
         for (uint32_t c{}; c < 3; ++c) {
             sum += *image++;
         }
-        sum >>= 1;
         *(gray++) = sum >= 255 ? 255 : sum;
     }
 }
