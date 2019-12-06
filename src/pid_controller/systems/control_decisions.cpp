@@ -54,12 +54,12 @@ pid_decision_data decide(pid_decision_in &in) {
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
     {
+        data.map.current_pos = in.map.path[index].node;
         index++;
     }
     data.map.index = index;
 
     path_step next = in.map.path[index];
-    data.map.current_pos = next.node;
 
     // Approaching a stop-line, is it the end node?
     if (next.node == in.map.path.back().node) {
