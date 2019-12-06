@@ -57,7 +57,6 @@ pid_decision_data decide(pid_decision_in &in) {
         index++;
     }
     data.map.index = index;
-    return data;
 
     path_step next = in.map.path[index];
     data.map.current_pos = next.node;
