@@ -54,7 +54,9 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     time_point mark_time{};
     time_point stop_time{};
 
-    // Sleep for 1 second to wait for camera to init.
+    // Wait for camera to init.
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    image_buffer.swap_buffers();
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // Main loop
@@ -179,7 +181,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
                                       + "_processed.ppm" };
 		queue_message("  Saving marked image to " + file_name);
 		std::ofstream output{ file_name, std::ios::binary };
-		write_image(gray_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
 		output.close();
 	    }
 	}
