@@ -76,7 +76,6 @@ pid_decision_data decide(pid_decision_in &in) {
 
     // A stop-line which is not the end-node.
     return data;
-
 }
 
 pid_decision_return regulate(pid_decision_data &dec) {
