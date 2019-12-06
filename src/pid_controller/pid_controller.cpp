@@ -92,7 +92,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         mission_data.missions.push_front(mission);
     }
     // Or if we haven't found the path yet, do it.
-    else if (path.back().node != mission.second)
+    else if (path.empty() || path.back().node != mission.second)
         path = find_shortest_path(mission_data.g, mission_data.current_pos,
                                     mission.second);
     set_path(path);
