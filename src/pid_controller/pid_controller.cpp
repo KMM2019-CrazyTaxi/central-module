@@ -58,8 +58,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         continue;
     }
 
-    queue_message("Hello");
-
     // Get all data for the regulator
     telemetrics_data metrics = get_metrics();
     regulator_param_data params = get_params();
@@ -138,6 +136,9 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
        .angle = regulate.angle,
        .speed = regulate.speed
       };
+
+    queue_message("angle: " + std::to_string(regulate.angle));
+    queue_message("speed: " + std::to_string(regulate.speed));
 
     // Send output
     set_output(reg_out);
