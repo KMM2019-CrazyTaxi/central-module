@@ -53,7 +53,6 @@ pid_decision_data decide(pid_decision_in &in) {
             prev_line_height < INC_POS_LOWER_LIMIT)
         current_pos++;
     data.map.current_pos = current_pos;
-    queue_message("Hello");
     return data; // TESTING
 
     path_step next = in.map.path[current_pos];
@@ -141,6 +140,7 @@ pid_decision_return regulate(pid_decision_data &dec) {
      .speed = line_out.speed,
      .samples = line_out.samples
     };
+    queue_message("Hello");
 
   return out;
 }
