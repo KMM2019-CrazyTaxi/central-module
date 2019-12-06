@@ -82,6 +82,8 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     }
     */
 
+    queue_message("Current_pos: " + std::to_string(mission_data.current_pos));
+
     // If we are not already at the start position for some reason, go there
     if (mission_data.current_pos != mission.first &&
             (path.empty() || path.back().node != mission.second))

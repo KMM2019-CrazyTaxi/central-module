@@ -6,6 +6,7 @@ pid_decision_return regulate(pid_decision_data &);
 
 
 pid_decision_return pid_decision(pid_decision_in &in) {
+    queue_message("3");
     pid_decision_data data = decide(in);
     pid_decision_return out = regulate(data);
     out.current_pos = data.map.current_pos;
