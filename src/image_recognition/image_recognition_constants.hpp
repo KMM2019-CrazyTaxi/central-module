@@ -40,9 +40,18 @@ const bool OUTPUT_MARKED_IMAGE_TO_FILE{ true };
 // Frame taken by the camera each second.
 const uint32_t CAMERA_FPS{ 60 };
 
+// Distance from car where the side edges are detected.
 const uint32_t BOUND_DISTANCE_1_PIXEL{ 200 };
 const uint32_t BOUND_DISTANCE_2_PIXEL{ 200 };
 
+/*
+The start and end distances in pixels from the bottom of the image where ir should
+look for stop lines.
+*/
+const uint32_t STOP_LINE_START_DISTANCE{ 10 };
+const uint32_t STOP_LINE_END_DISTANCE{ 200 };
+
+// The number of pixels to used to calculate average edge location.
 const uint32_t EDGE_AVG_PIXELS{ 20 };
 
 const double IMAGE_WIDTH_AT_BOUND_DISTANCE_1{ 40 };

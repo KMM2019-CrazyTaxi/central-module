@@ -109,12 +109,14 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
 	right.push_back(strongest_edge_pixel);
     }
     
+    const uint32_t range_start{ height - STOP_LINE_START_DISTANCE };
+    const uint32_t range_end{ height - STOP_LINE_END_DISTANCE };
     for (int column{}; column < width; ++column) {
-	uint8_t strongest_strength{ edgey_image[width * (height - 2) + column] };
-	uint32_t strongest_edge_pixel{ height - 2 };
+	uint32_t strongest_edge_pixel{ range_start };
+	uint8_t strongest_strength{ edgey_image[width * strongest_edge_pixel + column] };
         double min_stronger_edge_strength{ 
             strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD };
-	for (uint32_t row{ height - 2 }; row >= (height / 3); --row) {
+	for (uint32_t row{ range_start }; row >= range_end; --row) {
 	    if (edgey_image[row * width + column] >= min_stronger_edge_strength) {
 		strongest_strength = edgey_image[row * width + column];
 		strongest_edge_pixel = row;
