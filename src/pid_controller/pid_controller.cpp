@@ -76,9 +76,9 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     queue_message("Before");
     path = find_shortest_path(mission_data.g, 0, 7);
+    queue_message("After");
     for (path_step p : path)
         queue_message("Node: " + std::to_string(p.node) + "\n");
-    queue_message("After");
 
     /*
     // If we are not already at the start position for some reason, go there
