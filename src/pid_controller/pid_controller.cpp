@@ -47,7 +47,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     mission_data mission_data = get_mission_data();
     // Check if we have any current missions to run
-    //if (mission_data.missions.empty()) == 0) continue;
+    //if (mission_data.missions.empty()) continue;
 
     auto current_time = std::chrono::steady_clock::now();
 

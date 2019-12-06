@@ -51,8 +51,9 @@ pid_decision_data decide(pid_decision_in &in) {
 
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
-        current_pos += 2;
+        current_pos++;
     data.map.current_pos = current_pos;
+    queue_message("Hello");
     return data; // TESTING
 
     path_step next = in.map.path[current_pos];
