@@ -17,7 +17,7 @@ pid_decision_data decide(pid_decision_in &in) {
     // Default settings for line following
     pid_decision_data data =
         {
-        .sys = line,
+        .sys = turning,
         .map.g = in.map.g,
         .map.path = in.map.path,
         .map.current_pos = in.map.current_pos,
@@ -29,6 +29,7 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.angle = 1,
         .out.speed = 10
         };
+    return data;
 
     // If an obstacle is ahead, we stop
     // TODO: Update values, don't know what's reasonable
