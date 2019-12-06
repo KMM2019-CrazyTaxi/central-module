@@ -81,8 +81,11 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	sobely_time = hr_clock::now();
 
 	get_max_side_edge(edgex_image, left_edges,
-		     left_edges, right_edges, front_edges,
-                     IMAGE_WIDTH, IMAGE_HEIGHT);
+                          IMAGE_WIDTH, IMAGE_HEIGHT);
+        get_max_side_edge(edgex_image, right_edges,
+                          IMAGE_WIDTH, IMAGE_HEIGHT);
+        get_max_front_edge(edgey_image, front_edges,
+                           IMAGE_WIDTH, IMAGE_HEIGHT);
 
         const uint32_t distance_end_1{ IMAGE_HEIGHT - BOUND_DISTANCE_1_PIXEL };
         const uint32_t distance_start_1{ distance_end_1 - EDGE_AVG_PIXELS };

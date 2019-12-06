@@ -81,7 +81,7 @@ void sobely(const uint8_t* image, uint8_t* result,
 void get_max_side_edge(const uint8_t* edgex_image, std::vector<uint32_t>& old_edge,
                        const uint32_t width, const uint32_t height);
 
-void get_max_front_edge(const uint8_t edgey_image, std::vector<uint32_t>& old_edge,
+void get_max_front_edge(const uint8_t* edgey_image, std::vector<uint32_t>& old_edge,
                         const uint32_t width, const uint32_t height);
 
 double get_distance_to_side(const uint8_t* edge_image, std::vector<uint32_t>& best,

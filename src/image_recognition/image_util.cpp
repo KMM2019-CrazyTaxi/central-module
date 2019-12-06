@@ -76,7 +76,9 @@ void get_max_side_edge(const uint8_t* edgex_image, std::vector<uint32_t>& old_ed
     for (uint32_t row{}; row < height; ++row) {
 
         // Only look in area close to old edge location.
-        const uint32_t range_start{ std::max(0U, old_edge[row] - PIXEL_RANGE_FROM_OLD_EDGE) };
+        const uint32_t range_start{ old_edge[row] < PIXEL_RANGE_FROM_OLD_EDGE ? 
+                                                    0U : 
+                old_edge[row] - PIXEL_RANGE_FROM_OLD_EDGE };
         const uint32_t range_end{ std::min(width, old_edge[row] + PIXEL_RANGE_FROM_OLD_EDGE) };
 
         const uint32_t row_start{ row * width };
@@ -96,7 +98,7 @@ void get_max_side_edge(const uint8_t* edgex_image, std::vector<uint32_t>& old_ed
     }
 }
 
-void get_max_front_edge(const uint8_t* edgey_image, std::vector<uint32_t> old_edge,
+void get_max_front_edge(const uint8_t* edgey_image, std::vector<uint32_t>& old_edge,
                         const uint32_t width, const uint32_t height)
 {    
     for (uint32_t column{}; column < width; ++column) {
