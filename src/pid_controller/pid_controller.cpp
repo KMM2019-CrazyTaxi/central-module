@@ -31,6 +31,10 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
   while (running) {
 
+    auto current_time = std::chrono::steady_clock::now();
+
+    upd_controller.start();
+
     uint8_t mode = get_mode();
 
     // In manual mode, just forward the requested output
@@ -42,16 +46,18 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
             .speed = (double)requested.speed
         };
         set_output(reg_out);
+
+        upd_controller.wait();
         continue;
     }
 
     mission_data mission_data = get_mission_data();
     // Check if we have any current missions to run
-    //if (mission_data.missions.empty()) continue;
+    if (mission_data.missions.empty()) {
+        upd_controller.wait();
+        continue;
+    }
 
-    auto current_time = std::chrono::steady_clock::now();
-
-    upd_controller.start();
 
     // Get all data for the regulator
     telemetrics_data metrics = get_metrics();
@@ -63,12 +69,19 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     // Set deltatime
     double dt = std::chrono::duration_cast<std::chrono::duration<double>>(current_time - previous_time).count();
 
-    std::pair<int, int> mission;// = mission_data.missions[0];
+    std::pair<int, int> mission = mission_data.missions[0];
+    /*
     mission.first = 1;
     mission.second = 100;
+    */
+
+    // Quick fix while the bug where current_pos increments at the beginning persists
+    if (mission_data.current_pos == -1) {
+        upd_controller.wait();
+        continue;
+    }
 
     // If we are not already at the start position for some reason, go there
-    /*
     if (mission_data.current_pos != mission.first &&
             path.back().node != mission.second)
     {
@@ -82,7 +95,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         path = find_shortest_path(mission_data.g, mission_data.current_pos,
                                     mission.second);
     set_path(path);
-    */
 
     // Define input to the regulator
     pid_decision_in dec_in =
@@ -103,7 +115,8 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     // Stay at the end for some time, then continue
     if (mission_data.current_pos == mission.second && metrics.curr_speed <= 1){
         std::this_thread::sleep_for(std::chrono::seconds(3));
-        mission_data.missions.pop_front();
+        if (!mission_data.missions.empty())
+            mission_data.missions.pop_front();
     }
 
     // Update current position

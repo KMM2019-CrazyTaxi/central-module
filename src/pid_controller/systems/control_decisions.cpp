@@ -39,7 +39,7 @@ pid_decision_data decide(pid_decision_in &in) {
     }
 
     // If the next stop line is far away, return line follower
-    // if (in.metrics.dist_stop_line > INC_POS_UPPER_LIMIT) return data;
+    if (in.metrics.dist_stop_line > INC_POS_UPPER_LIMIT) return data;
 
     int current_pos = in.map.current_pos;
     queue_message("Current pos: " + std::to_string(current_pos));
@@ -53,24 +53,23 @@ pid_decision_data decide(pid_decision_in &in) {
             prev_line_height < INC_POS_LOWER_LIMIT)
         current_pos++;
     data.map.current_pos = current_pos;
-    return data; // TESTING
 
     path_step next = in.map.path[current_pos];
-
-    int num_edges = 3; //in.g.get_edges(next.node).size();
-
-    // Turning areas have more than 2 edges
-    if (num_edges > 2) {
-        data.out.angle = next.dir * 30;
-        data.out.speed = 10;
-        return data;
-    }
 
     // Approaching a stop-line, is it the end node?
     if (next.node == in.map.path.back().node) {
         data.sys = stopping;
-        data.out.speed = 5;
+        data.out.speed = 0;
         data.dist = in.metrics.dist_stop_line;
+        return data;
+    }
+
+    uint8_t num_edges = in.map.g.get_edges(next.node).size();
+    // Turning areas have more than 1 edge
+    if (num_edges > 1) {
+        data.sys = turning;
+        data.out.angle = next.dir * 30;
+        data.out.speed = 10;
         return data;
     }
 

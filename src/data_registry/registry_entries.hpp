@@ -134,7 +134,7 @@ struct regulator_sample_data{
   double line_angle_d;
   double line_speed_d;
   double stopping_speed_d;
-  double dist_stop_line;
+  double dist_stop_line = 250;
 };
 
 /**
@@ -142,8 +142,8 @@ struct regulator_sample_data{
   */
 struct mission_data{
     graph g;
-    std::deque<std::pair<int,int>> missions;
-    int current_pos = 0;
+    std::deque<std::pair<int,int>> missions = {std::make_pair(0, 10)};
+    int current_pos = -1;
 };
 
 /**
