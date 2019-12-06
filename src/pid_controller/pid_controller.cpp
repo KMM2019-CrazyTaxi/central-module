@@ -111,7 +111,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     samples = regulate.samples;
 
-    /*
     // Bind the angle
     if (regulate.angle > MAX_INPUT_ANGLE) regulate.angle = MAX_INPUT_ANGLE;
     else if (regulate.angle < -MAX_INPUT_ANGLE) regulate.angle = -MAX_INPUT_ANGLE;
@@ -119,7 +118,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     // Bind the speed
     if (regulate.speed > MAX_INPUT_SPEED) regulate.speed = MAX_INPUT_SPEED;
     else if (regulate.angle < -MAX_INPUT_SPEED) regulate.speed = -MAX_INPUT_SPEED;
-    */
 
     regulator_out_data reg_out =
       {
