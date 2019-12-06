@@ -36,10 +36,10 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     uint8_t* edgey_image = new uint8_t[IMAGE_SIZE_GRAY];
     uint8_t* marked_image = new uint8_t[IMAGE_SIZE_RGB];
 
-    // Resulting edge distances.
-    std::vector<uint32_t> left_edges{};
-    std::vector<uint32_t> right_edges{};
-    std::vector<uint32_t> front_edges{};
+    // Resulting edge distances. Initialize at middle of each image half.
+    std::vector<uint32_t> left_edges(IMAGE_HEIGHT, IMAGE_WIDTH / 4);
+    std::vector<uint32_t> right_edges(IMAGE_HEIGHT, (3 * IMAGE_WIDTH) / 2);
+    std::vector<uint32_t> front_edges(IMAGE_WIDTH);
 
     // Previous distance value for rolling average.
     std::deque<double> front_distances{0, 0, 0, 0, 0};
@@ -80,10 +80,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	sobely(gray_image, edgey_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	sobely_time = hr_clock::now();
 
-	left_edges.clear();
-	right_edges.clear();
-	front_edges.clear();
-	get_max_edge(edgex_image, edgey_image,
+	get_max_side_edge(edgex_image, left_edges,
 		     left_edges, right_edges, front_edges,
                      IMAGE_WIDTH, IMAGE_HEIGHT);
 

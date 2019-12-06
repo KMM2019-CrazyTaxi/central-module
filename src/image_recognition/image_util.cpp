@@ -72,19 +72,20 @@ void sobely(const uint8_t* image, uint8_t* result,
     }
 }
 
-void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
-                  std::vector<uint32_t>& left, std::vector<uint32_t>& right, 
-                  std::vector<uint32_t>& front,
-		  const uint32_t width, const uint32_t height) {
-    for (int row{}; row < height; ++row) {
-        const uint32_t row_start{ row * width };
-        const uint32_t row_middle{ width >> 1 };
+void get_max_side_edge(const uint8_t* edgex_image, std::vector<uint32_t>& old_edge,
+                       const uint32_t width, const uint32_t height) {
+    for (uint32_t row{}; row < height; ++row) {
 
-	uint8_t strongest_strength{ edgex_image[row_start + row_middle] };
-	uint32_t strongest_edge_pixel{ row_middle };
+        // Only look in area close to old edge location.
+        const uint32_t range_start{ std::max(0U, old_edge[row] - PIXEL_RANGE_FROM_OLD_EDGE) };
+        const uint32_t range_end{ std::min(width, old_edge[row] + PIXEL_RANGE_FROM_OLD_EDGE) };
+
+        const uint32_t row_start{ row * width };
+	uint8_t strongest_strength{ edgex_image[row_start + range_start] };
+	uint32_t strongest_edge_pixel{ range_start };
         double min_stronger_edge_strength{ 
             strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD };
-	for (uint32_t column{ row_middle }; column >= 1; --column) {
+	for (uint32_t column{ range_start }; column < range_end; ++column) {
 	    if (edgex_image[row_start + column] >= min_stronger_edge_strength) {
 		strongest_strength = edgex_image[row_start + column];
 		strongest_edge_pixel = column;
@@ -92,24 +93,14 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
                     strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
 	    }
 	}
-	left.push_back(strongest_edge_pixel);
-
-	strongest_strength = edgex_image[row_start + row_middle];
-	strongest_edge_pixel = row_middle;
-        min_stronger_edge_strength = 
-            strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
-	for (uint32_t column{ row_middle }; column < width; ++column) {
-	    if (edgex_image[row_start + column] >= min_stronger_edge_strength) {
-		strongest_strength = edgex_image[row_start + column];
-		strongest_edge_pixel = column;
-                min_stronger_edge_strength =
-                    strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
-	    }
-	}
-	right.push_back(strongest_edge_pixel);
+	old_edge[row] = strongest_edge_pixel;
     }
-    
-    for (int column{}; column < width; ++column) {
+}
+
+void get_max_front_edge(const uint8_t* edgey_image, std::vector<uint32_t> old_edge,
+                        const uint32_t width, const uint32_t height)
+{    
+    for (uint32_t column{}; column < width; ++column) {
 	uint8_t strongest_strength{ edgey_image[width * (height - 2) + column] };
 	uint32_t strongest_edge_pixel{ height - 2 };
         double min_stronger_edge_strength{ 
@@ -122,13 +113,13 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
                     strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
 	    }
 	}
-	front.push_back(strongest_edge_pixel);
+	old_edge[column] = strongest_edge_pixel;
     }
 }
 
 double get_distance_to_side(const uint8_t* edge_image, std::vector<uint32_t>& best,
                             const uint32_t start_row, const uint32_t end_row,
-                            const uint32_t width, const uint32_t height,
+                            const uint32_t width, const uint32_t,
 			    const double default_edge)
 {
     double weighted_edge_location_sum{};
@@ -153,7 +144,7 @@ double get_distance_to_side(const uint8_t* edge_image, std::vector<uint32_t>& be
 
 double get_distance_to_stop(const uint8_t* edge_image, std::vector<uint32_t>& best,
                             const uint32_t start_column, const uint32_t end_column,
-                            const uint32_t width, const uint32_t height)
+                            const uint32_t width, const uint32_t)
 {
     double weighted_edge_location_sum{};
     double edge_location_sum{};
@@ -177,7 +168,7 @@ void mark_selected_edges(uint8_t* marked,
                          const double left, const double right, const double front,
                          const uint32_t start_row, const uint32_t end_row,
                          const uint32_t start_column, const uint32_t end_column,
-                         const uint32_t width, const uint32_t height)
+                         const uint32_t width, const uint32_t)
 {
     for (uint32_t row{start_row}; row <= end_row; ++row) {
         uint32_t marked_pixel_index{ 3* row * width + 3 * static_cast<uint32_t>(left) };
@@ -199,7 +190,7 @@ void mark_selected_edges(uint8_t* marked,
     }
 }
 
-void mark_all_edges(const uint8_t* edgex_image, const uint8_t* edgey_image, uint8_t* marked,
+void mark_all_edges(uint8_t* marked,
                     const std::vector<uint32_t>& left, const std::vector<uint32_t>& right,
                     const std::vector<uint32_t>& front,
                     const uint32_t width, const uint32_t height)

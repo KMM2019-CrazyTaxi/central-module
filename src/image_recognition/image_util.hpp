@@ -65,26 +65,24 @@ void sobely(const uint8_t* image, uint8_t* result,
             const uint32_t width, const uint32_t height);
 
 /*
- * Finds the most prominent left, right and forward edges respectively in an
- * image. For the left and right edges, the function starts in the center of
- * the image and tranverses towards the edge, keeping track of local edge maxima.
- * If a new maxima is detected that is stronger than the previous by a factor
- * determined by RELATIVE_DGE_STRENGTH_THRESHOLD, this new maxima is considered
- * the most prominent edge going forward. The forward edge is calculated in a
- * similar way, but starting at the bottom of the image instead of the center.
- * This process is repeated for each row/column.
+ * Finds the most prominent side edge in an image. The search in each row starts
+ * at a location close to the previous edge, defined by the old_edge vector and
+ * the PIXEL_RANGE_FROM_OLD_EDGE constant. If a new maxima is detected that is
+ * stronger than the previous by a factor determined by RELATIVE_DGE_STRENGTH_THRESHOLD,
+ * this new maxima is considered the most prominent edge going forward.
  *
  * edgex_image: The image produced by a sobel operator in the x dimension.
- * edgey_image: The image produced by a sobel operator in the y dimension.
- * left, right, front: Vectors where the edge information is to be saved. The
- *                     pixel index with the most prominent edge is saved.
+ * old_edge: Vector where the edge information is to be saved. When calling this function,
+ *           the vector should contain edge information from the previous scan. These values 
+ *           are replaced with the new pixel index with the most prominent edge.
  * width: The image width in pixels.
  * height: The image height in pixels.
  */
-void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
-                  std::vector<uint32_t>& left, std::vector<uint32_t>& right,
-                  std::vector<uint32_t>& front,
-		  const uint32_t width, const uint32_t height);
+void get_max_side_edge(const uint8_t* edgex_image, std::vector<uint32_t>& old_edge,
+                       const uint32_t width, const uint32_t height);
+
+void get_max_front_edge(const uint8_t edgey_image, std::vector<uint32_t>& old_edge,
+                        const uint32_t width, const uint32_t height);
 
 double get_distance_to_side(const uint8_t* edge_image, std::vector<uint32_t>& best,
                             const uint32_t start_row, const uint32_t end_row,
@@ -106,13 +104,12 @@ void mark_selected_edges(uint8_t* marked,
  * in red, green and blue, respectively. Detected edges must be above the threshols value
  * set by EDGE_STRENGTH_THRESHOLD.
  *
- * edgex_image, edgey_image: The images produced by solbex and sobely, respectively.
  * marked: An rgb image to mark the edges in.
  * left, right, front: The vectors with edge information produced by get_max_edge.
  * width: The image width in pixels.
  * height: The image height in pixels.
  */
-void mark_all_edges(const uint8_t* edgex_image, const uint8_t* edgey_image, uint8_t* marked,
+void mark_all_edges(uint8_t* marked,
                     const std::vector<uint32_t>& left, const std::vector<uint32_t>& right,
                     const std::vector<uint32_t>& front,
                     const uint32_t width, const uint32_t height);

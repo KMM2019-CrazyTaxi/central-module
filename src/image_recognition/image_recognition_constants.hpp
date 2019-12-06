@@ -43,6 +43,7 @@ const uint32_t CAMERA_FPS{ 60 };
 const uint32_t BOUND_DISTANCE_1_PIXEL{ 200 };
 const uint32_t BOUND_DISTANCE_2_PIXEL{ 200 };
 
+const uint32_t PIXEL_RANGE_FROM_OLD_EDGE{ 32 };
 const uint32_t EDGE_AVG_PIXELS{ 20 };
 
 const double IMAGE_WIDTH_AT_BOUND_DISTANCE_1{ 40 };
