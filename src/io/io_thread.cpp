@@ -94,7 +94,9 @@ void acquire_sensor_data() {
         short acc_z  = concat_bytes(msg_buffer[7], msg_buffer[6]);
 
         short distance = concat_bytes(msg_buffer[9], msg_buffer[8]);
-        char speed    = msg_buffer[10];
+	char speed    = msg_buffer[10];
+
+	// queue_message("Received bytes, distance: " + std::to_string(msg_buffer[9]) +  ", " + std::to_string(msg_buffer[8]));
 
         result.acc_x = acc_x;
         result.acc_y = acc_y;
@@ -102,6 +104,8 @@ void acquire_sensor_data() {
 
         result.dist = distance;
         result.speed = speed;
+
+	// queue_message("Received distance: " + std::to_string(distance) + ", speed: " + std::to_string(speed) + ", acc_x: " + std::to_string(acc_x) + ", acc_y:" + std::to_string(acc_y) + ", acc_z " + std::to_string(acc_z));
 
         sensor_data* sd = (sensor_data*) data_registry::get_instance().acquire_data(SENSOR_DATA_ID);
         *sd = result;

@@ -15,7 +15,7 @@ const uint32_t IMAGE_SIZE_GRAY{ IMAGE_WIDTH * IMAGE_HEIGHT };
 const uint32_t IMAGE_SIZE_RGB{ IMAGE_SIZE_GRAY * 3 };
 
 // Lowest edge strength that is considered an edge.
-const uint32_t EDGE_STRENGTH_THRESHOLD{ 35 };
+const uint32_t EDGE_STRENGTH_THRESHOLD{ 100 };
 
 /*
  * The side edge detection prefers edges that are closer to the center of
@@ -40,7 +40,7 @@ const bool OUTPUT_MARKED_IMAGE_TO_FILE{ true };
 // Frame taken by the camera each second.
 const uint32_t CAMERA_FPS{ 60 };
 
-const uint32_t BOUND_DISTANCE_1_PIXEL{ 200 };
+const uint32_t BOUND_DISTANCE_1_PIXEL{ 150 };
 const uint32_t BOUND_DISTANCE_2_PIXEL{ 200 };
 
 const uint32_t EDGE_AVG_PIXELS{ 20 };

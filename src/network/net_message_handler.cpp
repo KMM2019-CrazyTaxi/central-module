@@ -5,6 +5,7 @@
 #include "packet_ids.hpp"
 #include "graph.hpp"
 #include "logging.hpp"
+#include "io_thread.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +22,7 @@ packet handle_request_ir_data(const packet& p);
 packet handle_send_map(const packet& p);
 packet handle_get_mode(const packet& p);
 packet handle_set_mode(const packet& p);
+packet handle_send_route(const packet& p);
 
 std::vector<packet> handle_packets(const std::vector<packet>& packets) {
 
@@ -70,8 +72,14 @@ packet handle_packet(const packet& p) {
         case REQUEST_MODE:
             return handle_get_mode(p);
 
+        case SEND_MAP:
+            return handle_send_map(p);
+
         case SET_MODE:
             return handle_set_mode(p);
+
+        case SEND_NEW_ROUTE:
+            return handle_send_route(p);
 
         default:
             return packet(p.get_id(), REMOTE_MODULE_COMMUNICATION_ERROR, 0, nullptr);
@@ -314,4 +322,37 @@ packet handle_set_mode(const packet& p) {
     registry.release_data(MODE_ID);
 
     return packet(p.get_id(), MODE_ACKNOWLEDGEMENT, 0, nullptr);
+}
+
+packet handle_send_route(const packet& p) {
+
+    data_registry& registry = data_registry::get_instance();
+
+    const uint8_t* buffer = p.get_data();
+    int index = 0;
+
+    int nodes = (int) concat_bytes(buffer[index+1], buffer[index]);
+    index += 2;
+
+    std::deque<std::pair<int, int>> new_missions;
+
+    for (int i = 0; i < nodes / 2; i++) {
+
+        int start = (int) concat_bytes(buffer[index+1], buffer[index]);
+        index += 2;
+
+        int end = (int) concat_bytes(buffer[index+1], buffer[index]);
+        index += 2;
+
+        new_missions.push_back({start, end});
+
+    }
+
+    mission_data* md = (mission_data*) registry.acquire_data(MISSION_DATA_ID);
+
+    md->missions = std::move(new_missions);
+
+    registry.release_data(MISSION_DATA_ID);
+
+    return packet(p.get_id(), NEW_ROUTE_ACKNOWLEDGEMENT, 0, nullptr);
 }

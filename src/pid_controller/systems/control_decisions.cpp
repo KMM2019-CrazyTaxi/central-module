@@ -26,10 +26,10 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.samples = in.samples,
         .out.samples.dist_stop_line = in.metrics.dist_stop_line,
         .out.dt = in.dt,
-        .out.angle = 0,
+        .out.angle = 1,
         .out.speed = 10
         };
-    //return data; // TESTING
+    return data; // TESTING
 
     // If an obstacle is ahead, we stop
     // TODO: Update values, don't know what's reasonable
