@@ -137,11 +137,9 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	registry.release_data(TELEMETRICS_DATA_ID);
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
-/*
-            mark_edges(edgex_image, edgey_image, marked_image, 
+            mark_all_edges(marked_image, 
                        left_edges, right_edges, front_edges,
                        IMAGE_WIDTH, IMAGE_HEIGHT);
-*/
             mark_selected_edges(marked_image, left_pixel_distance_1,
                                 right_pixel_distance_1, front_pixel_distance,
                                 distance_start_1, distance_end_1, middle_start, middle_end,

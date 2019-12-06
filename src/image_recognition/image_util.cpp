@@ -94,7 +94,10 @@ void get_max_side_edge(const uint8_t* edgex_image, std::vector<uint32_t>& old_ed
                     strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
 	    }
 	}
-	old_edge[row] = strongest_edge_pixel;
+        if (strongest_strength >= EDGE_STRENGTH_THRESHOLD)
+        {
+            old_edge[row] = strongest_edge_pixel;
+        }
     }
 }
 
