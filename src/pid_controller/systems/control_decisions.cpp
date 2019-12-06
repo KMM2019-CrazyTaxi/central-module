@@ -54,8 +54,10 @@ pid_decision_data decide(pid_decision_in &in) {
         current_pos++;
     data.map.current_pos = current_pos;
 
-    if (current_pos != -1)
-        path_step next = in.map.path[current_pos];
+    if (current_pos == -1)
+        return;
+
+    path_step next = in.map.path[current_pos];
 
     // Approaching a stop-line, is it the end node?
     if (next.node == in.map.path.back().node) {
