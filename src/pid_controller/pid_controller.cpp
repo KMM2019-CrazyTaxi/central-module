@@ -58,6 +58,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         continue;
     }
 
+    queue_message("Hello");
 
     // Get all data for the regulator
     telemetrics_data metrics = get_metrics();
