@@ -38,7 +38,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 
     // Resulting edge distances. Initialize at middle of each image half.
     std::vector<uint32_t> left_edges(IMAGE_HEIGHT, IMAGE_WIDTH / 4);
-    std::vector<uint32_t> right_edges(IMAGE_HEIGHT, (3 * IMAGE_WIDTH) / 2);
+    std::vector<uint32_t> right_edges(IMAGE_HEIGHT, (3 * IMAGE_WIDTH) / 4);
     std::vector<uint32_t> front_edges(IMAGE_WIDTH);
 
     // Previous distance value for rolling average.
@@ -60,6 +60,8 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     // Main loop
     while (running) 
     {
+	// Request new image.
+	image_buffer.swap_buffers();
 
 	// Start time for benchmarking
 	start_time = hr_clock::now();
@@ -68,9 +70,6 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	const uint8_t* image{ image_buffer.get_read_buffer() };
 	std::memcpy(marked_image, image, IMAGE_SIZE_RGB);
 	
-	// Request new image while processing this one.
-	image_buffer.swap_buffers();
-
 	// Process image.
 	rgb2gray(marked_image, gray_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	rgb2gray_time = hr_clock::now();
@@ -180,7 +179,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
                                       + "_processed.ppm" };
 		queue_message("  Saving marked image to " + file_name);
 		std::ofstream output{ file_name, std::ios::binary };
-		write_image(gray_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
 		output.close();
 	    }
 	}
