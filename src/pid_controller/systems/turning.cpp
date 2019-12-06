@@ -2,8 +2,6 @@
 #include "logging.hpp"
 #include <bitset>
 
-double OFFSET = 5;
-
 pid_system_out pid_turning(pid_decision_data &in) {
 
     double kp = in.out.params.turning.kp;
@@ -17,8 +15,9 @@ pid_system_out pid_turning(pid_decision_data &in) {
 
     double dist_left = in.out.metrics.dist_left;
     double dist_right = in.out.metrics.dist_right;
-    double diff = 0;
+    double diff = -dist_right + 10;
 
+    /*
     // Depending on the look of the crossing, we want to follow different lines
     path_step next = in.map.path[in.map.current_pos];
     std::vector<edge> edges = in.map.g.get_edges(next.node);
@@ -66,6 +65,7 @@ pid_system_out pid_turning(pid_decision_data &in) {
     }break;
 
     }
+    */
 
     double dt = in.out.dt;
     regulator_sample_data samples = in.out.samples;

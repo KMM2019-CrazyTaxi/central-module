@@ -95,37 +95,36 @@ struct pid_params{
   * Contains all of the parameters for the whole control system
   */
 struct regulator_param_data{
-    pid_params turning =
-    {
-        .kp = 1,
-        .ki = 0,
-        .kd = 0,
-        .alpha = 1,
-        .beta = 1,
-        .min_value = 5
-    };
-    pid_params parking;
-    pid_params stopping;
-    pid_params line_angle =
-    {
-        .kp = 10,
-        .ki = 0,
-        .kd = 0,
-        .alpha = 1,
-        .beta = 1
-    };
-    pid_params line_speed =
-    {
-        .kp = 2.5,
-        .ki = 0,
-        .kd = 0,
-        .alpha = 1,
-        .beta = 1,
-        .angle_threshold = 5,
-        .speed_threshold = 5,
-        .min_value = 0.5,
-        .slope = 1
-    };
+  pid_params turning =
+  {
+      .kp = 1,
+      .ki = 0,
+      .kd = 0,
+      .alpha = 1,
+      .beta = 1
+  };
+  pid_params parking;
+  pid_params stopping;
+  pid_params line_angle =
+  {
+      .kp = 10,
+      .ki = 0,
+      .kd = 0,
+      .alpha = 1,
+      .beta = 1
+  };
+  pid_params line_speed =
+  {
+      .kp = 0,
+      .ki = 0,
+      .kd = 0,
+      .alpha = 1,
+      .beta = 1,
+      .angle_threshold = 5,
+      .speed_threshold = 5,
+      .min_value = 0.5,
+      .slope = 1
+  };
 };
 
 /**
@@ -144,12 +143,12 @@ struct regulator_sample_data{
 struct mission_data{
     graph g;
     std::deque<std::pair<int,int>> missions;
-    int current_pos;
+    int current_pos = 0;
 };
 
 /**
  * The control mode of the system
  */
-enum mode : int8_t { MANUAL, AUTONOMOUS };
+enum mode : int8_t { AUTONOMOUS, MANUAL};
 
 #endif

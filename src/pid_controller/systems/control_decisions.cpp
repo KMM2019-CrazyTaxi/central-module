@@ -29,25 +29,31 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.angle = 0,
         .out.speed = 10
         };
-    //return data; // TESTING
 
     // If an obstacle is ahead, we stop
     // TODO: Update values, don't know what's reasonable
-    if (in.sensor_data.dist < 20) {
+    if (in.sensor_data.dist < 400) {
         data.sys = stopping;
-        data.out.speed = 5;
+        data.out.speed = 0;
         data.dist = (double)in.sensor_data.dist;
     }
 
     // If the next stop line is far away, return line follower
-    //if (in.metrics.dist_stop_line > 10) return data;
+    // if (in.metrics.dist_stop_line > INC_POS_UPPER_LIMIT) return data;
 
     int current_pos = in.map.current_pos;
+    queue_message("Current pos: " + std::to_string(current_pos));
 
     // If distance to stop line increased, we assume we passed one.
     // This also means that the initial sample value should be big.
-    if (in.metrics.dist_stop_line > in.samples.dist_stop_line) current_pos++;
+    double curr_line_height = in.metrics.dist_stop_line;
+    double prev_line_height = in.samples.dist_stop_line;
+
+    if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
+            prev_line_height < INC_POS_LOWER_LIMIT)
+        current_pos++;
     data.map.current_pos = current_pos;
+    return data; // TESTING
 
     path_step next = in.map.path[current_pos];
 
@@ -70,7 +76,6 @@ pid_decision_data decide(pid_decision_in &in) {
 
     // A stop-line which is not the end-node.
     return data;
-
 }
 
 pid_decision_return regulate(pid_decision_data &dec) {
@@ -126,6 +131,7 @@ pid_decision_return regulate(pid_decision_data &dec) {
 
   }
 
+  line_in.params = dec.out.params;
   line_in.dt = dec.out.dt;
   pid_system_out line_out = pid_line(line_in);
   pid_decision_return out =
