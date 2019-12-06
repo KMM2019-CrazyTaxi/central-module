@@ -9,6 +9,7 @@ pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
     pid_decision_return out = regulate(data);
     out.current_pos = data.map.current_pos;
+    out.index = data.map.index;
     return out;
 }
 
@@ -56,6 +57,7 @@ pid_decision_data decide(pid_decision_in &in) {
         index++;
     }
     data.map.index = index;
+    return data;
 
     path_step next = in.map.path[index];
     data.map.current_pos = next.node;
