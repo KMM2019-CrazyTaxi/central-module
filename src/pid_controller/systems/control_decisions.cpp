@@ -55,7 +55,7 @@ pid_decision_data decide(pid_decision_in &in) {
     data.map.current_pos = current_pos;
 
     if (current_pos == -1)
-        return;
+        return data;
 
     path_step next = in.map.path[current_pos];
 
