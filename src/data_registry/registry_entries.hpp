@@ -149,6 +149,6 @@ struct mission_data{
 /**
  * The control mode of the system
  */
-enum mode : int8_t { MANUAL, AUTONOMOUS };
+enum mode : int8_t { AUTONOMOUS, MANUAL};
 
 #endif
