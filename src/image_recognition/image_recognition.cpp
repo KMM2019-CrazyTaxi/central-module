@@ -37,8 +37,8 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     uint8_t* marked_image = new uint8_t[IMAGE_SIZE_RGB];
 
     // Resulting edge distances. Initialize at middle of each image half.
-    std::vector<uint32_t> left_edges(IMAGE_HEIGHT, IMAGE_WIDTH / 4);
-    std::vector<uint32_t> right_edges(IMAGE_HEIGHT, (3 * IMAGE_WIDTH) / 4);
+    std::vector<uint32_t> left_edges(IMAGE_HEIGHT, PIXEL_RANGE_FROM_OLD_EDGE);
+    std::vector<uint32_t> right_edges(IMAGE_HEIGHT, IMAGE_WIDTH - PIXEL_RANGE_FROM_OLD_EDGE);
     std::vector<uint32_t> front_edges(IMAGE_WIDTH);
 
     // Previous distance value for rolling average.
