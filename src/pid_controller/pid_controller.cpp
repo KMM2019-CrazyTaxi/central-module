@@ -58,6 +58,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         continue;
     }
 
+    queue_message("Hello");
 
     // Get all data for the regulator
     telemetrics_data metrics = get_metrics();
@@ -75,7 +76,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     mission.second = 100;
     */
 
-    // Quick fix while the bug where current_pos increments at the beginning persists
+    // Quick fix while the bug where current_pos increments at the beginning persist
     if (mission_data.current_pos == -1) {
         upd_controller.wait();
         continue;
