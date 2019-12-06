@@ -180,7 +180,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
                                       + "_processed.ppm" };
 		queue_message("  Saving marked image to " + file_name);
 		std::ofstream output{ file_name, std::ios::binary };
-		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
+		write_image(gray_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
 		output.close();
 	    }
 	}
