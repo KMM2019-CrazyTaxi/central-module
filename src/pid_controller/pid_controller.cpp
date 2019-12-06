@@ -37,6 +37,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     uint8_t mode = get_mode();
 
+    queue_message("1");
     // In manual mode, just forward the requested output
     if (mode == MANUAL) {
         control_change_data requested = get_request();
@@ -51,6 +52,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         continue;
     }
 
+    queue_message("2");
     mission_data mission_data = get_mission_data();
     // Check if we have any current missions to run
     if (mission_data.missions.empty()) {
@@ -58,6 +60,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         continue;
     }
 
+    queue_message("3");
     // Get all data for the regulator
     telemetrics_data metrics = get_metrics();
     regulator_param_data params = get_params();
@@ -79,6 +82,8 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         upd_controller.wait();
         continue;
     }
+
+    queue_message("4");
 
     // If we are not already at the start position for some reason, go there
     if (mission_data.current_pos != mission.first &&
@@ -136,9 +141,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
        .angle = regulate.angle,
        .speed = regulate.speed
       };
-
-    queue_message("angle: " + std::to_string(regulate.angle));
-    queue_message("speed: " + std::to_string(regulate.speed));
 
     // Send output
     set_output(reg_out);
