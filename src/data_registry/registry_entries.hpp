@@ -6,6 +6,7 @@
 #include <deque>
 #include <utility>
 #include "graph.hpp"
+#include "image_recognition_constants.hpp"
 
 #define SENSOR_DATA_ID              1
 #define CONTROL_CHANGE_DATA_ID      2
@@ -37,7 +38,7 @@ struct telemetrics_data {
     double curr_speed;
     double dist_left;
     double dist_right;
-    double dist_stop_line;
+    double dist_stop_line = IMAGE_HEIGHT;
 };
 
 /**
@@ -134,7 +135,7 @@ struct regulator_sample_data{
   double line_angle_d;
   double line_speed_d;
   double stopping_speed_d;
-  double dist_stop_line = 250;
+  double dist_stop_line = IMAGE_HEIGHT;
 };
 
 /**
