@@ -68,6 +68,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     // Set deltatime
     double dt = std::chrono::duration_cast<std::chrono::duration<double>>(current_time - previous_time).count();
 
+    queue_message("missions size: " + std::to_string(mission_data.missions.size()));
     std::pair<int, int> mission = mission_data.missions[0];
     /*
     mission.first = 1;
