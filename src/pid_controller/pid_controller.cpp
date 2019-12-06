@@ -65,7 +65,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     std::pair<int, int> mission;// = mission_data.missions[0];
     mission.first = 1;
-    mission.second = 5;
+    mission.second = 100;
 
     // If we are not already at the start position for some reason, go there
     /*
