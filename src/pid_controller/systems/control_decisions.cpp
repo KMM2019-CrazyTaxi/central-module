@@ -36,8 +36,9 @@ pid_decision_data decide(pid_decision_in &in) {
     // TODO: Update values, don't know what's reasonable
     if (in.sensor_data.dist < 400) {
         data.sys = stopping;
-        data.out.speed = 0;
+        data.out.speed = 5;
         data.dist = (double)in.sensor_data.dist;
+        return data;
     }
 
     // If the next stop line is far away, return line follower
@@ -64,7 +65,7 @@ pid_decision_data decide(pid_decision_in &in) {
     // Approaching a stop-line, is it the end node?
     if (next.node == in.map.path.back().node) {
         data.sys = stopping;
-        data.out.speed = 0;
+        data.out.speed = 5;
         data.dist = in.metrics.dist_stop_line;
         return data;
     }
