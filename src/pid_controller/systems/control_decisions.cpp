@@ -9,6 +9,7 @@ pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
     pid_decision_return out = regulate(data);
     out.current_pos = data.map.current_pos;
+    queue_message("Hello");
     return out;
 }
 
@@ -140,7 +141,6 @@ pid_decision_return regulate(pid_decision_data &dec) {
      .speed = line_out.speed,
      .samples = line_out.samples
     };
-    queue_message("Hello");
 
   return out;
 }
