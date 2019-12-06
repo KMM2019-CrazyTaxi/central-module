@@ -41,7 +41,7 @@ const bool OUTPUT_MARKED_IMAGE_TO_FILE{ true };
 const uint32_t CAMERA_FPS{ 60 };
 
 // Distance from car where the side edges are detected.
-const uint32_t BOUND_DISTANCE_1_PIXEL{ 150 };
+const uint32_t BOUND_DISTANCE_1_PIXEL{ 100 };
 const uint32_t BOUND_DISTANCE_2_PIXEL{ 200 };
 
 /*
