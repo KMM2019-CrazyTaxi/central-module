@@ -60,6 +60,8 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     // Main loop
     while (running) 
     {
+	// Request new image while processing this one.
+	image_buffer.swap_buffers();
 
 	// Start time for benchmarking
 	start_time = hr_clock::now();
@@ -68,9 +70,6 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	const uint8_t* image{ image_buffer.get_read_buffer() };
 	std::memcpy(marked_image, image, IMAGE_SIZE_RGB);
 	
-	// Request new image while processing this one.
-	image_buffer.swap_buffers();
-
 	// Process image.
 	rgb2gray(marked_image, gray_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	rgb2gray_time = hr_clock::now();
