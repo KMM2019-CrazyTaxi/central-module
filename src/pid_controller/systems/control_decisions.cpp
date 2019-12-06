@@ -32,9 +32,9 @@ pid_decision_data decide(pid_decision_in &in) {
 
     // If an obstacle is ahead, we stop
     // TODO: Update values, don't know what's reasonable
-    if (in.sensor_data.dist < 200) {
+    if (in.sensor_data.dist < 400) {
         data.sys = stopping;
-        data.out.speed = 5;
+        data.out.speed = 0;
         data.dist = (double)in.sensor_data.dist;
     }
 
