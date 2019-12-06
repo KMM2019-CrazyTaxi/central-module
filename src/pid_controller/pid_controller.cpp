@@ -74,12 +74,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     mission.second = 100;
     */
 
-    bool tmp = false;
-    if (mission_data.current_pos == 10) {
-        mission_data.current_pos++;
-        tmp = true;
-    }
-
     // If we are not already at the start position for some reason, go there
     if (mission_data.current_pos != mission.first &&
             (path.empty() || path.back().node != mission.second))
@@ -94,7 +88,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         path = find_shortest_path(mission_data.g, mission_data.current_pos,
                                     mission.second);
     set_path(path);
-    if (tmp) mission_data.current_pos--;
 
     // Define input to the regulator
     pid_decision_in dec_in =
