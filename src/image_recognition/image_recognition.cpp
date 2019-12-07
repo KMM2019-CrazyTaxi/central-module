@@ -92,8 +92,6 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         const uint32_t distance_start_1{ distance_end_1 - EDGE_AVG_PIXELS };
         const uint32_t distance_end_2{ IMAGE_HEIGHT - BOUND_DISTANCE_2_PIXEL };
         const uint32_t distance_start_2{ distance_end_2 - EDGE_AVG_PIXELS };
-        const uint32_t middle_end{ (IMAGE_WIDTH + EDGE_AVG_PIXELS) >> 1 };
-        const uint32_t middle_start{ middle_end - EDGE_AVG_PIXELS };
 
         double left_pixel_distance_1 = get_distance_to_side(edgex_image, left_edges,
                                                             distance_start_1, distance_end_1,
@@ -107,6 +105,11 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         double right_pixel_distance_2 = get_distance_to_side(edgex_image, right_edges,
                                                              distance_start_2, distance_end_2,
                                                              IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_WIDTH - 1);
+		
+		const uint32_t middle{ (left_pixel_distance_1 + right_pixel_distance_1) / 2 };
+		const uint32_t middle_end{ middle + EDGE_AVG_PIXELS / 2 };
+        const uint32_t middle_start{ middle - EDGE_AVG_PIXELS / 2 };
+		
         double front_pixel_distance = get_distance_to_stop(edgey_image, front_edges,
                                                            middle_start, middle_end,
                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
