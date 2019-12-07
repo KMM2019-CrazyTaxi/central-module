@@ -96,46 +96,50 @@ struct pid_params{
   * Contains all of the parameters for the whole control system
   */
 struct regulator_param_data{
-  pid_params turning =
-  {
-      .kp = 1,
-      .ki = 0,
-      .kd = 0,
-      .alpha = 1,
-      .beta = 1
-  };
-  pid_params parking;
-  pid_params stopping;
-  pid_params line_angle =
-  {
-      .kp = 10,
-      .ki = 0,
-      .kd = 0,
-      .alpha = 1,
-      .beta = 1
-  };
-  pid_params line_speed =
-  {
-      .kp = 0,
-      .ki = 0,
-      .kd = 0,
-      .alpha = 1,
-      .beta = 1,
-      .angle_threshold = 5,
-      .speed_threshold = 5,
-      .min_value = 0.5,
-      .slope = 1
-  };
+    pid_params turning =
+    {
+        .kp = 1,
+        .ki = 0,
+        .kd = 0,
+        .alpha = 1,
+        .beta = 1
+    };
+    pid_params parking;
+    pid_params stopping =
+    {
+        .speed_threshold = 0.3,
+        .min_value = 100
+    };
+    pid_params line_angle =
+    {
+        .kp = 10,
+        .ki = 0,
+        .kd = 0,
+        .alpha = 1,
+        .beta = 1
+    };
+    pid_params line_speed =
+    {
+        .kp = 0,
+        .ki = 0,
+        .kd = 0,
+        .alpha = 1,
+        .beta = 1,
+        .angle_threshold = 5,
+        .speed_threshold = 5,
+        .min_value = 0.5,
+        .slope = 1
 };
+
 
 /**
  * Contains sample data for different pid sub-systems
  */
 struct regulator_sample_data{
-  double line_angle_d;
-  double line_speed_d;
-  double stopping_speed_d;
-  double dist_stop_line = IMAGE_HEIGHT;
+    double line_angle_d;
+    double line_speed_d;
+    double stopping_speed_d;
+    double dist_stop_line = IMAGE_HEIGHT;
 };
 
 /**
@@ -143,7 +147,7 @@ struct regulator_sample_data{
   */
 struct mission_data{
     graph g;
-    std::deque<std::pair<int,int>> missions = {std::make_pair(0, 10)};
+    std::deque<std::pair<int,int>> missions = {std::make_pair(0, 0)};
     int current_pos = 0;
     int index = 0;
 };

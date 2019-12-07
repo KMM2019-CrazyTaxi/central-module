@@ -33,8 +33,7 @@ pid_decision_data decide(pid_decision_in &in) {
         };
 
     // If an obstacle is ahead, we stop
-    // TODO: Update values, don't know what's reasonable
-    if (in.sensor_data.dist < 400) {
+    if (in.sensor_data.dist < in.params.stopping.min_value) {
         data.sys = stopping;
         data.out.speed = 0;
         data.dist = (double)in.sensor_data.dist;
@@ -53,8 +52,8 @@ pid_decision_data decide(pid_decision_in &in) {
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
     {
-        data.map.current_pos = in.map.path[index].node;
         index++;
+        data.map.current_pos = in.map.path[index].node;
     }
     data.map.index = index;
 

@@ -69,10 +69,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     double dt = std::chrono::duration_cast<std::chrono::duration<double>>(current_time - previous_time).count();
 
     std::pair<int, int> mission = mission_data.missions[0];
-    /*
-    mission.first = 1;
-    mission.second = 100;
-    */
 
     // If we are not already at the start position for some reason, go there
     if (mission_data.current_pos != mission.first &&
@@ -109,10 +105,9 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     pid_decision_return regulate = pid_decision(dec_in);
 
     // Stay at the end for some time, then continue
-    if (mission_data.current_pos == mission.second && metrics.curr_speed <= 1){
+    if (mission_data.current_pos == mission.second && metrics.curr_speed <= 0.5){
         std::this_thread::sleep_for(std::chrono::seconds(3));
-        if (!mission_data.missions.empty())
-            mission_data.missions.pop_front();
+        mission_data.missions.pop_front();
     }
 
     // Update current position
