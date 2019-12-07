@@ -71,18 +71,18 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     std::pair<int, int> mission = mission_data.missions[0];
 
     // If we are not already at the start position for some reason, go there
-    if (mission_data.current_pos != mission.first &&
+    if (mission_data.previous_pos != mission.first &&
             (path.empty() || path.back().node != mission.second))
     {
-        path = find_shortest_path(mission_data.g, mission_data.current_pos,
+        path = find_shortest_path(mission_data.g, mission_data.previous_pos,
                                     mission.first);
-        mission = std::make_pair(mission_data.current_pos, mission.first);
+        mission = std::make_pair(mission_data.previous_pos, mission.first);
         mission_data.missions.push_front(mission);
     }
     // Or if we haven't found the path yet, do it.
     else if (path.empty() || path.back().node != mission.second)
     {
-        path = find_shortest_path(mission_data.g, mission_data.current_pos,
+        path = find_shortest_path(mission_data.g, mission_data.previous_pos,
                                     mission.second);
     }
     set_path(path);
@@ -97,7 +97,8 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
        .samples = samples,
        .map.g = mission_data.g,
        .map.path = path,
-       .map.current_pos = mission_data.current_pos,
+       .map.previous_pos = mission_data.previous_pos,
+       .map.next_pos = mission_data.next_pos,
        .map.index = mission_data.index
       };
 
@@ -111,7 +112,8 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     }
 
     // Update current position
-    mission_data.current_pos = regulate.current_pos;
+    mission_data.previous_pos = regulate.previous_pos;
+    mission_data.next_pos = regulate.next_pos;
     mission_data.index = regulate.index;
 
     samples = regulate.samples;

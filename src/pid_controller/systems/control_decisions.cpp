@@ -8,7 +8,8 @@ pid_decision_return regulate(pid_decision_data &);
 pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
     pid_decision_return out = regulate(data);
-    out.current_pos = data.map.current_pos;
+    out.previous_pos = data.map.previous_pos;
+    out.next_pos = data.map.next_pos;
     out.index = data.map.index;
     out.mission_finished = data.out.mission_finished;
     return out;
@@ -22,7 +23,8 @@ pid_decision_data decide(pid_decision_in &in) {
         .sys = line,
         .map.g = in.map.g,
         .map.path = in.map.path,
-        .map.current_pos = in.map.current_pos,
+        .map.previous_pos = in.map.previous_pos,
+        .map.next_pos = in.map.next_pos,
         .map.index = in.map.index,
         .out.metrics = in.metrics,
         .out.params = in.params,
@@ -53,9 +55,10 @@ pid_decision_data decide(pid_decision_in &in) {
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
     {
+        data.map.previous_pos = in.map.path[index].node;
         index++;
-        data.map.current_pos = in.map.path[index].node;
     }
+    data.map.next_pos = in.map.path[index].node;
     data.map.index = index;
 
     path_step next = in.map.path[index];
