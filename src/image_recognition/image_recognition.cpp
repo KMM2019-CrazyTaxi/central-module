@@ -54,7 +54,9 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     time_point mark_time{};
     time_point stop_time{};
 
-    // Sleep for 1 second to wait for camera to init.
+    // Wait for camera to init.
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    image_buffer.swap_buffers();
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // Main loop
@@ -90,8 +92,6 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         const uint32_t distance_start_1{ distance_end_1 - EDGE_AVG_PIXELS };
         const uint32_t distance_end_2{ IMAGE_HEIGHT - BOUND_DISTANCE_2_PIXEL };
         const uint32_t distance_start_2{ distance_end_2 - EDGE_AVG_PIXELS };
-        const uint32_t middle_end{ (IMAGE_WIDTH + EDGE_AVG_PIXELS) >> 1 };
-        const uint32_t middle_start{ middle_end - EDGE_AVG_PIXELS };
 
         double left_pixel_distance_1 = get_distance_to_side(edgex_image, left_edges,
                                                             distance_start_1, distance_end_1,
@@ -105,6 +105,11 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         double right_pixel_distance_2 = get_distance_to_side(edgex_image, right_edges,
                                                              distance_start_2, distance_end_2,
                                                              IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_WIDTH - 1);
+		
+        const uint32_t middle{ static_cast<uint32_t>((left_pixel_distance_1 + right_pixel_distance_1) / 2) };
+        const uint32_t middle_end{ middle + EDGE_AVG_PIXELS / 2 };
+        const uint32_t middle_start{ middle - EDGE_AVG_PIXELS / 2 };
+		
         double front_pixel_distance = get_distance_to_stop(edgey_image, front_edges,
                                                            middle_start, middle_end,
                                                            IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -137,11 +142,9 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	registry.release_data(TELEMETRICS_DATA_ID);
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
-/*
-            mark_edges(edgex_image, edgey_image, marked_image, 
-                       left_edges, right_edges, front_edges,
-                       IMAGE_WIDTH, IMAGE_HEIGHT);
-*/
+            mark_all_edges(edgex_image, edgey_image, marked_image, 
+                           left_edges, right_edges, front_edges,
+                           IMAGE_WIDTH, IMAGE_HEIGHT);
             mark_selected_edges(marked_image, left_pixel_distance_1,
                                 right_pixel_distance_1, front_pixel_distance,
                                 distance_start_1, distance_end_1, middle_start, middle_end,
@@ -179,7 +182,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
                                       + "_processed.ppm" };
 		queue_message("  Saving marked image to " + file_name);
 		std::ofstream output{ file_name, std::ios::binary };
-		write_image(gray_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
 		output.close();
 	    }
 	}
