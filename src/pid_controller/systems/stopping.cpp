@@ -1,7 +1,8 @@
 #include "stopping.hpp"
 #include "logging.hpp"
+#include "math.h"
 
-double calc_ref_speed(double, double, double, double, double);
+double calc_ref_speed(double, double, double, double, double, double, double);
 
 pid_system_out pid_stopping(const pid_decision_data &in) {
 
@@ -18,14 +19,17 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
 
     double min_dist = in.out.params.stopping.min_value;
     double speed_cutoff = in.out.params.stopping.speed_threshold;
-    double dist_threshold = in.out.params.stopping.angle_threshold;
+    double dist_thold = in.out.params.stopping.angle_threshold;
+    double width = in.out.params.stopping.slope;
 
+    double ref_speed_updated = calc_ref_speed(ref_speed, dist, speed_cutoff, min_dist,
+            dist_thold, curr_speed, width);
 
     regulator_sample_data samples = in.out.samples;
-    double sample_d = beta * ref_speed - curr_speed;
+    double sample_d = beta * ref_speed_updated - curr_speed;
     double dt = in.out.dt;
 
-    double calc_p = alpha * ref_speed - curr_speed;
+    double calc_p = alpha * ref_speed_updated - curr_speed;
     double calc_i = 0;
     double calc_d = (sample_d - samples.stopping_speed_d) / dt;
 
@@ -40,15 +44,18 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
     pid_system_out out =
       {
        .angle = in.out.angle,
-       .speed = calc_ref_speed(curr_speed + res, dist, speed_cutoff, min_dist, dist_threshold),
+       .speed = curr_speed + res,
        .samples = samples
       };
 
     return out;
 }
 
-double calc_ref_speed(double r, double d, double v0, double d0, double dt) {
+double calc_ref_speed(double r, double d, double v0, double d0, double dt, double c, double w) {
     if (d > dt) return r;
-    if (d < d0) return 0;
+    if (d < d0 + w/2 && c < v0) return 0;
+    if (d < d0 + w) return -r;
     return ( (r-v0)/(dt-d0) * d) + (r/dt) * ( (dt-d0)/(r-v0) );
 }
+
+
