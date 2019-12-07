@@ -57,6 +57,7 @@ struct pid_system_out{
 
   double dt;
   regulator_sample_data samples;
+  bool mission_finished = false;
 };
 
 struct pid_decision_return{
@@ -65,6 +66,7 @@ struct pid_decision_return{
   regulator_sample_data samples;
   int current_pos;
   int index;
+  bool mission_finished;
 };
 
 /**
@@ -75,6 +77,7 @@ struct pid_decision_data{
   double dist;
   System sys;
   map_data map;
+  bool set_if_finished = false;
 };
 
 #endif

@@ -105,7 +105,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     pid_decision_return regulate = pid_decision(dec_in);
 
     // Stay at the end for some time, then continue
-    if (mission_data.current_pos == mission.second && metrics.curr_speed <= 0.5){
+    if (regulate.mission_finished){
         std::this_thread::sleep_for(std::chrono::seconds(3));
         mission_data.missions.pop_front();
     }

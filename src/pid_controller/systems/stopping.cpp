@@ -10,9 +10,14 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
 
     double res = 0;
 
-    if (curr_speed > speed_cutoff) res = -curr_speed;
+    pid_system_out out;
 
-    pid_system_out out =
+    // If we are going too fast, break
+    if (curr_speed > speed_cutoff) res = -curr_speed;
+    // We are setting speed to 0, should mean we might have finished
+    else if (in.set_if_finished) out.mission_finished = true;
+
+    out =
       {
        .angle = in.out.angle,
        .speed = res,

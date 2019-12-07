@@ -10,6 +10,7 @@ pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_return out = regulate(data);
     out.current_pos = data.map.current_pos;
     out.index = data.map.index;
+    out.mission_finished = data.out.mission_finished;
     return out;
 }
 
