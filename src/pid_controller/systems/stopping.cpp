@@ -20,14 +20,12 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
     double speed_cutoff = in.out.params.stopping.speed_threshold;
     double dist_threshold = in.out.params.stopping.angle_threshold;
 
-    double ref_speed_updated = calc_ref_speed(ref_speed, dist, speed_cutoff, min_dist,
-            dist_threshold);
 
     regulator_sample_data samples = in.out.samples;
-    double sample_d = beta * ref_speed_updated - curr_speed;
+    double sample_d = beta * ref_speed - curr_speed;
     double dt = in.out.dt;
 
-    double calc_p = alpha * ref_speed_updated - curr_speed;
+    double calc_p = alpha * ref_speed - curr_speed;
     double calc_i = 0;
     double calc_d = (sample_d - samples.stopping_speed_d) / dt;
 
@@ -42,7 +40,7 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
     pid_system_out out =
       {
        .angle = in.out.angle,
-       .speed = curr_speed + res,
+       .speed = calc_ref_speed(curr_speed + res, dist, speed_cutoff, min_dist, dist_threshold),
        .samples = samples
       };
 
