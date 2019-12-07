@@ -71,7 +71,7 @@ pid_decision_data decide(pid_decision_in &in) {
         return data;
     }
 
-    uint8_t num_edges = in.map.g.get_edges(next.node).size();
+    uint8_t num_edges = in.map.g.get_edges(data.map.previous_pos).size();
     // Turning areas have more than 1 edge
     if (num_edges > 1) {
         data.sys = turning;
