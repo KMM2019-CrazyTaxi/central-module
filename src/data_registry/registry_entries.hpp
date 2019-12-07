@@ -129,6 +129,7 @@ struct regulator_param_data{
         .speed_threshold = 5,
         .min_value = 0.5,
         .slope = 1
+    };
 };
 
 
