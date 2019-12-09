@@ -45,7 +45,7 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
                 previous[e.end] = current;
 
                 // Since costs have been updated, resort heap
-                sort_heap(queue.begin(), queue.end(), comparator);
+                make_heap(queue.begin(), queue.end(), comparator);
             }
         }
     }
