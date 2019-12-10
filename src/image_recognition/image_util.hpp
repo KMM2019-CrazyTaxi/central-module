@@ -50,7 +50,7 @@ void rgb2gray(const uint8_t* image, uint8_t* gray,
  * width: The image width in pixels.
  * height: The image height in pixels.
  */
-void sobelx(const uint8_t* image, uint8_t* result,
+void sobelx(const uint8_t* rgb_image, const uint8_t* gray_image, uint8_t* result,
             const uint32_t width, const uint32_t height);
 
 /*

@@ -1,5 +1,6 @@
 #ifdef OPENCV
 #include <opencv2/opencv.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #endif
 
 #include <fstream>
@@ -75,17 +76,33 @@ void rgb2gray(const uint8_t* image, uint8_t* gray,
     }
 }
 
-void sobelx(const uint8_t* image, uint8_t* result, 
+void sobelx(const uint8_t* rgb_image, const uint8_t* gray_image, uint8_t* result, 
             const uint32_t width, const uint32_t height) {
+    cv::Mat cv_rgb_image = cv::Mat(height, width, CV_8UC3, (void*) rgb_image).clone();
+    cv_rgb_image.reshape(1, height);
+    cv::Mat cv_hsv_image(height, width, CV_8UC3);
+    cv::cvtColor(cv_rgb_image, cv_hsv_image, cv::COLOR_RGB2HSV);
+    
     const uint32_t size{ width * height };
     for (uint32_t pos{1}; pos < size - 1; ++pos) {
-        int32_t sum = image[pos - 1] - image[pos + 1];
-        result[pos] = sum < 0 ? 0 : (sum > 255 ? 255 : sum);
+        int32_t sum = gray_image[pos - 1] - gray_image[pos + 1];
+
+        const uint32_t row{ pos / width }, col{ pos % width };
+        cv::Vec3b pixel{ cv_hsv_image.at<cv::Vec3b>(row, col) };
+        if (pixel[2] > 50 && pixel[1] > 110 && pixel[1] < 130)
+        {
+            result[pos] = 0;
+        }
+        else
+        {
+            result[pos] = sum < 0 ? 0 : (sum > 255 ? 255 : sum);
+        }
     }
 }
 
 void sobely(const uint8_t* image, uint8_t* result, 
             const uint32_t width, const uint32_t height) {
+
     const uint32_t size{ width * height };
     for (uint32_t pos{width + 1}; pos < size - width - 1; ++pos) {
         int32_t sum = image[pos - width - 1] + (image[pos - width] << 1) + image[pos - width + 1]

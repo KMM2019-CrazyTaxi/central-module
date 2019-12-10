@@ -82,7 +82,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	rgb2gray(marked_image, gray_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	rgb2gray_time = hr_clock::now();
 
-	sobelx(gray_image, edgex_image, IMAGE_WIDTH, IMAGE_HEIGHT);
+	sobelx(image, gray_image, edgex_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	sobelx_time = hr_clock::now();
 	sobely(gray_image, edgey_image, IMAGE_WIDTH, IMAGE_HEIGHT);
 	sobely_time = hr_clock::now();
