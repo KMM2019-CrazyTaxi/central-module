@@ -1,3 +1,9 @@
+#ifdef OPENCV
+#include <opencv2/opencv.hpp>
+#endif
+
+#include <fstream>
+
 #include "image_util.hpp"
 
 void read_image(uint8_t* image, std::istream& input) {
@@ -13,24 +19,41 @@ void read_image(uint8_t* image, std::istream& input) {
     input.read((char*) image, size);
 }
 
-void write_image(const uint8_t* image, std::ostream& output,
+void write_image(const uint8_t* image, const std::string& file_name,
 		 const uint32_t width, const uint32_t height, const IMAGE_TYPE type) {
     uint32_t size{};
     std::string format{};
+#ifdef OPENCV
+    cv::Mat cv_image;
+#endif
 
     switch (type) {
     case GRAY:
+#ifdef OPENCV
+        cv_image = cv::Mat(height, width, CV_8UC1, (void*) image);
+        cv_image.reshape(1, height);
+#endif
         size = width * height;
 	format = "P5\n";
         break;
     case RGB:
+#ifdef OPENCV
+        cv_image = cv::Mat(height, width, CV_8UC3, (void*) image);
+        cv_image.reshape(3, height);
+#endif
         size = width * height * 3;
 	format = "P6\n";
         break;
     }
 
+#ifdef OPENCV
+    cv::imwrite(file_name, cv_image);
+#else
+    std::ofstream output{ file_name, std::ios::binary };
     output << format << width << " " << height << " 255\n";
     output.write((char*) image, size);
+    output.close();
+#endif
 }
 
 void rgb2gray(const uint8_t* image, uint8_t* gray, 
