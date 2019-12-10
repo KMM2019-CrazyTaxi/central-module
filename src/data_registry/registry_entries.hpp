@@ -102,19 +102,21 @@ struct regulator_param_data{
         .ki = 0,
         .kd = 0,
         .alpha = 1,
-        .beta = 1
+        .beta = 1,
+	.min_value = 15
     };
     pid_params parking;
     pid_params stopping =
     {
+	.kp = 1.0,
         .speed_threshold = 0.3,
         .min_value = 500
     };
     pid_params line_angle =
     {
-        .kp = 10,
+        .kp = 12,
         .ki = 0,
-        .kd = 0,
+        .kd = 0.2,
         .alpha = 1,
         .beta = 1
     };
@@ -126,9 +128,9 @@ struct regulator_param_data{
         .alpha = 1,
         .beta = 1,
         .angle_threshold = 5,
-        .speed_threshold = 5,
-        .min_value = 0.5,
-        .slope = 1
+        .speed_threshold = 0.5,
+        .min_value = 0.3,
+        .slope = 5
     };
 };
 
@@ -148,7 +150,7 @@ struct regulator_sample_data{
   */
 struct mission_data{
     graph g;
-    std::deque<std::pair<int,int>> missions = {std::make_pair(0, 2)};
+    std::deque<std::pair<int,int>> missions = {std::make_pair(0, 5)};
     int previous_pos = 0;
     int next_pos = 0; // Will be calculated immediately
     int index = 0;
