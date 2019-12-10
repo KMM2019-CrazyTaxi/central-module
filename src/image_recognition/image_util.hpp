@@ -15,15 +15,15 @@
 void read_image(uint8_t* image, std::istream& input);
 
 /*
- * Writes an image to file in .ppm format.
+ * Writes an image to file.
  *
  * image: A buffer to the image data to write.
- * output: An opened ostream to write the file to.
+ * output: The file name to write to.
  * width: The image width in pixels.
  * height: The image height in pixels.
  * type: RGB or GRAY matching the image color space.
  */
-void write_image(const uint8_t* image, std::ostream& output,
+void write_image(const uint8_t* image, const std::string& file_name,
 		 const uint32_t width, const uint32_t height, 
                  const IMAGE_TYPE type = RGB);
 
