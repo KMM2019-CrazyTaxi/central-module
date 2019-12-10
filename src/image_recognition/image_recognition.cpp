@@ -4,7 +4,6 @@
 #include <chrono>
 #include <cstring>
 #include <vector>
-#include <fstream>
 #include <deque>
 #include <algorithm>
 
@@ -179,13 +178,9 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 		queue_message("  Marking test image took "
 			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
 		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) 
-                                      + "_processed.jpg" };
+                                      + "_processed.ppm" };
 		queue_message("  Saving marked image to " + file_name);
 		write_image(marked_image, file_name, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
-                file_name = std::to_string(n_processed_images / CAMERA_FPS) + "_processed.ppm";
-                std::ofstream output{ file_name, std::ios::binary };
-                write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
-                output.close();
 	    }
 	}
     }
