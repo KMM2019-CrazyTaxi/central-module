@@ -43,12 +43,14 @@ void write_image(const uint8_t* image, const std::string& file_name,
 
     switch (type) {
     case GRAY:
-        cv_image = cv::Mat(height, width, CV_8UC1);
+        cv_image = cv::Mat(height, width, CV_8UC1, (void*) image);
+        cv_image.reshape(1, height);
         size = width * height;
 	format = "P5\n";
         break;
     case RGB:
-        cv_image = cv::Mat(height, width, CV_8UC3);
+        cv_image = cv::Mat(height, width, CV_8UC3, (void*) image);
+        cv_image.reshape(3, height);
         size = width * height * 3;
 	format = "P6\n";
         break;
