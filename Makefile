@@ -22,7 +22,7 @@ endif
 
 ifeq ($(OPENCV), 1)
 	CCXFLAGS += -DOPENCV=1
-	LDFLAGS  += -lopencv_core -lopencv_imgcodecs 
+	LDFLAGS  += -lopencv_core -lopencv_imgcodecs -lopencv_imgproc
 endif
 
 # Find all subdirectories
