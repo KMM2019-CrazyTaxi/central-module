@@ -19,7 +19,7 @@
 using hr_clock = std::chrono::high_resolution_clock;
 using time_point = hr_clock::time_point;
 
-double median(deque<double> v)
+double median(std::deque<double> v)
 {
     sort(v.begin(), v.end());
     return v[v.size() / 2];
@@ -138,7 +138,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	telemetrics_data* data{ static_cast<telemetrics_data*>(registry.acquire_data(TELEMETRICS_DATA_ID)) };
 	data->dist_left = left_real_distance_1;
 	data->dist_right = right_real_distance_1;
-	data->dist_stop_line = average_front_pixel_distance;
+	data->dist_stop_line = median_front_pixel_distance;
 	registry.release_data(TELEMETRICS_DATA_ID);
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
