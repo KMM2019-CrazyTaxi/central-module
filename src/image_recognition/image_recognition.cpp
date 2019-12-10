@@ -179,11 +179,11 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
 		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) };
 		queue_message("  Saving images to " + file_name);
-		write_image(image, file_name + "_original.png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
-		write_image(gray_image, file_name + "_gray.png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
-		write_image(edgex_image, file_name + "_edgex.png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
-		write_image(edgey_image, file_name + "_edgey.png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
-		write_image(marked_image, file_name + "_marked.png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
+		write_image(image, "original_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
+		write_image(gray_image, "gray_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(edgex_image, "edgex_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(edgey_image, "edgey_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(marked_image, "marked_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
 	    }
 	}
     }
