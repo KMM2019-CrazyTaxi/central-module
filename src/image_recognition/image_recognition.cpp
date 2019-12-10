@@ -6,6 +6,7 @@
 #include <vector>
 #include <fstream>
 #include <deque>
+#include <algorithm>
 
 #include "data_registry.hpp"
 #include "registry_entries.hpp"
@@ -17,6 +18,12 @@
 
 using hr_clock = std::chrono::high_resolution_clock;
 using time_point = hr_clock::time_point;
+
+double median(deque<double> v)
+{
+    sort(v.begin(), v.end());
+    return v[v.size() / 2];
+}
 
 // Returns the time difference in ms between to time points.
 int to_ms(const time_point& time1, const time_point& time2) {
@@ -123,16 +130,9 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
         double right_real_distance_2 =
             (right_pixel_distance_2 - IMAGE_WIDTH / 2) * CM_PER_PIXEL_AT_BOUND_DISTANCE_2;
         double adjusted_front_pixel_distance = IMAGE_HEIGHT - front_pixel_distance;
-
-	// Front distance if calculated as the average over five pictures to limit noise.
 	front_distances.pop_front();
 	front_distances.push_back(adjusted_front_pixel_distance);
-	double average_front_pixel_distance{};
-	for (const double& d : front_distances)
-	{
-	    average_front_pixel_distance += d;
-	}
-	average_front_pixel_distance /= 5;
+        const double median_front_pixel_distance{ median(front_distances) };
 	edge_time = hr_clock::now();
 
 	telemetrics_data* data{ static_cast<telemetrics_data*>(registry.acquire_data(TELEMETRICS_DATA_ID)) };
