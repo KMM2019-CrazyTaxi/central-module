@@ -90,8 +90,6 @@ pid_decision_data decide(pid_decision_in &in) {
     // Turning areas have more than 1 edge
     if (num_edges > 1) {
         data.sys = turning;
-        data.out.angle = next.dir * 30;
-        data.out.speed = 10;
         return data;
     }
 
