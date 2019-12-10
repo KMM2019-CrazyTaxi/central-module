@@ -1,10 +1,15 @@
 #pragma once
 
+#include <opencv2/opencv.hpp>
+
 #include <cmath>
 #include <iostream>
 #include <vector>
 
 #include "image_recognition_constants.hpp"
+
+cv::Mat to_mat(const uint8_t* rgb_image,
+               const uint32_t width, const uint32_t height, const IMAGE_TYPE type);
 
 /*
  * Read an image saved in .ppm format from file.
@@ -41,6 +46,9 @@ void write_image(const uint8_t* image, const std::string& file_name,
  */
 void rgb2gray(const uint8_t* image, uint8_t* gray, 
               const uint32_t width, const uint32_t height);
+
+void rgb2hsv(const uint8_t* image, uint8_t* hsv,
+             const uint32_t width, const uint32_t height);
 
 /*
  * Applies a sobel operator in the x dimension to an image.

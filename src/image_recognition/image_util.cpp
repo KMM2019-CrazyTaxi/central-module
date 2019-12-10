@@ -4,8 +4,20 @@
 #endif
 
 #include <fstream>
+#include <algorithm>
 
 #include "image_util.hpp"
+
+cv::Mat to_mat(const uint8_t* image,
+               const uint32_t width, const uint32_t height, const IMAGE_TYPE type)
+{
+    switch (type) {
+    case RGB:
+        return cv::Mat(height, width, CV_8UC3, (void*) image).clone();
+    case GRAY:
+        return cv::Mat(height, width, CV_8UC1, (void*) image).clone();
+    }
+}
 
 void read_image(uint8_t* image, std::istream& input) {
     uint32_t width, height, scale, size;
@@ -25,31 +37,19 @@ void write_image(const uint8_t* image, const std::string& file_name,
     uint32_t size{};
     std::string format{};
 #ifdef OPENCV
-    cv::Mat cv_image;
-#endif
-
+    cv::Mat cv_image = to_mat(image, width, height, type);
+    cv::imwrite(file_name, cv_image);
+#else
     switch (type) {
     case GRAY:
-#ifdef OPENCV
-        cv_image = cv::Mat(height, width, CV_8UC1, (void*) image);
-        cv_image.reshape(1, height);
-#endif
         size = width * height;
 	format = "P5\n";
         break;
     case RGB:
-#ifdef OPENCV
-        cv_image = cv::Mat(height, width, CV_8UC3, (void*) image);
-        cv_image.reshape(3, height);
-#endif
         size = width * height * 3;
 	format = "P6\n";
         break;
     }
-
-#ifdef OPENCV
-    cv::imwrite(file_name, cv_image);
-#else
     std::ofstream output{ file_name, std::ios::binary };
     output << format << width << " " << height << " 255\n";
     output.write((char*) image, size);
@@ -76,31 +76,61 @@ void rgb2gray(const uint8_t* image, uint8_t* gray,
     }
 }
 
-void sobelx(const uint8_t* rgb_image, const uint8_t* gray_image, uint8_t* result, 
-            const uint32_t width, const uint32_t height) {
-    cv::Mat cv_rgb_image = cv::Mat(height, width, CV_8UC3, (void*) rgb_image).clone();
-    cv_rgb_image.reshape(1, height);
-    cv::Mat cv_hsv_image(height, width, CV_8UC3);
-    cv::cvtColor(cv_rgb_image, cv_hsv_image, cv::COLOR_RGB2HSV);
-    
+void rgb2hsv(const uint8_t* image, uint8_t* hsv,
+             const uint32_t width, const uint32_t height)
+{
+    /*
+      source: math.stackexchange.com/questions/556341/rgb-to-hsv-color-conversion-algorithm
+     */
     const uint32_t size{ width * height };
-    for (uint32_t pos{1}; pos < size - 1; ++pos) {
-        int32_t sum = gray_image[pos - 1] - gray_image[pos + 1];
+    for (uint32_t pos{}; pos < size; ++pos)
+    {
+        const double r{ image[pos*3] / 255.0 }, g{ image[pos*3+1] / 255.0 }, b{ image[pos*3+2] / 255.0 };
+        const double c_max{ std::max(r, std::max(g, b)) };
+        const double c_min{ std::min(r, std::min(g, b)) };
+        const double delta{ c_max - c_min };
 
-        cv::Vec3b pixel1{ cv_hsv_image.at<cv::Vec3b>(pos / width, pos % width) };
-        cv::Vec3b pixel2{ cv_hsv_image.at<cv::Vec3b>((pos-1) / width, (pos-1) % width) };
-        cv::Vec3b pixel3{ cv_hsv_image.at<cv::Vec3b>((pos+1) / width, (pos+1) % width) };
-        if ((pixel1[2] > 50 && pixel1[1] > 110 && pixel1[1] < 130) ||
-            (pixel2[2] > 50 && pixel2[1] > 110 && pixel2[1] < 130) ||
-            (pixel3[2] > 50 && pixel3[1] > 110 && pixel3[1] < 130))
+        double h, s, v;
+        if (r > g && r > b)
         {
-            gray_image[pos] = 255;
-            result[pos] = 0;
+            h = 60 * ((g - b) / delta);
+            while (h > 6)
+            {
+                h -= 6;
+            }
+        }
+        else if (g > r && g > b)
+        {
+            h = 60 * ((b - r) / delta + 2);
         }
         else
         {
-            result[pos] = sum < 0 ? 0 : (sum > 255 ? 255 : sum);
+            h = 60 * ((r - g) / delta + 4);
         }
+        
+        if (c_max < 0.001)
+        {
+            s = 0;
+        }
+        else
+        {
+            s = delta / c_max;
+        }
+
+        v = c_max;
+
+        hsv[pos*3] = static_cast<uint8_t>(h / 360.0 * 255);
+        hsv[pos*3+1] = static_cast<uint8_t>(s / 100 * 255);
+        hsv[pos*3+2] = static_cast<uint8_t>(s / 100 * 255);
+    }
+}
+
+void sobelx(const uint8_t* rgb_image, const uint8_t* gray_image, uint8_t* result, 
+            const uint32_t width, const uint32_t height) {
+    const uint32_t size{ width * height };
+    for (uint32_t pos{1}; pos < size - 1; ++pos) {
+        int32_t sum = gray_image[pos - 1] - gray_image[pos + 1];
+        result[pos] = sum < 0 ? 0 : (sum > 255 ? 255 : sum);
     }
 }
 
