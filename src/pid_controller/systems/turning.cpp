@@ -18,9 +18,9 @@ pid_system_out pid_turning(pid_decision_data &in) {
     double diff = 0;
 
     // Depending on the look of the crossing, we want to follow different lines
-    path_step next = in.map.path[in.map.next_pos];
-    std::vector<edge> edges = in.map.g.get_edges(next.node);
-    switch (next.dir) {
+    path_step previous = in.map.path[in.map.previous_pos];
+    std::vector<edge> edges = in.map.g.get_edges(previous_pos);
+    switch (previous.dir) {
 
     // Going straight through crossing
     case STRAIGHT:
