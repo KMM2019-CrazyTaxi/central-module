@@ -15,7 +15,7 @@ const uint32_t IMAGE_SIZE_GRAY{ IMAGE_WIDTH * IMAGE_HEIGHT };
 const uint32_t IMAGE_SIZE_RGB{ IMAGE_SIZE_GRAY * 3 };
 
 // Lowest edge strength that is considered an edge.
-const uint32_t EDGE_STRENGTH_THRESHOLD{ 64 };
+const uint32_t EDGE_STRENGTH_THRESHOLD{ 96 };
 
 /*
  * The side edge detection prefers edges that are closer to the center of
