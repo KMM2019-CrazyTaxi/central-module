@@ -60,7 +60,7 @@ pid_system_out pid_turning(pid_decision_data &in) {
     default:
     {
         queue_message("Turning regulator got an invalid direction value" +
-                std::to_string(next.dir));
+                std::to_string(previous.dir));
     }break;
 
     }
