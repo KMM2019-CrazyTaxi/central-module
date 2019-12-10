@@ -1,5 +1,5 @@
 CCX=clang++
-CCXFLAGS = -std=c++17 -pthread -MD -MP -g
+CCXFLAGS = -std=c++17 -pthread -MD -MP
 LDFLAGS :=
 
 SRCDIR  = ./src
@@ -34,9 +34,6 @@ SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp')
 
 # Generate all objects
 OBJECTS  = $(SOURCES:$(SRCDIR)%.cpp=$(OBJSDIR)%.o)
-
-rm -f *.png
-rm -f central_module_log
 
 # Add qpulib to rule if you want to make with it
 project: $(OBJSDIR) $(OBJECTS)
