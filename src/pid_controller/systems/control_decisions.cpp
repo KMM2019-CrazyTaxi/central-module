@@ -64,12 +64,6 @@ pid_decision_data decide(pid_decision_in &in) {
     double prev_line_height = in.samples.dist_stop_line;
 
     queue_message("CURR_LINE_HEIGHT: " + std::to_string(curr_line_height));
-    // If the next stop line is far away, return line follower
-    //if (curr_line_height > in.params.stopping.min_value) {
-    //    queue_message("ABOVE MIN VAL");
-    //    return data;
-    //}
-
     int index = in.map.index;
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)

@@ -107,6 +107,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     // Stay at the end for some time, then continue
     if (regulate.mission_finished){
+        queue_message("MISSION FINISHED");
         std::this_thread::sleep_for(std::chrono::seconds(3));
         mission_data.missions.pop_front();
         regulate.index = 0;
