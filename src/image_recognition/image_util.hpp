@@ -26,6 +26,9 @@ void read_image(uint8_t* image, std::istream& input);
 void write_image(const uint8_t* image, std::ostream& output,
 		 const uint32_t width, const uint32_t height, 
                  const IMAGE_TYPE type = RGB);
+void write_image(const uint8_t* image, const std::string& output,
+		 const uint32_t width, const uint32_t height, 
+                 const IMAGE_TYPE type = RGB);
 
 /*
  * Converts an rgb image to approximate grayscale. The grayscale value of each

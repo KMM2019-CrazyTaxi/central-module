@@ -1,3 +1,5 @@
+#include <opencv2/opencv.hpp>
+
 #include "image_util.hpp"
 
 void read_image(uint8_t* image, std::istream& input) {
@@ -31,6 +33,27 @@ void write_image(const uint8_t* image, std::ostream& output,
 
     output << format << width << " " << height << " 255\n";
     output.write((char*) image, size);
+}
+
+void write_image(const uint8_t* image, const std::string& file_name,
+		 const uint32_t width, const uint32_t height, const IMAGE_TYPE type) {
+    uint32_t size{};
+    std::string format{};
+    cv::Mat cv_image;
+
+    switch (type) {
+    case GRAY:
+        cv_image = cv::Mat(height, width, CV_8UC1);
+        size = width * height;
+	format = "P5\n";
+        break;
+    case RGB:
+        cv_image = cv::Mat(height, width, CV_8UC3);
+        size = width * height * 3;
+	format = "P6\n";
+        break;
+    }
+    cv::imwrite(file_name, cv_image);
 }
 
 void rgb2gray(const uint8_t* image, uint8_t* gray, 
