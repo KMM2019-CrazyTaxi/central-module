@@ -36,9 +36,6 @@ pid_decision_data decide(pid_decision_in &in) {
         };
 
 
-    queue_message("Node index: " + std::to_string(data.map.index));
-    queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
-
     queue_message("Path:");
 
     std::string path_str;
@@ -74,6 +71,10 @@ pid_decision_data decide(pid_decision_in &in) {
     }
     data.map.next_pos = in.map.path[index].node;
     data.map.index = index;
+
+    queue_message("Node index: " + std::to_string(data.map.index));
+    queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
+
 
     path_step next = in.map.path[index];
 
