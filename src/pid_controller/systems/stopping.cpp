@@ -14,6 +14,7 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
     bool finished = false;
     // If we are going too fast, break
     if (curr_speed > speed_cutoff) res = -curr_speed;
+    else if (dist > 300) res = in.out.params.stopping.kp;
     // We are setting speed to 0, should mean we might have finished
     else if (in.set_if_finished) finished = true;
 
