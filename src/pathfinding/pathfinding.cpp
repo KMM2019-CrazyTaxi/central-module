@@ -25,7 +25,7 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
 
         if (i == start) continue;
 
-        dist[i] = 1000000000; // Cannot be max, as it would cause overflow when adding edge cost
+        dist[i] = std::numeric_limits<int>::max();
         queue.push_back(i);
     }
 
