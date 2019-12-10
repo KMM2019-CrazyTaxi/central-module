@@ -15,8 +15,6 @@ pid_decision_return pid_decision(pid_decision_in &in) {
     return out;
 }
 
-bool first_increment = true;
-
 pid_decision_data decide(pid_decision_in &in) {
 
     // Default settings for line following
@@ -76,15 +74,9 @@ pid_decision_data decide(pid_decision_in &in) {
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
     {
-        queue_message("UPDATE INDEX");
-        if (first_increment) {
-          queue_message("FIRST INCREMENT");
-           first_increment = false;
-        } else {
-          queue_message("NEW STOP LINE");
-          data.map.previous_pos = in.map.path[index].node;
-          index++;
-        }
+        queue_message("NEW STOP LINE");
+        data.map.previous_pos = in.map.path[index].node;
+        index++;
     }
     data.map.next_pos = in.map.path[index].node;
     data.map.index = index;
