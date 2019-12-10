@@ -35,6 +35,21 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.speed = 10
         };
 
+    
+    queue_message("Node index: " + std::to_string(data.map.index));
+    queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
+
+    queue_message("Path:");
+
+    std::string path_str;
+
+    for (const path_step& step : data.map.path) {
+        path_str += "N: " + std::to_string(step.node) + " D: " + std::to_string(step.dir) + " ";
+    }
+
+    queue_message(std::move(path_str));
+    queue_message("Current system: " + std::to_string(data.sys));
+
     // If an obstacle is ahead, we stop
     if (static_cast<double>(in.sensor_data.dist) < in.params.stopping.min_value) {
         data.sys = stopping;
