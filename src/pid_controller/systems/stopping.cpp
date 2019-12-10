@@ -1,10 +1,10 @@
 #include "stopping.hpp"
 #include "logging.hpp"
-#include "math.h"
+#include <cmath>
 
 pid_system_out pid_stopping(const pid_decision_data &in) {
 
-    double dist = in.out.metrics.dist_stop_line;
+    double dist = std::min(in.out.metrics.dist_stop_line, static_cast<double>(in.out.sensor_data.dist));
     double curr_speed = in.out.metrics.curr_speed;
     double speed_cutoff = in.out.params.stopping.speed_threshold;
 

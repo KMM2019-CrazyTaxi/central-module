@@ -36,7 +36,7 @@ pid_decision_data decide(pid_decision_in &in) {
         };
 
     // If an obstacle is ahead, we stop
-    if (in.sensor_data.dist < in.params.stopping.min_value) {
+    if (static_cast<double>(in.sensor_data.dist) < in.params.stopping.min_value) {
         data.sys = stopping;
         data.out.speed = 0;
         data.dist = (double)in.sensor_data.dist;

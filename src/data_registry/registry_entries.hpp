@@ -108,7 +108,7 @@ struct regulator_param_data{
     pid_params stopping =
     {
         .speed_threshold = 0.3,
-        .min_value = 100
+        .min_value = 500
     };
     pid_params line_angle =
     {
