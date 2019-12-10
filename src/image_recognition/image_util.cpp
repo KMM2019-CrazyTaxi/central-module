@@ -94,6 +94,7 @@ void sobelx(const uint8_t* rgb_image, const uint8_t* gray_image, uint8_t* result
             (pixel2[2] > 50 && pixel2[1] > 110 && pixel2[1] < 130) ||
             (pixel3[2] > 50 && pixel3[1] > 110 && pixel3[1] < 130))
         {
+            gray_image[pos] = 255;
             result[pos] = 0;
         }
         else
