@@ -95,6 +95,7 @@ pid_decision_data decide(pid_decision_in &in) {
         data.sys = stopping;
         data.out.speed = 0;
         data.dist = in.metrics.dist_stop_line;
+        data.out.mission_finished = true;
         return data;
     }
 
