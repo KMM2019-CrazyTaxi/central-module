@@ -91,9 +91,9 @@ pid_decision_data decide(pid_decision_in &in) {
     path_step next = in.map.path[index];
 
     // Approaching a stop-line, is it the end node?
-    if (next.node == in.map.path.back().node) {
+    if (next.node == in.map.path.back().node && curr_line_height < in.params.stopping.min_value) {
         data.sys = stopping;
-        // data.out.speed = 0;
+        data.out.speed = 0;
         data.dist = in.metrics.dist_stop_line;
         return data;
     }
