@@ -43,7 +43,7 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
 
         // Iterate over all the outgoing edges of the popped node
         for (const edge& e : g.get_edges(current)) {
-            
+
             int new_dist = dist[current] + e.cost;
 
             if (new_dist < dist[e.end]) {
@@ -62,7 +62,7 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
     // All shortest paths have been found, unwind path
     int current = end;
     std::vector<path_step> path;
-    
+
     while (current != start) {
 
         int prev = previous[current];
