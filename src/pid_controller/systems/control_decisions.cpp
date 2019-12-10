@@ -63,13 +63,18 @@ pid_decision_data decide(pid_decision_in &in) {
     double curr_line_height = in.metrics.dist_stop_line;
     double prev_line_height = in.samples.dist_stop_line;
 
+    queue_message("CURR_LINE_HEIGH: " + std::to_string(curr_line_height));
     // If the next stop line is far away, return line follower
-    if (curr_line_height > in.params.stopping.min_value) return data;
+    if (curr_line_height > in.params.stopping.min_value) {
+        queue_message("ABOVE MIN VAL");
+        return data;
+    }
 
     int index = in.map.index;
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
     {
+        queue_message("NEW STOP LINE");
         data.map.previous_pos = in.map.path[index].node;
         index++;
     }
