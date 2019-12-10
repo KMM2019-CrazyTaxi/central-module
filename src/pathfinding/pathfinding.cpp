@@ -14,9 +14,9 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
     // Lambda function that compares costs of nodes by binding the dist map to it
     auto comparator = [&dist](int lhs, int rhs) { return dist[lhs] > dist[rhs]; };
 
-    // Use comparator lambda above that uses dist to compare
     std::vector<int> queue;
 
+    // Add start node with 0 cost
     dist[start] = 0;
     queue.push_back(start);
 
@@ -29,13 +29,17 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
         queue.push_back(i);
     }
 
+    // Heapify queue
     std::make_heap(queue.begin(), queue.end(), comparator);
 
     while (!queue.empty()) {
+
+        // Pop node with lowest cost
         int current = queue.front();
         std::pop_heap(queue.begin(), queue.end(), comparator);
         queue.pop_back();
 
+        // Iterate over all the outgoing edges of the popped node
         for (const edge& e : g.get_edges(current)) {
             
             int new_dist = dist[current] + e.cost;
