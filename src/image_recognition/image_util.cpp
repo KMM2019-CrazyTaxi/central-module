@@ -87,9 +87,12 @@ void sobelx(const uint8_t* rgb_image, const uint8_t* gray_image, uint8_t* result
     for (uint32_t pos{1}; pos < size - 1; ++pos) {
         int32_t sum = gray_image[pos - 1] - gray_image[pos + 1];
 
-        const uint32_t row{ pos / width }, col{ pos % width };
-        cv::Vec3b pixel{ cv_hsv_image.at<cv::Vec3b>(row, col) };
-        if (pixel[2] > 50 && pixel[1] > 110 && pixel[1] < 130)
+        cv::Vec3b pixel1{ cv_hsv_image.at<cv::Vec3b>(pos / width, pos % width) };
+        cv::Vec3b pixel2{ cv_hsv_image.at<cv::Vec3b>((pos-1) / width, (pos-1) % width) };
+        cv::Vec3b pixel3{ cv_hsv_image.at<cv::Vec3b>((pos+1) / width, (pos+1) % width) };
+        if ((pixel1[2] > 50 && pixel1[1] > 110 && pixel1[1] < 130) ||
+            (pixel2[2] > 50 && pixel2[1] > 110 && pixel2[1] < 130) ||
+            (pixel3[2] > 50 && pixel3[1] > 110 && pixel3[1] < 130))
         {
             result[pos] = 0;
         }
