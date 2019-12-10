@@ -49,7 +49,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     std::vector<uint32_t> front_edges{};
 
     // Previous distance value for rolling average.
-    std::deque<double> front_distances{0, 0, 0, 0, 0};
+    std::deque<double> front_distances(5, IMAGE_HEIGHT);
 
     uint32_t n_processed_images{};
 
@@ -138,7 +138,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	telemetrics_data* data{ static_cast<telemetrics_data*>(registry.acquire_data(TELEMETRICS_DATA_ID)) };
 	data->dist_left = left_real_distance_1;
 	data->dist_right = right_real_distance_1;
-	data->dist_stop_line = median_front_pixel_distance*5;
+	data->dist_stop_line = median_front_pixel_distance * STOP_LINE_FACTOR;
 	registry.release_data(TELEMETRICS_DATA_ID);
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {

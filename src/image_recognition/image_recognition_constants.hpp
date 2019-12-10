@@ -53,6 +53,8 @@ should not be set less than 5 pixels from range end points.
 const uint32_t STOP_LINE_START_DISTANCE{ 10 };
 const uint32_t STOP_LINE_END_DISTANCE{ 200 };
 
+const uint32_t STOP_LINE_FACTOR{ 5 };
+
 // The number of pixels to used to calculate average edge location.
 const uint32_t EDGE_AVG_PIXELS{ 20 };
 
