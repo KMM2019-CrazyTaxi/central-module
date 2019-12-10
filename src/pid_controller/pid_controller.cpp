@@ -58,8 +58,6 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         continue;
     }
 
-    queue_message("Hello");
-
     // Get all data for the regulator
     telemetrics_data metrics = get_metrics();
     regulator_param_data params = get_params();
@@ -71,30 +69,22 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     double dt = std::chrono::duration_cast<std::chrono::duration<double>>(current_time - previous_time).count();
 
     std::pair<int, int> mission = mission_data.missions[0];
-    /*
-    mission.first = 1;
-    mission.second = 100;
-    */
-
-    // Quick fix while the bug where current_pos increments at the beginning persist
-    if (mission_data.current_pos == -1) {
-        upd_controller.wait();
-        continue;
-    }
 
     // If we are not already at the start position for some reason, go there
-    if (mission_data.current_pos != mission.first &&
-            path.back().node != mission.second)
+    if (mission_data.previous_pos != mission.first &&
+            (path.empty() || path.back().node != mission.second))
     {
-        path = find_shortest_path(mission_data.g, mission_data.current_pos,
+        path = find_shortest_path(mission_data.g, mission_data.previous_pos,
                                     mission.first);
-        mission = std::make_pair(mission_data.current_pos, mission.first);
+        mission = std::make_pair(mission_data.previous_pos, mission.first);
         mission_data.missions.push_front(mission);
     }
     // Or if we haven't found the path yet, do it.
-    else if (path.back().node != mission.second)
-        path = find_shortest_path(mission_data.g, mission_data.current_pos,
+    else if (path.empty() || path.back().node != mission.second)
+    {
+        path = find_shortest_path(mission_data.g, mission_data.previous_pos,
                                     mission.second);
+    }
     set_path(path);
 
     // Define input to the regulator
@@ -107,21 +97,24 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
        .samples = samples,
        .map.g = mission_data.g,
        .map.path = path,
-       .map.current_pos = mission_data.current_pos
+       .map.previous_pos = mission_data.previous_pos,
+       .map.next_pos = mission_data.next_pos,
+       .map.index = mission_data.index
       };
 
     // Regulate
     pid_decision_return regulate = pid_decision(dec_in);
 
     // Stay at the end for some time, then continue
-    if (mission_data.current_pos == mission.second && metrics.curr_speed <= 1){
+    if (regulate.mission_finished){
         std::this_thread::sleep_for(std::chrono::seconds(3));
-        if (!mission_data.missions.empty())
-            mission_data.missions.pop_front();
+        mission_data.missions.pop_front();
     }
 
     // Update current position
-    mission_data.current_pos = regulate.current_pos;
+    mission_data.previous_pos = regulate.previous_pos;
+    mission_data.next_pos = regulate.next_pos;
+    mission_data.index = regulate.index;
 
     samples = regulate.samples;
 

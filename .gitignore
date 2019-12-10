@@ -32,3 +32,6 @@ central_module_log
 
 # Emacs backup files
 *~
+
+# Test images
+*.ppm

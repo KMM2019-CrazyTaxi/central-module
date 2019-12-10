@@ -8,9 +8,14 @@ pid_decision_return regulate(pid_decision_data &);
 pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
     pid_decision_return out = regulate(data);
-    out.current_pos = data.map.current_pos;
+    out.previous_pos = data.map.previous_pos;
+    out.next_pos = data.map.next_pos;
+    out.index = data.map.index;
+    out.mission_finished = data.out.mission_finished;
     return out;
 }
+
+bool first_increment = true;
 
 pid_decision_data decide(pid_decision_in &in) {
 
@@ -20,7 +25,9 @@ pid_decision_data decide(pid_decision_in &in) {
         .sys = line,
         .map.g = in.map.g,
         .map.path = in.map.path,
-        .map.current_pos = in.map.current_pos,
+        .map.previous_pos = in.map.previous_pos,
+        .map.next_pos = in.map.next_pos,
+        .map.index = in.map.index,
         .out.metrics = in.metrics,
         .out.params = in.params,
         .out.samples = in.samples,
@@ -30,41 +37,69 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.speed = 10
         };
 
+    
+    queue_message("Node index: " + std::to_string(data.map.index));
+    queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
+
+    queue_message("Path:");
+
+    std::string path_str;
+
+    for (const path_step& step : data.map.path) {
+        path_str += "N: " + std::to_string(step.node) + " D: " + std::to_string(step.dir) + " ";
+    }
+
+    queue_message(std::move(path_str));
+    queue_message("Current system: " + std::to_string(data.sys));
+
     // If an obstacle is ahead, we stop
-    // TODO: Update values, don't know what's reasonable
-    if (in.sensor_data.dist < 400) {
+    if (static_cast<double>(in.sensor_data.dist) < in.params.stopping.min_value) {
         data.sys = stopping;
         data.out.speed = 0;
         data.dist = (double)in.sensor_data.dist;
+        return data;
     }
-
-    // If the next stop line is far away, return line follower
-    if (in.metrics.dist_stop_line > INC_POS_UPPER_LIMIT) return data;
-
-    int current_pos = in.map.current_pos;
-    queue_message("Current pos: " + std::to_string(current_pos));
 
     // If distance to stop line increased, we assume we passed one.
     // This also means that the initial sample value should be big.
     double curr_line_height = in.metrics.dist_stop_line;
     double prev_line_height = in.samples.dist_stop_line;
 
+    queue_message("CURR_LINE_HEIGH: " + std::to_string(curr_line_height));
+    // If the next stop line is far away, return line follower
+    //if (curr_line_height > in.params.stopping.min_value) {
+    //    queue_message("ABOVE MIN VAL");
+    //    return data;
+    //}
+
+    int index = in.map.index;
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
-        current_pos++;
-    data.map.current_pos = current_pos;
+    {
+        if (first_increment) {
+          queue_message("FIRST INCREMENT");
+           first_increment = false;
+        } else {
+          queue_message("NEW STOP LINE");
+          data.map.previous_pos = in.map.path[index].node;
+          index++;
+        }
+    }
+    data.map.next_pos = in.map.path[index].node;
+    data.map.index = index;
 
-    path_step next = in.map.path[current_pos];
+    path_step next = in.map.path[index];
 
     // Approaching a stop-line, is it the end node?
-    if (next.node == in.map.path.back().node) {
+    if (next.node == in.map.path.back().node && curr_line_height < in.params.stopping.min_value) {
         data.sys = stopping;
         data.out.speed = 0;
         data.dist = in.metrics.dist_stop_line;
+        data.out.mission_finished = true;
         return data;
     }
 
-    uint8_t num_edges = in.map.g.get_edges(next.node).size();
+    uint8_t num_edges = in.map.g.get_edges(data.map.previous_pos).size();
     // Turning areas have more than 1 edge
     if (num_edges > 1) {
         data.sys = turning;

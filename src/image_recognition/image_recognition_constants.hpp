@@ -15,7 +15,7 @@ const uint32_t IMAGE_SIZE_GRAY{ IMAGE_WIDTH * IMAGE_HEIGHT };
 const uint32_t IMAGE_SIZE_RGB{ IMAGE_SIZE_GRAY * 3 };
 
 // Lowest edge strength that is considered an edge.
-const uint32_t EDGE_STRENGTH_THRESHOLD{ 125 };
+const uint32_t EDGE_STRENGTH_THRESHOLD{ 64 };
 
 /*
  * The side edge detection prefers edges that are closer to the center of
@@ -46,7 +46,9 @@ const uint32_t BOUND_DISTANCE_2_PIXEL{ 200 };
 
 /*
 The start and end distances in pixels from the bottom of the image where ir should
-look for stop lines.
+look for stop lines. They are assumed to be in the range [0, IMAGE_HEIGHT). Note
+that the sobel convolutions create noise close the the image bounds, so these constants
+should not be set less than 5 pixels from range end points.
 */
 const uint32_t STOP_LINE_START_DISTANCE{ 10 };
 const uint32_t STOP_LINE_END_DISTANCE{ 200 };
