@@ -101,8 +101,8 @@ double regulate_speed(const telemetrics_data &metrics,
   double slope = params.slope;
 
   double speed_fact = calc_fact(reg_angle/MAX_INPUT_ANGLE,
-          metrics.curr_speed/10, angle_threshold/MAX_INPUT_ANGLE,
-          speed_threshold/10, min_value, slope);
+          metrics.curr_speed/6, angle_threshold/MAX_INPUT_ANGLE,
+          speed_threshold/6, min_value, slope);
 
   double sample_d = beta * ref_speed - metrics.curr_speed;
 
