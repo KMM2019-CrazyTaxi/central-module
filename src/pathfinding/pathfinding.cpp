@@ -33,7 +33,7 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
 
     while (!queue.empty()) {
         int current = queue.front();
-        pop_heap(queue.begin(), queue.end(), comparator);
+        std::pop_heap(queue.begin(), queue.end(), comparator);
         queue.pop_back();
 
         for (const edge& e : g.get_edges(current)) {
@@ -45,7 +45,7 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
                 previous[e.end] = current;
 
                 // Since costs have been updated, resort heap
-                make_heap(queue.begin(), queue.end(), comparator);
+                std::make_heap(queue.begin(), queue.end(), comparator);
             }
         }
     }
