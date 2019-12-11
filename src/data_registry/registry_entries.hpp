@@ -103,12 +103,12 @@ struct regulator_param_data{
         .kd = 0,
         .alpha = 1,
         .beta = 1,
-	    .min_value = 13.7
+	.min_value = 13.7
     };
     pid_params parking;
     pid_params stopping =
     {
-	    .kp = 0.25,
+	.kp = 0.25,
         .speed_threshold = 0.3,
         .min_value = 800
     };
@@ -150,7 +150,7 @@ struct regulator_sample_data{
   */
 struct mission_data{
     graph g;
-    std::deque<std::pair<int,int>> missions = {std::make_pair(3, 10)};
+    std::deque<std::pair<int,int>> missions = {std::make_pair(3, 1), std::make_pair(3, 1), std::make_pair(3, 1), std::make_pair(3, 1)};
     int previous_pos = 3;
     int next_pos = 0; // Will be calculated immediately
     int index = 0;
