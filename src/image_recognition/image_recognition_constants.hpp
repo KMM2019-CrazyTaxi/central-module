@@ -22,7 +22,7 @@ const uint32_t EDGE_STRENGTH_THRESHOLD{ 64 };
  * the image. This constant determines the lowest relative strength for an
  * outer edge to be prefered over an inner edge.
  */
-const double RELATIVE_EDGE_STRENGTH_THRESHOLD{ 1.5 };
+const double RELATIVE_EDGE_STRENGTH_THRESHOLD{ 1 };
 
 // Number of available test images.
 const uint32_t N_TEST_IMAGES{ 8 };
@@ -38,7 +38,7 @@ const std::string TEST_IMAGES[N_TEST_IMAGES] = {"1.ppm", "2.ppm", "3.ppm", "4.pp
 const bool OUTPUT_MARKED_IMAGE_TO_FILE{ true };
 
 // Frame taken by the camera each second.
-const uint32_t CAMERA_FPS{ 60 };
+const uint32_t CAMERA_FPS{ 60};
 
 // Distance from car where the side edges are detected.
 const uint32_t BOUND_DISTANCE_1_PIXEL{ 100 };
