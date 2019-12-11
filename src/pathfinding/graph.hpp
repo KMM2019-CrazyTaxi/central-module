@@ -9,8 +9,8 @@
  */
 enum direction {
     STRAIGHT = 0,
-    LEFT = -1,
-    RIGHT = 1,
+    LEFT = 1,
+    RIGHT = 2,
 
     NUM_DIRECTIONS = 3
 };

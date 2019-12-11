@@ -15,7 +15,7 @@ const uint32_t IMAGE_SIZE_GRAY{ IMAGE_WIDTH * IMAGE_HEIGHT };
 const uint32_t IMAGE_SIZE_RGB{ IMAGE_SIZE_GRAY * 3 };
 
 // Lowest edge strength that is considered an edge.
-const uint32_t EDGE_STRENGTH_THRESHOLD{ 64 };
+const uint32_t EDGE_STRENGTH_THRESHOLD{ 96 };
 
 /*
  * The side edge detection prefers edges that are closer to the center of
@@ -52,6 +52,8 @@ should not be set less than 5 pixels from range end points.
 */
 const uint32_t STOP_LINE_START_DISTANCE{ 10 };
 const uint32_t STOP_LINE_END_DISTANCE{ 200 };
+
+const uint32_t STOP_LINE_FACTOR{ 5 };
 
 // The number of pixels to used to calculate average edge location.
 const uint32_t EDGE_AVG_PIXELS{ 20 };

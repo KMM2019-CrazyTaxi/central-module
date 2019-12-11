@@ -15,13 +15,12 @@ pid_system_out pid_turning(pid_decision_data &in) {
 
     double dist_left = in.out.metrics.dist_left;
     double dist_right = in.out.metrics.dist_right;
-    double diff = -dist_right + 10;
+    double diff = 0;
 
-    /*
     // Depending on the look of the crossing, we want to follow different lines
-    path_step next = in.map.path[in.map.current_pos];
-    std::vector<edge> edges = in.map.g.get_edges(next.node);
-    switch (next.dir) {
+    path_step previous = in.map.path[in.map.index - 1];
+    std::vector<edge> edges = in.map.g.get_edges(previous.node);
+    switch (previous.dir) {
 
     // Going straight through crossing
     case STRAIGHT:
@@ -36,10 +35,10 @@ pid_system_out pid_turning(pid_decision_data &in) {
             diff = dist_left - dist_right;
         // 3-way crossing with a turn to the left
         else if (dirs.test(LEFT))
-            diff = -dist_right + min_value;
+            diff = dist_left - min_value;
         // 3-way crossing with a turn to the right
         else if (dirs.test(RIGHT))
-            diff = dist_left - min_value;
+            diff = -dist_right + min_value;
         else
             queue_message("No directions are set in turning regulator");
     }break;
@@ -60,12 +59,11 @@ pid_system_out pid_turning(pid_decision_data &in) {
 
     default:
     {
-        queue_message("Turning regulator got an invalid direction value" +
-                std::to_string(next.dir));
+        queue_message("Turning regulator got an invalid direction value " +
+                std::to_string(previous.dir));
     }break;
 
     }
-    */
 
     double dt = in.out.dt;
     regulator_sample_data samples = in.out.samples;

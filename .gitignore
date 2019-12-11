@@ -35,3 +35,4 @@ central_module_log
 
 # Test images
 *.ppm
+*.png

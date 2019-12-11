@@ -4,7 +4,6 @@
 #include <chrono>
 #include <cstring>
 #include <vector>
-#include <fstream>
 #include <deque>
 #include <algorithm>
 
@@ -49,7 +48,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
     std::vector<uint32_t> front_edges{};
 
     // Previous distance value for rolling average.
-    std::deque<double> front_distances{0, 0, 0, 0, 0};
+    std::deque<double> front_distances(5, IMAGE_HEIGHT);
 
     uint32_t n_processed_images{};
 
@@ -138,7 +137,7 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
 	telemetrics_data* data{ static_cast<telemetrics_data*>(registry.acquire_data(TELEMETRICS_DATA_ID)) };
 	data->dist_left = left_real_distance_1;
 	data->dist_right = right_real_distance_1;
-	data->dist_stop_line = median_front_pixel_distance*5;
+	data->dist_stop_line = median_front_pixel_distance * STOP_LINE_FACTOR;
 	registry.release_data(TELEMETRICS_DATA_ID);
 
         if (OUTPUT_MARKED_IMAGE_TO_FILE) {
@@ -178,12 +177,13 @@ void image_recognition_main(const std::atomic_bool& running, double_buffer& imag
                 queue_message("  Front edge distance: " + std::to_string(adjusted_front_pixel_distance));
 		queue_message("  Marking test image took "
 			      + std::to_string(to_ms(edge_time, mark_time)) + " ms.");
-		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) 
-                                      + "_processed.ppm" };
-		queue_message("  Saving marked image to " + file_name);
-		std::ofstream output{ file_name, std::ios::binary };
-		write_image(marked_image, output, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
-		output.close();
+		std::string file_name{ std::to_string(n_processed_images / CAMERA_FPS) };
+		queue_message("  Saving images to " + file_name);
+		write_image(image, "original_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
+		write_image(gray_image, "gray_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(edgex_image, "edgex_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(edgey_image, "edgey_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::GRAY);
+		write_image(marked_image, "marked_" + file_name + ".png", IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_TYPE::RGB);
 	    }
 	}
     }
