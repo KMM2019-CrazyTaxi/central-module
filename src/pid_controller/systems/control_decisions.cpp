@@ -7,6 +7,19 @@ pid_decision_return regulate(pid_decision_data &);
 
 pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
+
+    queue_message("Path:");
+    std::string path_str;
+    double curr_line_height = in.metrics.dist_stop_line;
+    for (const path_step& step : data.map.path) {
+        path_str += "N: " + std::to_string(step.node) + " D: " + std::to_string(step.dir) + " ";
+    }
+    queue_message(std::move(path_str));
+    queue_message("Current system: " + std::to_string(data.sys));
+    queue_message("CURR_LINE_HEIGHT: " + std::to_string(curr_line_height));
+    queue_message("Node index: " + std::to_string(data.map.index));
+    queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
+
     pid_decision_return out = regulate(data);
     out.previous_pos = data.map.previous_pos;
     out.next_pos = data.map.next_pos;
@@ -35,18 +48,6 @@ pid_decision_data decide(pid_decision_in &in) {
         .out.speed = 10
         };
 
-
-    queue_message("Path:");
-
-    std::string path_str;
-
-    for (const path_step& step : data.map.path) {
-        path_str += "N: " + std::to_string(step.node) + " D: " + std::to_string(step.dir) + " ";
-    }
-
-    queue_message(std::move(path_str));
-    queue_message("Current system: " + std::to_string(data.sys));
-
     // If an obstacle is ahead, we stop
     if (static_cast<double>(in.sensor_data.dist) < in.params.stopping.min_value) {
         data.sys = stopping;
@@ -60,21 +61,15 @@ pid_decision_data decide(pid_decision_in &in) {
     double curr_line_height = in.metrics.dist_stop_line;
     double prev_line_height = in.samples.dist_stop_line;
 
-    queue_message("CURR_LINE_HEIGHT: " + std::to_string(curr_line_height));
     int index = in.map.index;
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
             prev_line_height < INC_POS_LOWER_LIMIT)
     {
-        queue_message("NEW STOP LINE");
         data.map.previous_pos = in.map.path[index].node;
         index++;
     }
     data.map.next_pos = in.map.path[index].node;
     data.map.index = index;
-
-    queue_message("Node index: " + std::to_string(data.map.index));
-    queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
-
 
     path_step next = in.map.path[index];
 
@@ -98,6 +93,8 @@ pid_decision_data decide(pid_decision_in &in) {
 }
 
 pid_decision_return regulate(pid_decision_data &dec) {
+
+
 
   pid_system_out line_in;
 
