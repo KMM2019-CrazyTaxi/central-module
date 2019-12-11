@@ -18,13 +18,14 @@ pid_system_out pid_turning(pid_decision_data &in) {
     double diff = 0;
 
     // Depending on the look of the crossing, we want to follow different lines
-    path_step previous = in.map.path[in.map.index - 1];
-    std::vector<edge> edges = in.map.g.get_edges(previous.node);
-    switch (previous.dir) {
+    path_step next = in.map.path[in.map.index];
+    switch (next.dir) {
 
     // Going straight through crossing
     case STRAIGHT:
     {
+        int previous_node = in.map.path[in.map.index - 1].node; // We cannot start in crossings!!
+        std::vector<edge> edges = in.map.g.get_edges(previous_node);
         std::bitset<NUM_DIRECTIONS> dirs;
 
         for (edge e : edges)
@@ -60,7 +61,7 @@ pid_system_out pid_turning(pid_decision_data &in) {
     default:
     {
         queue_message("Turning regulator got an invalid direction value " +
-                std::to_string(previous.dir));
+                std::to_string(next.dir));
     }break;
 
     }
