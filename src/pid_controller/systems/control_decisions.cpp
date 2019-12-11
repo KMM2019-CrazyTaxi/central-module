@@ -95,47 +95,31 @@ pid_decision_data decide(pid_decision_in &in) {
 
 pid_decision_return regulate(pid_decision_data &dec) {
 
-  pid_system_out line_in;
+  pid_system_out output;
 
   switch(dec.sys) {
 
   case turning:
     {
-      // Regulate turn
-      pid_system_out turning = pid_turning(dec);
-
-      // Set input for line system
-      line_in = turning;
+      pid_system_out output = pid_turning(dec);
 
     }break;
 
   case parking:
     {
-
-      // Regulate parking
-      pid_system_out parking = pid_parking(dec);
-
-      // Set input for line system
-      line_in = parking;
+      pid_system_out output = pid_parking(dec);
 
     }break;
 
   case stopping:
     {
-
-      // Regulate stopping
-      pid_system_out stopping = pid_stopping(dec);
-
-      // set input for line system
-      line_in = stopping;
+      pid_system_out output = pid_stopping(dec);
 
     }break;
 
   case line:
     {
-
-      // Set input for line system
-      line_in = dec.out;
+      output = pid_line(dec.out);
 
     }break;
 
@@ -146,16 +130,12 @@ pid_decision_return regulate(pid_decision_data &dec) {
 
   }
 
-  line_in.params = dec.out.params;
-  line_in.dt = dec.out.dt;
-  line_in.metrics = dec.out.metrics;
-  pid_system_out line_out = pid_line(line_in);
   pid_decision_return out =
     {
-     .angle = line_out.angle,
-     .speed = line_out.speed,
-     .samples = line_out.samples,
-     .mission_finished = line_in.mission_finished
+     .angle = output.angle,
+     .speed = output.speed,
+     .samples = output.samples,
+     .mission_finished = output.mission_finished
     };
 
   return out;
