@@ -24,7 +24,6 @@ pid_decision_return pid_decision(pid_decision_in &in) {
     out.previous_pos = data.map.previous_pos;
     out.next_pos = data.map.next_pos;
     out.index = data.map.index;
-    out.mission_finished = data.out.mission_finished;
     return out;
 }
 
@@ -63,7 +62,8 @@ pid_decision_data decide(pid_decision_in &in) {
 
     int index = in.map.index;
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
-            prev_line_height < INC_POS_LOWER_LIMIT)
+            prev_line_height < INC_POS_LOWER_LIMIT &&
+            curr_line_height > INC_POS_LOWER_LIMIT)
     {
         data.map.previous_pos = in.map.path[index].node;
         index++;
@@ -78,6 +78,7 @@ pid_decision_data decide(pid_decision_in &in) {
         data.sys = stopping;
         data.out.speed = 0;
         data.dist = in.metrics.dist_stop_line;
+        data.set_if_finished = true;
         return data;
     }
 
@@ -93,8 +94,6 @@ pid_decision_data decide(pid_decision_in &in) {
 }
 
 pid_decision_return regulate(pid_decision_data &dec) {
-
-
 
   pid_system_out line_in;
 
@@ -154,7 +153,8 @@ pid_decision_return regulate(pid_decision_data &dec) {
     {
      .angle = line_out.angle,
      .speed = line_out.speed,
-     .samples = line_out.samples
+     .samples = line_out.samples,
+     .mission_finished = line_in.mission_finished
     };
 
   return out;

@@ -38,7 +38,7 @@ struct telemetrics_data {
     double curr_speed;
     double dist_left;
     double dist_right;
-    double dist_stop_line = IMAGE_HEIGHT;
+    double dist_stop_line = IMAGE_HEIGHT * STOP_LINE_FACTOR;
 };
 
 /**
@@ -142,7 +142,7 @@ struct regulator_sample_data{
     double line_angle_d;
     double line_speed_d;
     double stopping_speed_d;
-    double dist_stop_line = IMAGE_HEIGHT;
+    double dist_stop_line = IMAGE_HEIGHT * STOP_LINE_FACTOR;
 };
 
 /**
