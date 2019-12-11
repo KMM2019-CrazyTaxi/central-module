@@ -74,9 +74,9 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     if (mission_data.previous_pos != mission.first &&
             (path.empty() || path.back().node != mission.second))
     {
-        path = find_shortest_path(mission_data.g, mission_data.previous_pos,
-                                    mission.first);
-        mission = std::make_pair(mission_data.previous_pos, mission.first);
+        edge e = mission_data.g.get_edges(mission.first)[0]; // Assuming we are never starting in a crossing
+        path = find_shortest_path(mission_data.g, mission_data.previous_pos, e.end);
+        mission = std::make_pair(mission_data.previous_pos, e.end);
         mission_data.missions.push_front(mission);
     }
     // Or if we haven't found the path yet, do it.
