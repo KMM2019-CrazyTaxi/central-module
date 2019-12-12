@@ -98,25 +98,25 @@ struct pid_params{
 struct regulator_param_data{
     pid_params turning =
     {
-        .kp = 1,
+        .kp = 1.2,
         .ki = 0,
         .kd = 0,
         .alpha = 1,
         .beta = 1,
-	.min_value = 15
+	    .min_value = 13.7
     };
     pid_params parking;
     pid_params stopping =
     {
-	.kp = 1.0,
+	    .kp = 0.25,
         .speed_threshold = 0.3,
-        .min_value = 500
+        .min_value = 800
     };
     pid_params line_angle =
     {
-        .kp = 12,
+        .kp = 9,
         .ki = 0,
-        .kd = 0.2,
+        .kd = 0.8,
         .alpha = 1,
         .beta = 1
     };
