@@ -7,7 +7,6 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
     double dist = in.dist;
     double curr_speed = in.out.metrics.curr_speed;
     double speed_cutoff = in.out.params.stopping.speed_threshold;
-    //double reverse_speed = in.out.params.stopping.kd;
 
     double res = 0;
 
@@ -21,10 +20,10 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
 
     pid_system_out out =
       {
-       .angle = in.out.angle,
-       .speed = res,
-       .samples = in.out.samples,
-       .mission_finished = finished
+          .angle = in.out.angle,
+          .speed = res,
+          .samples = in.out.samples,
+          .mission_finished = finished
       };
 
     return out;

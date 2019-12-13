@@ -32,12 +32,8 @@ pid_decision_data decide(pid_decision_in &in) {
     // Default settings for line following
     pid_decision_data data =
         {
-        .sys = line,
-        .map.g = in.map.g,
-        .map.path = in.map.path,
-        .map.previous_pos = in.map.previous_pos,
-        .map.next_pos = in.map.next_pos,
-        .map.index = in.map.index,
+        .sys = angle,
+        .map = in.map,
         .out.metrics = in.metrics,
         .out.params = in.params,
         .out.samples = in.samples,
@@ -95,31 +91,31 @@ pid_decision_data decide(pid_decision_in &in) {
 
 pid_decision_return regulate(pid_decision_data &dec) {
 
-  pid_system_out output;
+  pid_system_out output = dec.out;
 
   switch(dec.sys) {
 
   case turning:
     {
-      pid_system_out output = pid_turning(dec);
+      output = pid_turning(dec);
 
     }break;
 
   case parking:
     {
-      pid_system_out output = pid_parking(dec);
+      output = pid_parking(dec);
 
     }break;
 
   case stopping:
     {
-      pid_system_out output = pid_stopping(dec);
+      output = pid_stopping(dec);
 
     }break;
 
-  case line:
+  case angle:
     {
-      output = pid_line(dec.out);
+      output = pid_angle(dec);
 
     }break;
 
@@ -130,6 +126,7 @@ pid_decision_return regulate(pid_decision_data &dec) {
 
   }
 
+  output = pid_speed(output);
   pid_decision_return out =
     {
      .angle = output.angle,
