@@ -150,8 +150,8 @@ struct regulator_sample_data{
   */
 struct mission_data{
     graph g;
-    std::deque<std::pair<int,int>> missions = {std::make_pair(0, 5)};
-    int previous_pos = 0;
+    std::deque<std::pair<int,int>> missions = {std::make_pair(3, 10)};
+    int previous_pos = 3;
     int next_pos = 0; // Will be calculated immediately
     int index = 0;
 };

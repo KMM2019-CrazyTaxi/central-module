@@ -8,6 +8,7 @@ pid_decision_return regulate(pid_decision_data &);
 pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
 
+    /*
     queue_message("Path:");
     std::string path_str;
     double curr_line_height = in.metrics.dist_stop_line;
@@ -19,6 +20,7 @@ pid_decision_return pid_decision(pid_decision_in &in) {
     queue_message("CURR_LINE_HEIGHT: " + std::to_string(curr_line_height));
     queue_message("Node index: " + std::to_string(data.map.index));
     queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
+    */
 
     pid_decision_return out = regulate(data);
     out.previous_pos = data.map.previous_pos;
@@ -148,6 +150,7 @@ pid_decision_return regulate(pid_decision_data &dec) {
 
   line_in.params = dec.out.params;
   line_in.dt = dec.out.dt;
+  line_in.metrics = dec.out.metrics;
   pid_system_out line_out = pid_line(line_in);
   pid_decision_return out =
     {
