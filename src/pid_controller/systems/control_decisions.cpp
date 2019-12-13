@@ -127,6 +127,7 @@ pid_decision_return regulate(pid_decision_data &dec) {
   }
 
   output.dt = dec.out.dt;
+  output.params = dec.out.params;
   output = pid_speed(output);
   pid_decision_return out =
     {
