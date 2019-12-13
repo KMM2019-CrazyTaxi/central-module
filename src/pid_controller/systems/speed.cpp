@@ -64,6 +64,8 @@ pid_system_out pid_speed(pid_system_out &in){
       .speed = res,
       .samples = in.samples
   };
+
+  return out;
 }
 
 /**
