@@ -154,6 +154,7 @@ struct mission_data{
     int previous_pos = 3;
     int next_pos = 0; // Will be calculated immediately
     int index = 0;
+    bool running = false;
 };
 
 /**

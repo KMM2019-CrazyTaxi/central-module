@@ -70,14 +70,14 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     std::pair<int, int> mission = mission_data.missions[0];
 
-    // If we are not already at the start position for some reason, go there
-    if (mission_data.previous_pos != mission.first &&
-            (path.empty() || path.back().node != mission.second))
+    // If we are not already at the start position, go there
+    if (!mission_data.running && mission_data.previous_pos != mission.first)
     {
-        edge e = mission_data.g.get_edges(mission.first)[0]; // Assuming we are never starting in a crossing
+        edge e = mission_data.g.get_edges(mission.first)[0]; // Assuming we are never starting in an intersection
         path = find_shortest_path(mission_data.g, mission_data.previous_pos, e.end);
         mission = std::make_pair(mission_data.previous_pos, e.end);
         mission_data.missions.push_front(mission);
+        mission_data.running = true;
     }
     // Or if we haven't found the path yet, do it.
     else if (path.empty() || path.back().node != mission.second)
@@ -111,6 +111,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
         std::this_thread::sleep_for(std::chrono::seconds(3));
         mission_data.missions.pop_front();
         regulate.index = 0;
+        mission_data.running = false;
     }
 
     // Update current position
