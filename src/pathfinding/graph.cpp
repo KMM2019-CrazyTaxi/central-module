@@ -8,19 +8,19 @@
 
 graph::graph() {
 
-    nodes = 12;
+    nodes = 16;
 
     int DEFAULT_COST = 1;
 
-    g[0].push_back((edge){0, 10, DEFAULT_COST, STRAIGHT});
-    
+    g[0].push_back((edge){0, 13, DEFAULT_COST, STRAIGHT});
+
     g[1].push_back((edge){1, 3, DEFAULT_COST, STRAIGHT});
     g[1].push_back((edge){1, 4, DEFAULT_COST, RIGHT});
-    
+
     g[2].push_back((edge){2, 0, DEFAULT_COST, STRAIGHT});
     g[2].push_back((edge){2, 4, DEFAULT_COST, LEFT});
 
-    g[3].push_back((edge){3, 9, DEFAULT_COST, STRAIGHT});
+    g[3].push_back((edge){3, 14, DEFAULT_COST, STRAIGHT});
 
     g[4].push_back((edge){4, 6, DEFAULT_COST, STRAIGHT});
 
@@ -32,7 +32,7 @@ graph::graph() {
 
     g[7].push_back((edge){7, 5, DEFAULT_COST, STRAIGHT});
 
-    g[8].push_back((edge){8, 1, DEFAULT_COST, STRAIGHT});
+    g[8].push_back((edge){8, 12, DEFAULT_COST, STRAIGHT});
 
     g[9].push_back((edge){9, 8, DEFAULT_COST, STRAIGHT});
     g[9].push_back((edge){9, 7, DEFAULT_COST, RIGHT});
@@ -40,7 +40,15 @@ graph::graph() {
     g[10].push_back((edge){10, 7, DEFAULT_COST, LEFT});
     g[10].push_back((edge){10, 11, DEFAULT_COST, STRAIGHT});
 
-    g[11].push_back((edge){11, 2, DEFAULT_COST, STRAIGHT});
+    g[11].push_back((edge){11, 15, DEFAULT_COST, STRAIGHT});
+
+    g[12].push_back((edge){12, 1, DEFAULT_COST, STRAIGHT});
+
+    g[13].push_back((edge){13, 10, DEFAULT_COST, STRAIGHT});
+
+    g[14].push_back((edge){14, 9, DEFAULT_COST, STRAIGHT});
+
+    g[15].push_back((edge){15, 2, DEFAULT_COST, STRAIGHT});
 
 }
 
@@ -87,7 +95,7 @@ graph::graph(const uint8_t* buffer) {
             queue_message("\tEdge: " + std::to_string(edge.start) + " " + std::to_string(edge.end) + " " + std::to_string(edge.cost) + " " + std::to_string((int) edge.dir));
         }
     }
-    
+
 }
 
 std::vector<edge>& graph::get_edges(int node) {
