@@ -36,10 +36,10 @@ pid_system_out pid_turning(pid_decision_data &in) {
             diff = dist_left - dist_right;
         // 3-way crossing with a turn to the left
         else if (dirs.test(LEFT))
-            diff = dist_left - min_value;
+            diff = -dist_right + min_value;
         // 3-way crossing with a turn to the right
         else if (dirs.test(RIGHT))
-            diff = -dist_right + min_value;
+            diff = dist_left - min_value;
         else
             queue_message("No directions are set in turning regulator");
     }break;

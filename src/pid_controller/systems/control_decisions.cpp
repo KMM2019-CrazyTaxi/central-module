@@ -8,6 +8,7 @@ pid_decision_return regulate(pid_decision_data &);
 pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
 
+    /*
     queue_message("Path:");
     std::string path_str;
     double curr_line_height = in.metrics.dist_stop_line;
@@ -19,12 +20,12 @@ pid_decision_return pid_decision(pid_decision_in &in) {
     queue_message("CURR_LINE_HEIGHT: " + std::to_string(curr_line_height));
     queue_message("Node index: " + std::to_string(data.map.index));
     queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
+    */
 
     pid_decision_return out = regulate(data);
     out.previous_pos = data.map.previous_pos;
     out.next_pos = data.map.next_pos;
     out.index = data.map.index;
-    out.mission_finished = data.out.mission_finished;
     return out;
 }
 
@@ -63,7 +64,8 @@ pid_decision_data decide(pid_decision_in &in) {
 
     int index = in.map.index;
     if (curr_line_height > prev_line_height + INC_POS_ERROR_DELTA &&
-            prev_line_height < INC_POS_LOWER_LIMIT)
+            prev_line_height < INC_POS_LOWER_LIMIT &&
+            curr_line_height > INC_POS_LOWER_LIMIT)
     {
         data.map.previous_pos = in.map.path[index].node;
         index++;
@@ -78,6 +80,7 @@ pid_decision_data decide(pid_decision_in &in) {
         data.sys = stopping;
         data.out.speed = 0;
         data.dist = in.metrics.dist_stop_line;
+        data.set_if_finished = true;
         return data;
     }
 
@@ -93,8 +96,6 @@ pid_decision_data decide(pid_decision_in &in) {
 }
 
 pid_decision_return regulate(pid_decision_data &dec) {
-
-
 
   pid_system_out line_in;
 
@@ -149,12 +150,14 @@ pid_decision_return regulate(pid_decision_data &dec) {
 
   line_in.params = dec.out.params;
   line_in.dt = dec.out.dt;
+  line_in.metrics = dec.out.metrics;
   pid_system_out line_out = pid_line(line_in);
   pid_decision_return out =
     {
      .angle = line_out.angle,
      .speed = line_out.speed,
-     .samples = line_out.samples
+     .samples = line_out.samples,
+     .mission_finished = line_in.mission_finished
     };
 
   return out;

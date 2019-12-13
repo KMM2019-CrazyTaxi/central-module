@@ -104,6 +104,10 @@ double regulate_speed(const telemetrics_data &metrics,
           metrics.curr_speed/6, angle_threshold/MAX_INPUT_ANGLE,
           speed_threshold/6, min_value, slope);
 
+  queue_message("Curr speed: " + std::to_string(metrics.curr_speed));
+  queue_message("Reg angle: " + std::to_string(reg_angle));
+  queue_message("Speed fact: " + std::to_string(speed_fact));
+
   double sample_d = beta * ref_speed - metrics.curr_speed;
 
   double calc_p = alpha * ref_speed - metrics.curr_speed;
