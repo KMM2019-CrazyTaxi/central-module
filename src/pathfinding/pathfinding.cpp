@@ -8,6 +8,17 @@
 
 std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
 
+    int original_start = -1;
+    bool insert_original_start = false;
+
+    // If start and end are equal, return a full traverse
+    // rather than an empty path
+    if (start == end) {
+        original_start = start;
+        start = g.get_edges(start)[0].end;
+    }
+
+
     std::unordered_map<int, int> previous;
     std::unordered_map<int, int> dist;
 
@@ -71,6 +82,11 @@ std::vector<path_step> find_shortest_path(graph& g, int start, int end) {
         edge e = g.get_edge(prev, current);
         path.push_back((path_step){current, e.dir});
         current = prev;
+    }
+
+    // Insert path between new start and original start at the end
+    if (insert_original_start) {
+        path.push_back((path_step){start, g.get_edges(original_start)[0].dir});
     }
 
     // Path is backwards so reverse it
