@@ -22,7 +22,7 @@ const uint32_t EDGE_STRENGTH_THRESHOLD{ 64 };
  * the image. This constant determines the lowest relative strength for an
  * outer edge to be prefered over an inner edge.
  */
-const double RELATIVE_EDGE_STRENGTH_THRESHOLD{ 1 };
+const double RELATIVE_EDGE_STRENGTH_THRESHOLD{ 1.2 };
 
 // Number of available test images.
 const uint32_t N_TEST_IMAGES{ 8 };
