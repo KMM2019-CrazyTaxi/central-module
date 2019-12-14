@@ -84,6 +84,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     {
         path = find_shortest_path(mission_data.g, mission_data.previous_pos,
                                     mission.second);
+        mission_data.running = true;
     }
     set_path(path);
 
