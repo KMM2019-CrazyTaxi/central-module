@@ -91,31 +91,31 @@ pid_decision_data decide(pid_decision_in &in) {
 
 pid_decision_return regulate(pid_decision_data &dec) {
 
-  pid_system_out output = dec.out;
+  pid_system_out reg_angle = dec.out;
 
   switch(dec.sys) {
 
   case turning:
     {
-      output = pid_turning(dec);
+      reg_angle = pid_turning(dec);
 
     }break;
 
   case parking:
     {
-      output = pid_parking(dec);
+      reg_angle = pid_parking(dec);
 
     }break;
 
   case stopping:
     {
-      output = pid_stopping(dec);
+      reg_angle = pid_stopping(dec);
 
     }break;
 
   case angle:
     {
-      output = pid_angle(dec);
+      reg_angle = pid_angle(dec);
 
     }break;
 
@@ -126,16 +126,16 @@ pid_decision_return regulate(pid_decision_data &dec) {
 
   }
 
-  output.dt = dec.out.dt;
-  output.params = dec.out.params;
-  output.metrics = dec.out.metrics;
-  output = pid_speed(output);
+  reg_angle.dt = dec.out.dt;
+  reg_angle.params = dec.out.params;
+  reg_angle.metrics = dec.out.metrics;
+  pid_system_out speed = pid_speed(reg_angle);
   pid_decision_return out =
     {
-     .angle = output.angle,
-     .speed = output.speed,
-     .samples = output.samples,
-     .mission_finished = output.mission_finished
+     .angle = reg_angle.angle,
+     .speed = speed.speed,
+     .samples = speed.samples,
+     .mission_finished = reg_angle.mission_finished
     };
 
   return out;
