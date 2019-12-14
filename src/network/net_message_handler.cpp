@@ -23,6 +23,7 @@ packet handle_send_map(const packet& p);
 packet handle_get_mode(const packet& p);
 packet handle_set_mode(const packet& p);
 packet handle_send_route(const packet& p);
+packet handle_request_heartbeat(const packet& p);
 
 std::vector<packet> handle_packets(const std::vector<packet>& packets) {
 
@@ -80,6 +81,9 @@ packet handle_packet(const packet& p) {
 
         case SEND_NEW_ROUTE:
             return handle_send_route(p);
+
+        case REQUEST_HEARTBEAT:
+            return handle_request_heartbeat(p);
 
         default:
             return packet(p.get_id(), REMOTE_MODULE_COMMUNICATION_ERROR, 0, nullptr);
@@ -355,4 +359,9 @@ packet handle_send_route(const packet& p) {
     registry.release_data(MISSION_DATA_ID);
 
     return packet(p.get_id(), NEW_ROUTE_ACKNOWLEDGEMENT, 0, nullptr);
+}
+
+packet handle_request_heartbeat(const packet& p) {
+
+    return packet(p.get_id(), HEARTBEAT_ACKNOWLEDGEMENT, 0, nullptr);
 }
