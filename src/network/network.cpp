@@ -14,6 +14,7 @@
 #include "logging.hpp"
 #include "defs.hpp"
 #include "io_thread.hpp"
+#include "data_registry.hpp"
 
 uint16_t concat_bytes(uint8_t hi, uint8_t lo);
 
@@ -147,6 +148,16 @@ void network_thread_main(const std::atomic_bool& running) {
             if (send_error == -1) {
                 connection = false;
                 queue_message("Connection broken.");
+
+                // If connection broken, set manual speed to 0
+                data_registry& registry = data_registry::get_instance();
+
+                control_change_data* registry_entry = 
+                (control_change_data*) registry.acquire_data(CONTROL_CHANGE_DATA_ID);
+
+                registry_entry->speed = 0;
+
+                registry.release_data(CONTROL_CHANGE_DATA_ID);
             }
 
             if (!running) {
