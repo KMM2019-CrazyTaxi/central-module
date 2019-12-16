@@ -109,7 +109,10 @@ pid_decision_return regulate(pid_decision_data &dec) {
 
   case stopping:
     {
-      reg_angle = pid_stopping(dec);
+//      reg_angle = pid_stopping(dec);
+        pid_system_out stop = pid_stopping(Dec);
+        reg_angle = pid_angle(dec);
+        reg_angle.speed = stop.speed;
 
     }break;
 

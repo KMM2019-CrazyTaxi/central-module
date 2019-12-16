@@ -106,8 +106,8 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
         const uint32_t row_start{ row * width };
         const uint32_t row_middle{ width >> 1 };
 
-	uint8_t strongest_strength{ edgex_image[row_start + row_middle] };
-	uint32_t strongest_edge_pixel{ row_middle };
+	uint8_t strongest_strength{ edgex_image[row_start + 1] };
+	uint32_t strongest_edge_pixel{ 1 };
         double min_stronger_edge_strength{ 
             strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD };
 	for (uint32_t column{ 1 }; column < row_middle; ++column) {
@@ -120,8 +120,8 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
 	}
 	left.push_back(strongest_edge_pixel);
 
-	strongest_strength = edgex_image[row_start + row_middle];
-	strongest_edge_pixel = row_middle;
+	strongest_strength = edgex_image[row_start + width - 2];
+	strongest_edge_pixel = width - 2;
         min_stronger_edge_strength = 
             strongest_strength * RELATIVE_EDGE_STRENGTH_THRESHOLD;
 	for (uint32_t column{ width - 2 }; column > row_middle; --column) {
