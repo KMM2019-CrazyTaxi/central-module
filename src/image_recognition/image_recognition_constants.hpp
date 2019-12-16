@@ -50,7 +50,7 @@ look for stop lines. They are assumed to be in the range [0, IMAGE_HEIGHT). Note
 that the sobel convolutions create noise close the the image bounds, so these constants
 should not be set less than 5 pixels from range end points.
 */
-const uint32_t STOP_LINE_START_DISTANCE{ 10 };
+const uint32_t STOP_LINE_START_DISTANCE{ 40 };
 const uint32_t STOP_LINE_END_DISTANCE{ 200 };
 
 const uint32_t STOP_LINE_FACTOR{ 5 };
