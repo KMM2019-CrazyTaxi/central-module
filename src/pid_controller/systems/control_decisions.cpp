@@ -8,7 +8,6 @@ pid_decision_return regulate(pid_decision_data &);
 pid_decision_return pid_decision(pid_decision_in &in) {
     pid_decision_data data = decide(in);
 
-    /*
     queue_message("Path:");
     std::string path_str;
     double curr_line_height = in.metrics.dist_stop_line;
@@ -20,7 +19,6 @@ pid_decision_return pid_decision(pid_decision_in &in) {
     queue_message("CURR_LINE_HEIGHT: " + std::to_string(curr_line_height));
     queue_message("Node index: " + std::to_string(data.map.index));
     queue_message("Next node: " + std::to_string(data.map.path[data.map.index].node));
-    */
 
     pid_decision_return out = regulate(data);
     out.previous_pos = data.map.previous_pos;
@@ -34,12 +32,8 @@ pid_decision_data decide(pid_decision_in &in) {
     // Default settings for line following
     pid_decision_data data =
         {
-        .sys = line,
-        .map.g = in.map.g,
-        .map.path = in.map.path,
-        .map.previous_pos = in.map.previous_pos,
-        .map.next_pos = in.map.next_pos,
-        .map.index = in.map.index,
+        .sys = angle,
+        .map = in.map,
         .out.metrics = in.metrics,
         .out.params = in.params,
         .out.samples = in.samples,
@@ -97,47 +91,31 @@ pid_decision_data decide(pid_decision_in &in) {
 
 pid_decision_return regulate(pid_decision_data &dec) {
 
-  pid_system_out line_in;
+  pid_system_out reg_angle = dec.out;
 
   switch(dec.sys) {
 
   case turning:
     {
-      // Regulate turn
-      pid_system_out turning = pid_turning(dec);
-
-      // Set input for line system
-      line_in = turning;
+      reg_angle = pid_turning(dec);
 
     }break;
 
   case parking:
     {
-
-      // Regulate parking
-      pid_system_out parking = pid_parking(dec);
-
-      // Set input for line system
-      line_in = parking;
+      reg_angle = pid_parking(dec);
 
     }break;
 
   case stopping:
     {
-
-      // Regulate stopping
-      pid_system_out stopping = pid_stopping(dec);
-
-      // set input for line system
-      line_in = stopping;
+      reg_angle = pid_stopping(dec);
 
     }break;
 
-  case line:
+  case angle:
     {
-
-      // Set input for line system
-      line_in = dec.out;
+      reg_angle = pid_angle(dec);
 
     }break;
 
@@ -148,16 +126,16 @@ pid_decision_return regulate(pid_decision_data &dec) {
 
   }
 
-  line_in.params = dec.out.params;
-  line_in.dt = dec.out.dt;
-  line_in.metrics = dec.out.metrics;
-  pid_system_out line_out = pid_line(line_in);
+  reg_angle.dt = dec.out.dt;
+  reg_angle.params = dec.out.params;
+  reg_angle.metrics = dec.out.metrics;
+  pid_system_out speed = pid_speed(reg_angle);
   pid_decision_return out =
     {
-     .angle = line_out.angle,
-     .speed = line_out.speed,
-     .samples = line_out.samples,
-     .mission_finished = line_in.mission_finished
+     .angle = reg_angle.angle,
+     .speed = speed.speed,
+     .samples = speed.samples,
+     .mission_finished = reg_angle.mission_finished
     };
 
   return out;

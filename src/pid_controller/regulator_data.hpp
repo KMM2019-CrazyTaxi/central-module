@@ -21,7 +21,7 @@
 /**
  * Enumerates all of the available sub systems.
  */
-enum System {decision, turning, parking, stopping, line};
+enum System {decision, turning, parking, stopping, angle, speed};
 
 /**
   * Map data

@@ -5,7 +5,8 @@
 #include "turning.hpp"
 #include "parking.hpp"
 #include "stopping.hpp"
-#include "line.hpp"
+#include "angle.hpp"
+#include "speed.hpp"
 
 #include "pathfinding.hpp"
 #include "graph.hpp"

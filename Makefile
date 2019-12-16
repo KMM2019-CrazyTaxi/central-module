@@ -1,5 +1,5 @@
 CCX=clang++
-CCXFLAGS = -std=c++17 -pthread -MD -MP
+CCXFLAGS = -std=c++17 -pthread -MD -MP -g
 LDFLAGS :=
 
 SRCDIR  = ./src
