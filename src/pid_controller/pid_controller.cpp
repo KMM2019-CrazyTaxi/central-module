@@ -106,11 +106,16 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     pid_decision_return regulate = pid_decision(dec_in);
 
     // Stay at the end for some time, then continue
+    if (regulate.index >= path.size())
+    {
+        regulate.speed = 0;
+        regulate.mission_finished = true;
+    }
     if (regulate.mission_finished){
         queue_message("MISSION FINISHED");
-        std::this_thread::sleep_for(std::chrono::seconds(3));
         mission_data.missions.pop_front();
         regulate.index = 0;
+        regulate.samples.dist_stop_line = IMAGE_HEIGHT * STOP_LINE_FACTOR;
     }
 
     // Update current position
@@ -138,8 +143,12 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
     set_output(reg_out);
     set_samples(samples);
     set_mission_data(mission_data);
-    previous_time = current_time;
 
+    if (regulate.mission_finished)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+    previous_time = current_time;
     upd_controller.wait();
   }
 
