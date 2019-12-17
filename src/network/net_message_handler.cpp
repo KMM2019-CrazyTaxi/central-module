@@ -354,8 +354,8 @@ packet handle_send_route(const packet& p) {
 
     mission_data* md = (mission_data*) registry.acquire_data(MISSION_DATA_ID);
 
-    md->missions = std::move(new_missions);
     md->previous_pos = new_missions[0].first;
+    md->missions = std::move(new_missions);
 
     registry.release_data(MISSION_DATA_ID);
 

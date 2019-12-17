@@ -42,7 +42,7 @@ const uint32_t CAMERA_FPS{ 60};
 
 // Distance from car where the side edges are detected.
 const uint32_t BOUND_DISTANCE_1_PIXEL{ 100 };
-const uint32_t BOUND_DISTANCE_2_PIXEL{ 200 };
+const uint32_t BOUND_DISTANCE_2_PIXEL{ 175 };
 
 /*
 The start and end distances in pixels from the bottom of the image where ir should
