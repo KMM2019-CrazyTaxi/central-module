@@ -24,6 +24,7 @@ pid_system_out pid_stopping(const pid_decision_data &in) {
     {
         res = -curr_speed;
         last_dist = dist;
+    }
     // We are setting speed to 0, should mean we might have finished
     else if (in.set_if_finished)
     {
