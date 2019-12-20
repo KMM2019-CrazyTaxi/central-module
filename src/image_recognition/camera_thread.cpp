@@ -49,7 +49,6 @@ void camera_thread_main(const std::atomic_bool& running, double_buffer& image_bu
 
             camera.grab();
             camera.retrieve(image_buffer.get_write_buffer());
-	    queue_message("Image read");
 
         #else
 

@@ -15,15 +15,15 @@
 void read_image(uint8_t* image, std::istream& input);
 
 /*
- * Writes an image to file in .ppm format.
+ * Writes an image to file.
  *
  * image: A buffer to the image data to write.
- * output: An opened ostream to write the file to.
+ * output: The file name to write to.
  * width: The image width in pixels.
  * height: The image height in pixels.
  * type: RGB or GRAY matching the image color space.
  */
-void write_image(const uint8_t* image, std::ostream& output,
+void write_image(const uint8_t* image, const std::string& file_name,
 		 const uint32_t width, const uint32_t height, 
                  const IMAGE_TYPE type = RGB);
 
@@ -86,6 +86,21 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
                   std::vector<uint32_t>& front,
 		  const uint32_t width, const uint32_t height);
 
+double get_distance_to_side(const uint8_t* edge_image, std::vector<uint32_t>& best,
+                            const uint32_t start_row, const uint32_t end_row,
+                            const uint32_t width, const uint32_t height,
+			    const double default_edge);
+
+double get_distance_to_stop(const uint8_t* edge_image, std::vector<uint32_t>& best,
+                            const uint32_t start_column, const uint32_t end_column,
+                            const uint32_t width, const uint32_t height);
+
+void mark_selected_edges(uint8_t* marked, 
+                         const double left, const double right, const double front,
+                         const uint32_t start_row, const uint32_t end_row,
+                         const uint32_t start_column, const uint32_t end_column,
+                         const uint32_t width, const uint32_t height);
+
 /*
  * Marks the most priminent edges in an image. Left, right and front edges are marked
  * in red, green and blue, respectively. Detected edges must be above the threshols value
@@ -97,7 +112,7 @@ void get_max_edge(const uint8_t* edgex_image, const uint8_t* edgey_image,
  * width: The image width in pixels.
  * height: The image height in pixels.
  */
-void mark_edges(const uint8_t* edgex_image, const uint8_t* edgey_image, uint8_t* marked,
-		const std::vector<uint32_t>& left, const std::vector<uint32_t>& right,
-		const std::vector<uint32_t>& front,
-                const uint32_t width, const uint32_t height);
+void mark_all_edges(const uint8_t* edgex_image, const uint8_t* edgey_image, uint8_t* marked,
+                    const std::vector<uint32_t>& left, const std::vector<uint32_t>& right,
+                    const std::vector<uint32_t>& front,
+                    const uint32_t width, const uint32_t height);

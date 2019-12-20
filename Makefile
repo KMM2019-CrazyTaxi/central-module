@@ -51,12 +51,12 @@ $(OBJSDIR):
 
 all:
 	@echo "------------------------------ Compiling project... ------------------------------"		
-	make WIRING=1 CAM=1
+	make WIRING=1 CAM=1 OPENCV=1
 	@echo "------------------------------- Compiled project! --------------------------------"
 
 release:
 	@echo "------------------------------ Compiling project... ------------------------------"		
-	make WIRING=1 CAM=1 RELEASE=1
+	make WIRING=1 CAM=1 RELEASE=1 OPENCV=1
 	@echo "------------------------------- Compiled project! --------------------------------"
 
 clean:

@@ -2,40 +2,51 @@
 #define CM_REGISTRY_ENTRIES_H
 
 #include <cstdint>
+#include <vector>
+#include <deque>
+#include <utility>
+#include "graph.hpp"
+#include "image_recognition_constants.hpp"
 
-#define SENSOR_DATA_ID 				1
-#define CONTROL_CHANGE_DATA_ID 		2
-#define TELEMETRICS_DATA_ID 		3
-#define REGULATOR_OUT_DATA_ID 		4
-#define REGULATOR_PARAM_DATA_ID 	5
-#define REGULATOR_SAMPLE_DATA_ID 	6
+#define SENSOR_DATA_ID              1
+#define CONTROL_CHANGE_DATA_ID      2
+#define TELEMETRICS_DATA_ID         3
+#define REGULATOR_OUT_DATA_ID       4
+#define REGULATOR_PARAM_DATA_ID     5
+#define REGULATOR_SAMPLE_DATA_ID    6
+#define MISSION_DATA_ID             7
+#define PATH_ID                     8
+#define MODE_ID                     9
 
 struct sensor_data {
-    float distance;
-    float acceleration;
+    int16_t acc_x;
+    int16_t acc_y;
+    int16_t acc_z;
+    uint16_t dist;
+    uint8_t speed;
 };
 
 struct control_change_data {
-    char speed_delta;
-    char angle_delta;
+    char speed;
+    char angle;
 };
 
 /**
   * Necessary data sent to the control system to describe the environment
   */
 struct telemetrics_data {
-  double curr_speed;
-  double dist_left;
-  double dist_right;
-  double dist_stop_line;
+    double curr_speed;
+    double dist_left;
+    double dist_right;
+    double dist_stop_line = IMAGE_HEIGHT * STOP_LINE_FACTOR;
 };
 
 /**
   * Output of the whole control system, sent to the control module
   */
 struct regulator_out_data {
-  double speed;
-  double angle;
+    double speed;
+    double angle;
 };
 
 /**
@@ -69,36 +80,85 @@ struct regulator_out_data {
  * The rest of the data is system-specific in how they are used.
  */
 struct pid_params{
-  double kp;
-  double ki;
-  double kd;
-  double alpha;
-  double beta;
+    double kp;
+    double ki;
+    double kd;
+    double alpha;
+    double beta;
 
-  double angle_threshold;
-  double speed_threshold;
-  double min_value;
-  double slope;
+    double angle_threshold;
+    double speed_threshold;
+    double min_value;
+    double slope;
 };
 
 /**
   * Contains all of the parameters for the whole control system
   */
 struct regulator_param_data{
-  pid_params turning;
-  pid_params parking;
-  pid_params stopping;
-  pid_params line_angle;
-  pid_params line_speed;
+    pid_params turning =
+    {
+        .kp = 1.2,
+        .ki = 0,
+        .kd = 0,
+        .alpha = 1,
+        .beta = 1,
+	    .min_value = 13.7
+    };
+    pid_params parking;
+    pid_params stopping =
+    {
+	    .kp = 0.25,
+        .speed_threshold = 1.5,
+        .min_value = 800
+    };
+    pid_params line_angle =
+    {
+        .kp = 9,
+        .ki = 0,
+        .kd = 0.8,
+        .alpha = 1,
+        .beta = 1
+    };
+    pid_params line_speed =
+    {
+        .kp = 10,
+        .ki = 0,
+        .kd = 0,
+        .alpha = 1,
+        .beta = 1,
+        .angle_threshold = 0.3,
+        .speed_threshold = 0.5,
+        .min_value = 0.3,
+        .slope = 15
+    };
 };
+
 
 /**
  * Contains sample data for different pid sub-systems
  */
 struct regulator_sample_data{
-  double line_angle_d;
-  double line_speed_d;
-  double stopping_speed_d;
+    double line_angle_d;
+    double line_speed_d;
+    double stopping_speed_d;
+    double dist_stop_line = IMAGE_HEIGHT * STOP_LINE_FACTOR;
 };
+
+/**
+  * Contains data about the map and missions
+  */
+struct mission_data{
+    graph g;
+    std::deque<std::pair<int,int>> missions = { };
+    int previous_pos = 0;
+    int next_pos = 0; // Will be calculated immediately
+    int index = 0;
+};
+
+/**
+ * The control mode of the system
+ */
+enum mode : int8_t { AUTONOMOUS, MANUAL};
 
 #endif

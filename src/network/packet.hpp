@@ -59,9 +59,14 @@ public:
     uint32_t get_type() const;
 
     /**
+     * @return Constant pointer to data
+     */
+    const uint8_t* get_data() const;
+
+    /**
      * Indexes over the data
      */
-    // uint8_t operator[](uint32_t index) const;
+    uint8_t operator[](uint32_t index) const;
 
     /**
      * Writes the given packet to the given buffer

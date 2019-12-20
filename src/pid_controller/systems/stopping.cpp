@@ -1,48 +1,44 @@
 #include "stopping.hpp"
 #include "logging.hpp"
-#include <algorithm>
+#include <cmath>
 
-double calc_dist(const double &, const double &);
+double last_dist{ 10000 };
+const double EPS{  };
 
 pid_system_out pid_stopping(const pid_decision_data &in) {
 
-  double kp = in.out.params.stopping.kp;
-  double ki = in.out.params.stopping.ki;
-  double kd = in.out.params.stopping.kd;
-  double alpha = in.out.params.stopping.alpha;
-  double beta = in.out.params.stopping.beta;
+    double dist = in.dist;
+    double curr_speed = in.out.metrics.curr_speed;
+    double speed_cutoff = in.out.params.stopping.speed_threshold;
+    double res = 0;
 
-  double dist = in.out.metrics.dist_stop_line;
-  double curr_speed = in.out.metrics.curr_speed;
-  double ref_speed = in.out.speed;
-  double threshold = in.out.params.stopping.speed_threshold;
 
-  regulator_sample_data samples  = in.out.samples;
-  double sample_d = beta * ref_speed - curr_speed;
-  double dt = in.out.dt;
-
-  double calc_p = alpha * ref_speed * calc_dist(dist, threshold) - curr_speed;
-  double calc_i = 0;
-  double calc_d = (sample_d - samples.stopping_speed_d) / dt;
-
-  double p = kp * calc_p;
-  double i = ki * calc_i;
-  double d = kd * calc_d;
-
-  samples.line_speed_d = sample_d;
-
-  double res = p + i + d;
-
-  pid_system_out out =
+    bool finished = false;
+    // If we are going too fast, break
+    if (last_dist < 300 && last_dist < dist - EPS)
     {
-     .angle = in.out.angle,
-     .speed = curr_speed + res,
-     .samples = in.out.samples
-    };
-  
-  return out;
-}
+        finished = in.set_if_finished;
+        last_dist = 10000;
+    }
+    else if (curr_speed > speed_cutoff)
+    {
+        res = -curr_speed;
+        last_dist = dist;
+    }
+    // We are setting speed to 0, should mean we might have finished
+    else if (in.set_if_finished)
+    {
+        last_dist = 10000;
+        finished = true;
+    }
 
-double calc_dist(const double &dist, const double &threshold) {
-  return std::min(dist, threshold);
+    pid_system_out out =
+      {
+       .angle = in.out.angle,
+       .speed = res,
+       .samples = in.out.samples,
+       .mission_finished = finished
+      };
+
+    return out;
 }
