@@ -110,7 +110,7 @@ struct regulator_param_data{
     {
 	    .kp = 0.25,
         .speed_threshold = 1.5,
-        .min_value = 900
+        .min_value = 800
     };
     pid_params line_angle =
     {
