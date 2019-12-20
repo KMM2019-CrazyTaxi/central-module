@@ -146,7 +146,7 @@ void pid_ctrl_thread_main(const std::atomic_bool& running){
 
     if (regulate.mission_finished)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     previous_time = current_time;
     upd_controller.wait();
