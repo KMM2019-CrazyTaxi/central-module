@@ -156,7 +156,7 @@ pid_decision_return regulate(pid_decision_data &dec) {
   pid_decision_return out =
     {
      .angle = line_out.angle,
-     .speed = (dec.sys == stopping ? stopping_out.speed : line_out.speed,
+     .speed = (dec.sys == stopping) ? stopping_out.speed : line_out.speed,
      .samples = line_out.samples,
      .mission_finished = (dec.sys == stopping && stopping_out.mission_finished)
     };
